@@ -5,20 +5,20 @@ response.buffer = true
 on error resume next
 tm = now
 ff = Request.ServerVariables("SCRIPT_NAME")
- 
+
 uip = Request.ServerVariables("HTTP_X_FORWARDED_FOR")
 If uip = "" Then uip = Request.ServerVariables("REMOTE_ADDR")
 uip=split(uip,".",-1,1)
 ipx=uip(0)&"."&uip(1)&"."&uip(2)&".*"
- 
-data = left(replace(trim(request.form("what")),"ËµµãÊ²Ã´°É",""),200)
- 
+
+data = left(replace(trim(request.form("what")),"Ëµï¿½ï¿½Ê²Ã´ï¿½ï¿½",""),200)
+
 if data<>"" then
 data = replace(replace(replace(replace(replace(replace(replace(replace(replace(data,"http://",""),"<","&lt;"),">","&gt;"),"%","&#37;"),"(","["),")","]"),"/","&#47;"),"'","&#39;"),"""","&#34;")
 data = replace(data,"[img]","<img src=""http://")
 data = replace(data,"[&#47;img]",""" />")
-txt = "<pre>"&data&"<p>IPÎª"&ipx&"µÄÐÖµÜ >>> Say this at:"&tm&"</p></pre>"
-Set Fs=Server.CreateObject("Scripting.FileSystemObject") 
+txt = "<pre>"&data&"<p>IPÎª"&ipx&"ï¿½ï¿½ï¿½Öµï¿½ >>> Say this at:"&tm&"</p></pre>"
+Set Fs=Server.CreateObject("Scripting.FileSystemObject")
 Set File=Fs.OpenTextFile(Server.MapPath(ff),8,Flase)
 File.Writeline txt
 File.Close
@@ -27,7 +27,7 @@ end if
 %>
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=gb2312" />
-<title>Hacked by LJokerP</title>
+<title>Hacked by evil7</title>
 <style type="text/css">
 html{background:#f7f7f7;}
 pre{font-size:15pt;font-family:Times New Roman;line-height:120%;}
@@ -37,11 +37,11 @@ p{font-size:10pt;}
 </head>
 <center>
 <a style="letter-spacing:3px;"><b>welcome to</b><br></a>
-<h1>=>¾Õ»¨ÁÄÌìÊÒ<=</h1>
+<h1>=>ï¿½Õ»ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½<=</h1>
 <hr>
 <form method=post action="?">
-<p><a href="#img" onclick="document.getElementById('what').value+='[img]ÕâÀï»»³ÉÍ¼Æ¬µÄURLµØÖ·[/img]'">²åÈëÍ¼Æ¬</a></p>
-<textarea rows="5" id="what" style="font-family:Times New Roman;font-size:14pt;" cols="80" name="what">ËµµãÊ²Ã´°É</textarea>
-<input type="submit" value="Ñã¹ýÁôÉù Â·¹ýÁôÑÔ" tilte="Ìá½»" style="width:120px;height:64px;">
+<p><a href="#img" onclick="document.getElementById('what').value+='[img]ï¿½ï¿½ï¿½ï»»ï¿½ï¿½Í¼Æ¬ï¿½ï¿½URLï¿½ï¿½Ö·[/img]'">ï¿½ï¿½ï¿½ï¿½Í¼Æ¬</a></p>
+<textarea rows="5" id="what" style="font-family:Times New Roman;font-size:14pt;" cols="80" name="what">Ëµï¿½ï¿½Ê²Ã´ï¿½ï¿½</textarea>
+<input type="submit" value="ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ Â·ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½" tilte="ï¿½á½»" style="width:120px;height:64px;">
 </form>
 </center>
