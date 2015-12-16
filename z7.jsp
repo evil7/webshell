@@ -1,4 +1,3 @@
-GIF98a
 <%@page pageEncoding="utf-8"%>
 <%@page import="java.io.*"%>
 <%@page import="java.util.*"%>
